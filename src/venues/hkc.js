@@ -210,18 +210,6 @@ export const hkc = {
       new THREE.Vector3(20, 0.04, 20), new THREE.Vector3(-20, 0.04, 20)]),
       new THREE.LineBasicMaterial({ color: 0x3a4a66 })));
 
-    // arena-floor wheelchair zones
-    {
-      const m = new THREE.MeshStandardMaterial({ color: 0x2b6ea8, roughness: 0.8 });
-      const edge = new THREE.LineBasicMaterial({ color: 0x9fd4ff });
-      [[16.2, -16.2], [-16.2, 16.2]].forEach(([x, z]) => {
-        const g = new THREE.BoxGeometry(4.4, 0.06, 2.2);
-        const p = new THREE.Mesh(g, m); p.position.set(x, 0.05, z); p.rotation.y = 45 * DEG; scene.add(p);
-        const line = new THREE.LineSegments(new THREE.EdgesGeometry(g), edge);
-        line.position.set(x, 0.085, z); line.rotation.y = 45 * DEG; scene.add(line);
-      });
-    }
-
     const topRow = rowGeo(38);
     scene.add(new THREE.Mesh(strip([{ S: topRow.S + TIER.upper.dr, y: topRow.y + TIER.upper.dy },
       { S: topRow.S + TIER.upper.dr + 2.6, y: 0 }]),

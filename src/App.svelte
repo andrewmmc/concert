@@ -63,6 +63,19 @@
       pinned = false; clearInfo();
     }
 
+    function selectSeat(i) {
+      const previousPinnedId = pinnedId;
+      pinnedId = i;
+      restoreFn(previousPinnedId);
+      setColor(i, PIN);
+      const p = placements[i];
+      showInfo(p);
+      pinned = true;
+      const target = new engine.THREE.Vector3(p.x, p.y + 0.5, p.z);
+      const camPos = new engine.THREE.Vector3(p.x * 0.45, p.y + 15, p.z * 0.45);
+      flyTo(target, camPos);
+    }
+
     function onMove(e) {
       mouseNDC.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
       mouseDirty = true;
@@ -75,12 +88,7 @@
     }
     function onClick() {
       if (hoveredId >= 0) {
-        const previousPinnedId = pinnedId;
-        pinnedId = hoveredId;
-        restoreFn(previousPinnedId);
-        setColor(pinnedId, PIN);
-        showInfo(placements[pinnedId]);
-        pinned = true;
+        selectSeat(hoveredId);
       } else {
         clearPin();
       }
@@ -134,13 +142,7 @@
       const i = seatIndex.get(`${+inSec}-${+inRow}-${+inSeat}`);
       if (i === undefined) { searchMsg = 'Seat not found — check Sec / Row / Seat.'; return; }
       searchMsg = '';
-      const previousPinnedId = pinnedId;
-      pinnedId = i; restoreFn(previousPinnedId); setColor(i, PIN);
-      showInfo(placements[i]); pinned = true;
-      const p = placements[i];
-      const target = new engine.THREE.Vector3(p.x, p.y + 0.5, p.z);
-      const camPos = new engine.THREE.Vector3(p.x * 0.45, p.y + 15, p.z * 0.45);
-      flyFn(target, camPos);
+      selectSeat(i);
     };
     window.__clearPin = clearPin;
 
@@ -159,7 +161,10 @@
   });
 
   function goSeat() { window.__goSeat && window.__goSeat(); }
-  function unselect() { window.__clearPin && window.__clearPin(); }
+  function unselect() {
+    window.__clearPin && window.__clearPin();
+    resetCamera();
+  }
   function resetCamera() {
     if (!engine || !flyFn) return;
     flyFn(
