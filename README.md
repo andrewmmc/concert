@@ -4,8 +4,6 @@ An interactive 3D seating-plan viewer for Hong Kong concert venues. Explore the
 arena in 3D, hover any seat to see its **section · row · seat number**, search
 for a specific seat, and fly the camera straight to it.
 
-**Built with Kimi K3.**
-
 ---
 
 ## Features
@@ -35,6 +33,8 @@ and the column-slot seat numbering (81–98) repeated per section row. Arena
 - No **三面台 (end stage)** layout yet (Hong Kong Coliseum only ships the
   centre-stage 四面台 configuration).
 - No **內場 (arena-floor) seating** — only the fixed tiered bowl is modelled.
+- Seat dimensions are visual approximations and are scaled to fit the available
+  spacing in each section, so their size is not physically exact.
 
 ## Roadmap — venues to support
 
