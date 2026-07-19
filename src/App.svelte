@@ -213,7 +213,7 @@
   <div class="row"><span>Side labels</span>
     <label class="switch"><input type="checkbox" bind:checked={showLabels}><span class="slider"></span></label></div>
   <div id="search">
-    <label>Find a seat</label>
+    <div class="search-label">Find a seat</div>
     <div class="fields">
       <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="2">
       <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Row"  maxlength="2">
@@ -250,7 +250,7 @@
   :global(#app) { width: 100%; height: 100%; }
 
   #scene { position: fixed; inset: 0; display: block; cursor: grab; }
-  #scene.hovering { cursor: pointer; }
+  :global(#scene.hovering) { cursor: pointer; }
   #scene.dragging { cursor: grabbing; }
 
   .card { position: fixed; background: rgba(13,18,28,.86); border: 1px solid rgba(120,150,200,.22);
@@ -283,7 +283,7 @@
   .switch input:checked + .slider { background: #2f6fed; }
   .switch input:checked + .slider:before { transform: translateX(15px); background: #fff; }
   #search { border-top: 1px solid rgba(120,150,200,.22); margin-top: 8px; padding-top: 10px; }
-  #search label { font-size: 11px; color: #7d8ca3; display: block; margin-bottom: 6px; }
+  #search .search-label { font-size: 11px; color: #7d8ca3; margin-bottom: 6px; }
   #search .fields { display: flex; gap: 6px; }
   #search input { width: 100%; background: #0b1120; border: 1px solid rgba(120,150,200,.22); color: #dbe6f5;
     border-radius: 7px; padding: 6px 7px; font-size: 12px; outline: none; }

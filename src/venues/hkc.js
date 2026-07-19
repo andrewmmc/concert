@@ -4,7 +4,8 @@
 //   · arena floor 40 m × 40 m · indoor ceiling 23 m · inverted-pyramid roof 41 m
 //   · 40 sections: Red 40-49, Blue 50-59, Green 60-69, Yellow 70-79
 //   · rows 1-13 lower tier · 14-15 promenade level (11 wheelchair platforms)
-//   · rows 16-33 upper tier (corner sections deeper, to row 39)
+//   · rows 16-39 upper tier; row limits differ by gate and by the two seat
+//     blocks adjoining each numbered aisle
 //   · seat numbers are fixed "column" slots 81-98 repeated in every row:
 //     one half of each section runs 90,91…98, the other half …81,82…89
 import * as THREE from 'three';
@@ -12,6 +13,122 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { makeRingR, ringStripGeo } from '../scene.js';
 
 const DEG = Math.PI / 180;
+
+// The PDF numbers aisles, not self-contained rectangular sections.  A seat
+// numbered 90-98 is in the block clockwise from its aisle; a seat numbered
+// 81-89 is in the block counter-clockwise from it.  Row depth therefore has
+// to be stored per block and applied independently to each half of an aisle.
+export const ROW_LIMITS_BY_GATE = [
+  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Red 40-49
+  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Blue 50-59
+  [39, 39, 36, 33, 34, 34, 34, 33, 36, 39], // Green 60-69
+  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Yellow 70-79
+];
+
+// Each platform occupies rows 14-15 of the block after `aisle`.  The compact
+// corner platforms only have rows 9-13 in front of them; the central
+// platforms retain rows 1-13.  IDs and anchors follow the labels in the PDF.
+export const WHEELCHAIR_PLATFORMS = [
+  { id: 6, aisle: 41, firstRow: 9 },
+  { id: 7, aisle: 44, firstRow: 1 },
+  { id: 8, aisle: 47, firstRow: 9 },
+  { id: 9, aisle: 51, firstRow: 9 },
+  { id: 10, aisle: 54, firstRow: 1 },
+  { id: 11, aisle: 56, firstRow: 9 },
+  { id: 1, aisle: 61, firstRow: 9 },
+  { id: 2, aisle: 64, firstRow: 9 },
+  { id: 3, aisle: 67, firstRow: 9 },
+  { id: 4, aisle: 72, firstRow: 1 },
+  { id: 5, aisle: 75, firstRow: 9 },
+];
+
+const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
+
+const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;
+const gateAndOffset = (aisle) => {
+  const normalized = aisle - 40;
+  return { gate: Math.floor(normalized / 10), offset: normalized % 10 };
+};
+const blockAfterAisleForSeat = (aisle, seat) => seat >= 90 ? aisle : previousAisle(aisle);
+const rowLimitAfterAisle = (aisle) => {
+  const { gate, offset } = gateAndOffset(aisle);
+  return ROW_LIMITS_BY_GATE[gate][offset];
+};
+
+function compactPlatformRange(platform, row) {
+  // WP1 is the smaller curved platform block marked (35) on the plan.
+  if (platform.id === 1) return { highMax: 93, lowMin: 87 };
+  if (row <= 10) return { highMax: 94, lowMin: 85 };
+  if (row === 11) return { highMax: 95, lowMin: 85 };
+  return { highMax: 95, lowMin: 84 };
+}
+
+function narrowOuterRange(row, extraHighSeat = 0) {
+  let highCount;
+  let lowCount;
+  if (row === 21) { highCount = 3; lowCount = 3; }
+  else if (row <= 23) { highCount = 4; lowCount = 3; }
+  else if (row <= 25) { highCount = 4; lowCount = 4; }
+  else if (row <= 27) { highCount = 5; lowCount = 4; }
+  else if (row <= 30) { highCount = 5; lowCount = 5; }
+  else if (row <= 32) { highCount = 6; lowCount = 5; }
+  else if (row <= 36) { highCount = 6 + (row === 36 ? 1 : 0); lowCount = 6; }
+  else if (row === 37) { highCount = 6; lowCount = 6; }
+  else if (row === 38) { highCount = 4; lowCount = 4; }
+  else { highCount = 3; lowCount = 3; }
+  highCount = Math.min(9, highCount + extraHighSeat);
+  return { highMax: 89 + highCount, lowMin: 90 - lowCount };
+}
+
+function seatRangeAfterAisle(aisle, row) {
+  const platform = PLATFORM_BY_AISLE.get(aisle);
+  if (platform?.firstRow === 9 && row >= 9 && row <= 13) {
+    return compactPlatformRange(platform, row);
+  }
+
+  if (row <= 15) return { highMax: 96, lowMin: 84 };
+  if (row <= 17) return { highMax: 93, lowMin: 86 };
+  if (row <= 20) return { highMax: 94, lowMin: 86 };
+
+  const { gate, offset } = gateAndOffset(aisle);
+  if (offset === 1 || offset === 9) {
+    // Corner shoulders total 188 seats (186 at Green Gate) in the PDF.
+    const widen = gate === 2 ? row >= 32 && row <= 36 : row >= 30 && row <= 36;
+    return narrowOuterRange(row, widen ? 1 : 0);
+  }
+  if (offset === 0) {
+    // The corner block itself totals 205 seats (199 at Green Gate).
+    const range = narrowOuterRange(row, gate === 2 ? (row <= 38 ? 1 : 0) : 1);
+    if (gate !== 2 && row >= 30 && row <= 34) range.lowMin -= 1;
+    return range;
+  }
+  if (offset === 2 || offset === 8) {
+    // These tapering blocks total 154 seats, or 152 at Green Gate.
+    const range = narrowOuterRange(row);
+    if ((gate === 2 && row >= 33 && row <= 35) || (gate !== 2 && row === 35)) {
+      range.highMax -= 1;
+    }
+    return range;
+  }
+
+  // The Green Gate's straight upper blocks contain 13 seats per row.  The
+  // other straight gates contain 14, with the shoulder blocks widening from
+  // 13 to 14 seats over their final six rows.
+  if (gate === 2) return { highMax: 96, lowMin: 84 };
+  if ((offset === 3 || offset === 7) && row <= 30) return { highMax: 96, lowMin: 84 };
+  return { highMax: 96, lowMin: 83 };
+}
+
+export function seatExistsOnPlan(aisle, row, seat) {
+  const blockAisle = blockAfterAisleForSeat(aisle, seat);
+  if (row > rowLimitAfterAisle(blockAisle)) return false;
+
+  const platform = PLATFORM_BY_AISLE.get(blockAisle);
+  if (platform && (row === 14 || row === 15 || row < platform.firstRow)) return false;
+
+  const { highMax, lowMin } = seatRangeAfterAisle(blockAisle, row);
+  return seat >= 90 ? seat <= highMax : seat >= lowMin;
+}
 
 export const hkc = {
   id: 'hkc',
@@ -63,12 +180,6 @@ export const hkc = {
       if (i < 15)  { const k = i - 13; return { S: TIER.prom.r0  + k * TIER.prom.dr,  y: TIER.prom.y0  + k * TIER.prom.dy,  name: 'Promenade Level' }; }
       const k = i - 15; return { S: TIER.upper.r0 + k * TIER.upper.dr, y: TIER.upper.y0 + k * TIER.upper.dy, name: 'Upper Tier' };
     };
-    const MAX_ROWS = 39;
-    const ROWS_UPPER_TOTAL = 33;   // straights stop at 33
-    const isCornerSec = (sec) => [40, 49, 50, 59, 60, 69, 70, 79].includes(sec);
-
-    const WP_SECTIONS = [41, 44, 47, 51, 54, 56, 61, 64, 67, 72, 75];
-    const WP_SET = new Set(WP_SECTIONS);
     const WALK = { S0: 33.9, S1: 35.2, y: 6.9 };
 
     const terraceMat = new THREE.MeshStandardMaterial({ color: 0x1c2432, roughness: 0.95, metalness: 0.05 });
@@ -155,15 +266,12 @@ export const hkc = {
     }
     {
       const wpMat = new THREE.MeshStandardMaterial({ color: 0x6b7684, roughness: 0.85, side: THREE.DoubleSide });
-      let n = 0;
-      for (let side = 0; side < 4; side++) {
-        const S = SIDES[side];
-        for (let j = 0; j < SECS_PER_SIDE; j++) {
-          const sec = S.base + j;
-          if (!WP_SET.has(sec)) continue;
-          const id = ++n;
-          const tMid = (S.center / DEG - 45 + (j + 0.5) * SEC_DEG) * DEG;
-          const halfW = SEC_DEG * DEG * 0.35;
+      for (const wp of WHEELCHAIR_PLATFORMS) {
+          const { gate: side, offset: j } = gateAndOffset(wp.aisle);
+          const S = SIDES[side];
+          // Platforms occupy the block between this aisle and the next one.
+          const tMid = (S.center / DEG - 45 + (j + 1) * SEC_DEG) * DEG;
+          const halfW = SEC_DEG * DEG * 0.44;
           const segs = 16, pos = [], idx = [];
           for (let k = 0; k <= segs; k++) {
             const t = tMid - halfW + (k / segs) * halfW * 2;
@@ -175,48 +283,47 @@ export const hkc = {
           g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
           g.setIndex(idx); g.computeVertexNormals();
           const p = new THREE.Mesh(g, wpMat);
-          p.position.y = WALK.y + 0.045; p.userData.wp = id;
+          p.position.y = WALK.y + 0.045; p.userData.wp = wp.id;
           scene.add(p); wpMeshes.push(p);
           const decal = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.95),
-            new THREE.MeshBasicMaterial({ map: wpLabelTexture(`WP${id}`) }));
+            new THREE.MeshBasicMaterial({ map: wpLabelTexture(`WP${wp.id}`) }));
           const rMid = ringR(tMid, (WALK.S0 + WALK.S1) / 2);
           decal.position.set(rMid * Math.cos(tMid), WALK.y + 0.06, rMid * Math.sin(tMid));
           decal.rotation.x = -Math.PI / 2; decal.rotation.z = -tMid - Math.PI / 2;
           scene.add(decal);
-        }
       }
     }
 
     /* seats (instanced) */
     const SLOT_LEFT_START = 90, SLOT_LEFT_MAX = 98, SLOT_RIGHT_START = 89, SLOT_RIGHT_MIN = 81;
-    const seatStep = 0.50, aisleInset = 0.45, seatWidth = 0.44;
+    const aisleInset = 0.45, seatWidth = 0.44;
     const placements = [];
     for (let side = 0; side < 4; side++) {
       const S = SIDES[side];
       for (let j = 0; j < SECS_PER_SIDE; j++) {
         const secNo = S.base + j;
-        const corner = isCornerSec(secNo);
-        const lastRow = corner ? MAX_ROWS : ROWS_UPPER_TOTAL;
         const w0 = (S.center / DEG - 45 + j * SEC_DEG) * DEG;
         const w1 = w0 + SEC_DEG * DEG;
-        const wpSec = WP_SET.has(secNo);
-        for (let row = 0; row < lastRow; row++) {
+        for (let row = 0; row < 39; row++) {
           const rg = rowGeo(row);
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;
-          if (wpSec && (row === 13 || row === 14)) continue;
+          const tMid = (w0 + w1) / 2;
+          const leftStep = (tMid - tL) / 9;
+          const rightStep = (tR - tMid) / 9;
           const put = (t, slot) => {
+            if (!seatExistsOnPlan(secNo, row + 1, slot)) return;
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
             placements.push({ x, y: rg.y, z, yaw: Math.atan2(-x, -z), sec: secNo, row: row + 1, seat: slot, tier: rg.name, side });
           };
           for (let i = 0; ; i++) {
             const slot = SLOT_LEFT_START + i; if (slot > SLOT_LEFT_MAX) break;
-            const t = tL + (i + 0.5) * seatStep / rMid; if (t > (w0 + w1) / 2) break; put(t, slot);
+            put(tL + (i + 0.5) * leftStep, slot);
           }
           for (let i = 0; ; i++) {
             const slot = SLOT_RIGHT_START - i; if (slot < SLOT_RIGHT_MIN) break;
-            const t = tR - (i + 0.5) * seatStep / rMid; if (t < (w0 + w1) / 2) break; put(t, slot);
+            put(tR - (i + 0.5) * rightStep, slot);
           }
         }
       }
