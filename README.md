@@ -20,19 +20,22 @@ for a specific seat, and fly the camera straight to it.
 | Venue | Layouts | Route |
 |-------|---------|-------|
 | **Hong Kong Coliseum** 香港體育館 | Centre Stage 四面台 (360°) | `#/hkc/center-stage` |
+| | End Stage 三面台 (with arena-floor blocks 61–67) | `#/hkc/end-stage` |
 
-Modelled from the official LCSD arena plan with the real HKC conventions:
+Modelled from the official LCSD arena plans with the real HKC conventions:
 40 sections (Red 40–49, Blue 50–59, Green 60–69, Yellow 70–79), rows 1–39,
 and the column-slot seat numbering (81–98) repeated per section row. Arena
-40 m × 40 m · ceiling 23 m · inverted-pyramid roof 41 m.
+40 m × 40 m · ceiling 23 m · inverted-pyramid roof 41 m. The end-stage
+layout moves the stage to the Red Gate (40s) end and adds 648 flat-floor
+seats across seven Brown Gate (啡閘) blocks 61–67.
 
-[Official seating plan (PDF)](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf)
+- [Centre-stage seating plan (PDF)](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf)
+- [End-stage seating plan (PDF)](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_end_stage.pdf)
 
 ## Known limitations
 
-- No **三面台 (end stage)** layout yet (Hong Kong Coliseum only ships the
-  centre-stage 四面台 configuration).
-- No **內場 (arena-floor) seating** — only the fixed tiered bowl is modelled.
+- Only the **Hong Kong Coliseum** venue is modelled so far — see the roadmap
+  for other venues still to come.
 - Seat dimensions are visual approximations and are scaled to fit the available
   spacing in each section, so their size is not physically exact.
 
@@ -76,6 +79,8 @@ Venues are data modules under `src/venues/`:
 
 ## Data sources
 
-- Hong Kong Coliseum seating plan —
+- Hong Kong Coliseum centre-stage seating plan —
   [LCSD](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf)
+- Hong Kong Coliseum end-stage seating plan —
+  [LCSD](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_end_stage.pdf)
 - LCSD technical information (dimensions, capacity).
