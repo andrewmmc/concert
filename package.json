@@ -1,9 +1,9 @@
 {
-  "name": "venue-seating-3d",
+  "name": "hong-kong-concert-seats-view",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Interactive 3D venue seating models (Hong Kong Coliseum and more)",
+  "description": "Hong Kong Concert Seats View — interactive 3D venue seating models",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

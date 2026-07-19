@@ -19,6 +19,23 @@ export const hkc = {
   zh: '香港體育館',
   subtitle: 'Centre Stage 360° configuration',
   dims: 'Arena 40 m × 40 m · ceiling 23 m · inverted-pyramid roof 41 m',
+  planUrl: 'https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf',
+  defaultLayout: 'center-stage',
+  layouts: [
+    {
+      id: 'center-stage',
+      label: 'Centre Stage',
+      zh: '四面台',
+      planUrl: 'https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf',
+    },
+    {
+      id: 'end-stage',
+      label: 'End Stage',
+      zh: '三面台',
+      planUrl: 'https://www.lcsd.gov.hk/en/hkc/common/form/hkc_end_stage.pdf',
+      comingSoon: true,
+    },
+  ],
 
   sides: [
     { base: 40, center: 270 * DEG, color: '#ff5f5f', name: 'Red Gate (40s)' },
@@ -27,8 +44,10 @@ export const hkc = {
     { base: 70, center: 180 * DEG, color: '#ffc44d', name: 'Yellow Gate (70s)' },
   ],
 
-  build(ctx) {
+  build(ctx, opts = {}) {
     const { scene } = ctx;
+    // opts.layout reserved for future layouts (e.g. end stage 三面台);
+    // the centre-stage 四面台 bowl is the same for all 360° layouts.
     const P_SUPER = 3.2;
     const ringR = makeRingR(P_SUPER);
     const SIDES = this.sides;

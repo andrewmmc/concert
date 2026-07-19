@@ -1,9 +1,14 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { createScene, HOVER, PIN } from './scene.js';
-  import { defaultVenue } from './venues/index.js';
+  import { venues } from './venues/index.js';
+  import { parseHash, goTo, onRoute } from './lib/router.js';
 
-  const venue = defaultVenue;
+  const siteName = 'Hong Kong Concert Seats View';
+
+  let route = $state(parseHash());
+  let venue = $derived(route.venue);
+  let layout = $derived(route.layout);
 
   let canvas;
   let autoRotate = $state(false);
@@ -22,10 +27,16 @@
   let paintFn, restoreFn, pickFn, flyFn;
 
   onMount(() => {
+    route = parseHash();
+    const off = onRoute((r) => { route = r; });
+    return off;
+  });
+
+  onMount(() => {
     engine = createScene(canvas);
     const { scene, camera, controls, flyTo } = engine;
     controlsRef = controls; cameraRef = camera;
-    model = venue.build({ scene });
+    model = venue.build({ scene }, { layout: layout?.id });
     const { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe } = model;
 
     countText = `${placements.length.toLocaleString()} seats · 40 sections · rows 1–39`;
@@ -146,14 +157,42 @@
   function goSeat() { window.__goSeat && window.__goSeat(); }
   function unselect() { window.__clearPin && window.__clearPin(); }
   function onKey(e) { if (e.key === 'Enter') goSeat(); }
+  function selectVenue(e) { goTo(e.currentTarget.value, layout?.id); }
+  function selectLayout(e) { goTo(venue.id, e.currentTarget.value); }
 </script>
 
 <canvas bind:this={canvas} id="scene" class:dragging={false}></canvas>
 
 <div id="header" class="card">
+  <div class="site">{siteName}</div>
   <h1><span class="zh">{venue.zh}</span> {venue.name}</h1>
-  <p>Interactive 3D seating model — <b>{venue.subtitle}</b>.<br>{venue.dims}.<br>
+
+  <div class="pickers">
+    <select class="picker" value={venue.id} onchange={selectVenue} aria-label="Venue">
+      {#each venues as v}
+        <option value={v.id} selected={v.id === venue.id}>{v.zh} {v.name}</option>
+      {/each}
+    </select>
+    {#if venue.layouts && venue.layouts.length}
+      <select class="picker" value={layout?.id} onchange={selectLayout} aria-label="Seating layout">
+        {#each venue.layouts as l}
+          <option value={l.id} selected={l.id === layout?.id} disabled={l.comingSoon}>
+            {l.label} {l.zh}{l.comingSoon ? ' (coming soon)' : ''}
+          </option>
+        {/each}
+      </select>
+    {/if}
+  </div>
+
+  <p>Interactive 3D seating model — <b>{layout ? `${layout.label} ${layout.zh}` : venue.subtitle}</b>.<br>{venue.dims}.<br>
      Hover any seat for its <b>section · row · seat number</b> (rows 1–39, seats 81–98).</p>
+
+  {#if layout?.planUrl || venue.planUrl}
+    <a class="plan" href={layout?.planUrl || venue.planUrl} target="_blank" rel="noopener noreferrer">
+      📄 Official seating plan (PDF) ↗
+    </a>
+  {/if}
+
   <div id="legend">
     {#each venue.sides as s}
       <span class="chip"><i style="background:{s.color}"></i>{s.name.replace(' (', ' ').replace('s)', 's').replace('Gate (', 'Gate ')}</span>
@@ -214,8 +253,16 @@
     box-shadow: 0 8px 30px rgba(0,0,0,.45); z-index: 10; }
 
   #header { top: 16px; left: 16px; padding: 12px 16px; max-width: 350px; }
+  #header .site { font-size: 10.5px; color: #7d8ca3; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
   #header h1 { font-size: 17px; font-weight: 700; letter-spacing: .3px; }
   #header h1 .zh { color: #ffd34d; }
+  .pickers { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .picker { flex: 1; min-width: 0; background: #0b1120; border: 1px solid rgba(120,150,200,.22); color: #dbe6f5;
+    border-radius: 7px; padding: 6px 7px; font-size: 12px; outline: none; }
+  .picker:focus { border-color: #2f6fed; }
+  a.plan { display: inline-block; margin-top: 8px; font-size: 12px; color: #ffd34d; text-decoration: none;
+    border-bottom: 1px dashed rgba(255,211,77,.4); padding-bottom: 1px; }
+  a.plan:hover { color: #ffe14d; border-bottom-color: #ffe14d; }
   #header p { font-size: 11.5px; color: #7d8ca3; margin-top: 4px; line-height: 1.45; }
   #legend { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .chip { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #dbe6f5;
