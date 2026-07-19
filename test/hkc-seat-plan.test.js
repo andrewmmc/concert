@@ -35,20 +35,35 @@ test('rejects coordinates outside the official seat-number domain', () => {
 });
 
 test('WP6 has only rows 9-13 before the platform', () => {
-  assert.equal(seatExistsOnPlan(41, 1, 90), false);
-  assert.equal(seatExistsOnPlan(41, 8, 90), false);
-  assert.equal(seatExistsOnPlan(41, 9, 90), true);
-  assert.equal(seatExistsOnPlan(41, 13, 90), true);
-  assert.equal(seatExistsOnPlan(41, 14, 90), false);
-  assert.equal(seatExistsOnPlan(42, 14, 89), false);
-  assert.equal(seatExistsOnPlan(41, 1, 89), true);
+  // WP6 occupies the block between aisles 41 and 42, which holds the high
+  // seats of gate 42 and the low seats of gate 41.
+  assert.equal(seatExistsOnPlan(42, 1, 90), false);
+  assert.equal(seatExistsOnPlan(42, 8, 90), false);
+  assert.equal(seatExistsOnPlan(42, 9, 90), true);
+  assert.equal(seatExistsOnPlan(42, 13, 90), true);
+  assert.equal(seatExistsOnPlan(42, 14, 90), false);
+  assert.equal(seatExistsOnPlan(41, 1, 89), false);
+  assert.equal(seatExistsOnPlan(41, 9, 89), true);
 });
 
 test('applies a wheelchair platform to both halves of its physical block', () => {
-  assert.equal(seatExistsOnPlan(41, 14, 90), false);
-  assert.equal(seatExistsOnPlan(42, 14, 89), false);
-  assert.equal(seatExistsOnPlan(41, 14, 89), true);
-  assert.equal(seatExistsOnPlan(42, 14, 90), true);
+  assert.equal(seatExistsOnPlan(41, 14, 89), false);
+  assert.equal(seatExistsOnPlan(42, 14, 90), false);
+  assert.equal(seatExistsOnPlan(41, 14, 90), true);
+  assert.equal(seatExistsOnPlan(42, 14, 89), true);
+});
+
+test('attributes the two halves of a block to the correct gates', () => {
+  // WP1 occupies the block between aisles 61 and 62, so gate 62's high
+  // seats and gate 61's low seats both start only at row 9 there.
+  assert.equal(seatExistsOnPlan(62, 8, 90), false);
+  assert.equal(seatExistsOnPlan(61, 8, 89), false);
+  assert.equal(seatExistsOnPlan(62, 9, 90), true);
+  assert.equal(seatExistsOnPlan(61, 9, 89), true);
+  // Gate 61's high seats live in the previous block (aisles 60-61) and
+  // gate 62's low seats in the next one (aisles 62-63), both unaffected.
+  assert.equal(seatExistsOnPlan(61, 1, 90), true);
+  assert.equal(seatExistsOnPlan(62, 1, 89), true);
 });
 
 test('applies the PDF seat-number ranges by row', () => {
@@ -72,8 +87,10 @@ test('matches the PDF seat totals for representative outer blocks', () => {
   const outerBlockTotal = (aisle, lastRow) => {
     let total = 0;
     for (let row = 21; row <= lastRow; row++) {
-      for (let seat = 90; seat <= 98; seat++) total += Number(seatExistsOnPlan(aisle, row, seat));
-      for (let seat = 81; seat <= 89; seat++) total += Number(seatExistsOnPlan(nextAisle(aisle), row, seat));
+      // The block between `aisle` and the next one holds the low seats of
+      // gate `aisle` and the high seats of the next gate.
+      for (let seat = 81; seat <= 89; seat++) total += Number(seatExistsOnPlan(aisle, row, seat));
+      for (let seat = 90; seat <= 98; seat++) total += Number(seatExistsOnPlan(nextAisle(aisle), row, seat));
     }
     return total;
   };

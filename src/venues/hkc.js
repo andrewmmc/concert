@@ -7,18 +7,22 @@
 //   · rows 1-13 lower tier · 14-15 promenade level (11 wheelchair platforms)
 //   · rows 16-39 upper tier; row limits differ by gate and by the two seat
 //     blocks adjoining each numbered aisle
-//   · seat numbers are fixed "column" slots 81-98 repeated in every row:
-//     one half of each section runs 90,91…98, the other half …81,82…89
+//   · seat numbers are fixed "column" slots 81-98 repeated in every row;
+//     seats 90-98 of a gate lie in the block before its aisle and seats
+//     81-89 in the block after it (see blockAfterAisleForSeat)
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { makeRingR, ringStripGeo } from '../scene.js';
 
 const DEG = Math.PI / 180;
 
-// The PDF numbers aisles, not self-contained rectangular sections.  A seat
-// numbered 90-98 is in the block clockwise from its aisle; a seat numbered
-// 81-89 is in the block counter-clockwise from it.  Row depth therefore has
-// to be stored per block and applied independently to each half of an aisle.
+// The PDF numbers entrance aisles (gates), not self-contained rectangular
+// sections.  Each physical block between two aisles is shared by two gates:
+// seats 90-98 belong to the higher gate and seats 81-89 to the lower one, so
+// a gate's seats run continuously (e.g. 84-96) across two neighbouring
+// blocks.  Seat 90 and seat 89 sit beside their own gate's aisle, so along a
+// block the numbers run 89,88…81 then 98…91,90.  Row depth therefore has to
+// be stored per block and applied independently to each half of a block.
 export const ROW_LIMITS_BY_GATE = [
   [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Red 40-49
   [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Blue 50-59
@@ -67,7 +71,10 @@ const gateAndOffset = (aisle) => {
   const normalized = aisle - 40;
   return { gate: Math.floor(normalized / 10), offset: normalized % 10 };
 };
-const blockAfterAisleForSeat = (aisle, seat) => seat >= 90 ? aisle : previousAisle(aisle);
+// Seats 90-98 of a gate lie in the block before its aisle (between aisles
+// N-1 and N); seats 81-89 lie in the block after it (between aisles N and
+// N+1).
+const blockAfterAisleForSeat = (aisle, seat) => seat >= 90 ? previousAisle(aisle) : aisle;
 const rowLimitAfterAisle = (aisle) => {
   const { gate, offset } = gateAndOffset(aisle);
   return ROW_LIMITS_BY_GATE[gate][offset];
@@ -316,14 +323,21 @@ export const hkc = {
       }
     }
 
-    /* seats (instanced) */
-    const SLOT_LEFT_START = 90, SLOT_LEFT_MAX = 98, SLOT_RIGHT_START = 89, SLOT_RIGHT_MIN = 81;
+    /* seats (instanced) — each wedge is the block between aisles secNo-1
+       (tL side) and secNo (tR side): seats 81-89 of gate secNo-1 hug the tL
+       aisle starting at 89, seats 90-98 of gate secNo hug the tR aisle
+       starting at 90 */
+    const SLOT_HIGH_MIN = 90, SLOT_HIGH_MAX = 98, SLOT_LOW_MAX = 89, SLOT_LOW_MIN = 81;
     const aisleInset = 0.45, seatWidth = 0.56;
     const placements = [];
     for (let side = 0; side < 4; side++) {
       const S = SIDES[side];
       for (let j = 0; j < SECS_PER_SIDE; j++) {
         const secNo = S.base + j;
+        const prevSec = previousAisle(secNo);
+        // Gate prevSec usually belongs to the same side; at the side corner
+        // (e.g. gate 79's low seats in gate 40's wedge) it is the previous one.
+        const prevSide = Math.floor((prevSec - 40) / 10);
         const w0 = (S.center / DEG - 45 + j * SEC_DEG) * DEG;
         const w1 = w0 + SEC_DEG * DEG;
         for (let row = 0; row < 39; row++) {
@@ -331,9 +345,9 @@ export const hkc = {
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;
           const tMid = (w0 + w1) / 2;
-          const leftStep = (tMid - tL) / 9;
-          const rightStep = (tR - tMid) / 9;
-          const put = (t, slot, angularStep) => {
+          const lowStep = (tMid - tL) / 9;
+          const highStep = (tR - tMid) / 9;
+          const put = (t, slot, angularStep, sec, seatSide) => {
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
             const beforeT = t - angularStep / 2, afterT = t + angularStep / 2;
@@ -344,24 +358,30 @@ export const hkc = {
             );
             placements.push({
               x, y: rg.y, z, yaw: Math.atan2(-x, -z),
-              sec: secNo, row: row + 1, seat: slot, tier: rg.name, side,
+              sec, row: row + 1, seat: slot, tier: rg.name, side: seatSide,
               widthScale: spacing * 0.82 / seatWidth,
             });
           };
-          const leftSlots = [], rightSlots = [];
-          for (let slot = SLOT_LEFT_START; slot <= SLOT_LEFT_MAX; slot++) {
-            if (seatExistsOnPlan(secNo, row + 1, slot)) leftSlots.push(slot);
+          const lowSlots = [], highSlots = [];
+          for (let slot = SLOT_LOW_MIN; slot <= SLOT_LOW_MAX; slot++) {
+            if (seatExistsOnPlan(prevSec, row + 1, slot)) lowSlots.push(slot);
           }
-          for (let slot = SLOT_RIGHT_MIN; slot <= SLOT_RIGHT_START; slot++) {
-            if (seatExistsOnPlan(secNo, row + 1, slot)) rightSlots.push(slot);
+          for (let slot = SLOT_HIGH_MIN; slot <= SLOT_HIGH_MAX; slot++) {
+            if (seatExistsOnPlan(secNo, row + 1, slot)) highSlots.push(slot);
           }
-          if (leftSlots.length && rightSlots.length) {
-            const slots = [...leftSlots, ...rightSlots];
+          // Physical order from tL to tR: 89,88…lowMin of gate prevSec,
+          // then highMax…91,90 of gate secNo.
+          const outward = (slots) => slots.slice().reverse();
+          if (lowSlots.length && highSlots.length) {
+            const slots = [
+              ...outward(lowSlots).map((slot) => ({ slot, sec: prevSec, seatSide: prevSide })),
+              ...outward(highSlots).map((slot) => ({ slot, sec: secNo, seatSide: side })),
+            ];
             const step = (tR - tL) / slots.length;
-            slots.forEach((slot, i) => put(tL + (i + 0.5) * step, slot, step));
+            slots.forEach(({ slot, sec, seatSide }, i) => put(tL + (i + 0.5) * step, slot, step, sec, seatSide));
           } else {
-            leftSlots.forEach((slot, i) => put(tL + (i + 0.5) * leftStep, slot, leftStep));
-            rightSlots.forEach((slot, i) => put(tR - (rightSlots.length - i - 0.5) * rightStep, slot, rightStep));
+            outward(lowSlots).forEach((slot, i) => put(tL + (i + 0.5) * lowStep, slot, lowStep, prevSec, prevSide));
+            outward(highSlots).forEach((slot, i) => put(tR - (highSlots.length - i - 0.5) * highStep, slot, highStep, secNo, side));
           }
         }
       }
