@@ -1,6 +1,7 @@
-// Hong Kong Coliseum (香港體育館) — centre-stage 360° configuration.
-// Modelled from the official LCSD arena plan (hkc_center_stage.pdf, "HKC_NCS_AW_July2024")
-// and LCSD technical data:
+// Hong Kong Coliseum (香港體育館) — centre-stage 四面台 360° and end-stage
+// 三面台 configurations, modelled from the official LCSD arena plans
+// (hkc_center_stage.pdf "HKC_NCS_AW_July2024", hkc_end_stage.pdf) and LCSD
+// technical data:
 //   · arena floor 40 m × 40 m · indoor ceiling 23 m · inverted-pyramid roof 41 m
 //   · 40 sections: Red 40-49, Blue 50-59, Green 60-69, Yellow 70-79
 //   · rows 1-13 lower tier · 14-15 promenade level (11 wheelchair platforms)
@@ -43,6 +44,23 @@ export const WHEELCHAIR_PLATFORMS = [
 ];
 
 const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
+
+// End-stage 三面台 arena floor (Brown Gate 啡閘): seven flat-floor blocks
+// facing the stage — a back bank of five and a front bank of two wider
+// blocks, numbered 61-67 as on the official plan.  x/z are the centre of
+// the first row on the 40 m × 40 m arena floor; the stage occupies z < -10.
+// Rows are lettered A-H in the back bank and J-Q in the front bank (no I).
+export const END_STAGE_FLOOR_BLOCKS = [
+  { id: 62, x: 15.2, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
+  { id: 61, x: 7.6, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
+  { id: 67, x: 0, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
+  { id: 63, x: -7.6, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
+  { id: 66, x: -15.2, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
+  { id: 64, x: 6.6, z: 1.6, rows: 8, seats: 18, rowOffset: 8 },
+  { id: 65, x: -6.6, z: 1.6, rows: 8, seats: 18, rowOffset: 8 },
+];
+
+export const FLOOR_ROW_LETTERS = 'ABCDEFGHJKLMNOPQR'; // no I
 
 const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;
 const gateAndOffset = (aisle) => {
@@ -154,7 +172,6 @@ export const hkc = {
       label: 'End Stage',
       zh: '三面台',
       planUrl: 'https://www.lcsd.gov.hk/en/hkc/common/form/hkc_end_stage.pdf',
-      comingSoon: true,
     },
   ],
 
@@ -167,8 +184,9 @@ export const hkc = {
 
   build(ctx, opts = {}) {
     const { scene } = ctx;
-    // opts.layout reserved for future layouts (e.g. end stage 三面台);
-    // the centre-stage 四面台 bowl is the same for all 360° layouts.
+    // The bowl is identical for both layouts; the end-stage 三面台 layout
+    // moves the stage to the Red Gate (40s) end and adds floor blocks.
+    const endStage = opts.layout === 'end-stage';
     const P_SUPER = 3.2;
     const ringR = makeRingR(P_SUPER);
     const SIDES = this.sides;
@@ -222,28 +240,34 @@ export const hkc = {
       new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
 
-    /* centre stage — 正面 (front) faces the Green Gate side (+Z) */
+    /* stage — 四面台: centred box; 三面台: box against the Red Gate end (-Z),
+       正面 (front) faces the Green Gate side (+Z) in both layouts */
+    const STAGE = endStage
+      ? { w: 24, d: 9, z: -14.5, title: 'END STAGE', zh: '三面台', arrow: '正面 ↓' }
+      : { w: 16, d: 12, z: 0, title: 'CENTRE STAGE', zh: '中央舞台', arrow: '正面 →' };
     const stageGroup = new THREE.Group();
-    const stage = new THREE.Mesh(new THREE.BoxGeometry(16, 1.2, 12),
+    const stage = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w, 1.2, STAGE.d),
       new THREE.MeshStandardMaterial({ color: 0x2a3242, roughness: 0.6 }));
-    stage.position.y = 0.6; stage.name = 'stage'; stageGroup.add(stage);
-    const trim = new THREE.Mesh(new THREE.BoxGeometry(16.3, 0.12, 12.3),
+    stage.position.set(0, 0.6, STAGE.z); stage.name = 'stage';
+    stage.userData.label = endStage ? 'End Stage 三面台' : 'Centre Stage 中央舞台';
+    stageGroup.add(stage);
+    const trim = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w + 0.3, 0.12, STAGE.d + 0.3),
       new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0xffc44d, emissiveIntensity: 0.55 }));
-    trim.position.y = 1.22; stageGroup.add(trim);
+    trim.position.set(0, 1.22, STAGE.z); stageGroup.add(trim);
     {
-      const c = document.createElement('canvas'); c.width = 1024; c.height = 768;
+      const c = document.createElement('canvas'); c.width = 1024; c.height = endStage ? 384 : 768;
       const x = c.getContext('2d');
-      x.fillStyle = '#232b3a'; x.fillRect(0, 0, 1024, 768);
+      x.fillStyle = '#232b3a'; x.fillRect(0, 0, 1024, c.height);
       x.fillStyle = '#ffd34d'; x.font = '700 96px system-ui'; x.textAlign = 'center';
-      x.fillText('CENTRE STAGE', 512, 340);
-      x.font = '600 56px system-ui'; x.fillStyle = '#8fa3c0'; x.fillText('中央舞台', 512, 436);
-      x.font = '600 44px system-ui'; x.fillStyle = '#46d39a'; x.fillText('正面 →', 512, 700);
+      x.fillText(STAGE.title, 512, endStage ? 150 : 340);
+      x.font = '600 56px system-ui'; x.fillStyle = '#8fa3c0'; x.fillText(STAGE.zh, 512, endStage ? 246 : 436);
+      x.font = '600 44px system-ui'; x.fillStyle = '#46d39a'; x.fillText(STAGE.arrow, 512, c.height - 40);
       const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
-      const top = new THREE.Mesh(new THREE.PlaneGeometry(14.5, 10.8), new THREE.MeshBasicMaterial({ map: tex }));
-      top.rotation.x = -Math.PI / 2; top.rotation.z = 0; top.position.y = 1.33; stageGroup.add(top);
-      const front = new THREE.Mesh(new THREE.BoxGeometry(16.3, 0.16, 0.5),
+      const top = new THREE.Mesh(new THREE.PlaneGeometry(STAGE.w - 1.5, STAGE.d - 1.2), new THREE.MeshBasicMaterial({ map: tex }));
+      top.rotation.x = -Math.PI / 2; top.rotation.z = 0; top.position.set(0, 1.33, STAGE.z); stageGroup.add(top);
+      const front = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w + 0.3, 0.16, 0.5),
         new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0x46d39a, emissiveIntensity: 0.7 }));
-      front.position.set(0, 1.22, 6.15); stageGroup.add(front);
+      front.position.set(0, 1.22, STAGE.z + STAGE.d / 2 + 0.15); stageGroup.add(front);
     }
     scene.add(stageGroup);
 
@@ -343,6 +367,28 @@ export const hkc = {
       }
     }
 
+    /* arena floor seats (end stage 三面台 only) — Brown Gate 啡閘 blocks
+       standing on the flat floor and facing the stage at the -Z end */
+    if (endStage) {
+      const pitch = 0.6, rowPitch = 0.95;
+      for (const block of END_STAGE_FLOOR_BLOCKS) {
+        for (let r = 0; r < block.rows; r++) {
+          for (let s = 0; s < block.seats; s++) {
+            placements.push({
+              x: block.x + (s - (block.seats - 1) / 2) * pitch,
+              y: 0,
+              z: block.z + r * rowPitch,
+              yaw: Math.PI,
+              sec: block.id, row: FLOOR_ROW_LETTERS[block.rowOffset + r], seat: s + 1,
+              tier: 'Arena Floor', zone: 'Brown Gate 啡閘', color: '#cf8f52', side: 0,
+              alt: r % 2,
+              widthScale: pitch * 0.82 / seatWidth,
+            });
+          }
+        }
+      }
+    }
+
     const pan = new THREE.BoxGeometry(seatWidth, 0.10, 0.38); pan.translate(0, 0.24, 0.03);
     const back = new THREE.BoxGeometry(seatWidth, 0.44, 0.09); back.translate(0, 0.44, -0.17);
     const seatGeo = mergeGeometries([pan, back]);
@@ -358,9 +404,9 @@ export const hkc = {
         const preferredWidthScale = p.tier === 'Upper Tier' ? 1.12 : 1;
         scale.set(Math.min(preferredWidthScale, p.widthScale), 1, 1);
         M.compose(V, Q, scale); seats.setMatrixAt(i, M);
-        const c = new THREE.Color(SIDES[p.side].color);
+        const c = new THREE.Color(p.color || SIDES[p.side].color);
         const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82;
-        c.multiplyScalar(shade + (p.row % 2) * 0.05);
+        c.multiplyScalar(shade + (p.alt ?? p.row % 2) * 0.05);
         seats.setColorAt(i, c);
         baseColors.set([c.r, c.g, c.b], i * 3);
         seatIndex.set(`${p.sec}-${p.row}-${p.seat}`, i);
@@ -409,7 +455,7 @@ export const hkc = {
     });
     scene.add(labelGroup);
 
-    const describe = (p) => ({ main: `Sec ${p.sec} · Row ${p.row} · Seat ${p.seat}`, sub: `${SIDES[p.side].name} — ${p.tier}` });
+    const describe = (p) => ({ main: `Sec ${p.sec} · Row ${p.row} · Seat ${p.seat}`, sub: `${p.zone || SIDES[p.side].name} — ${p.tier}` });
 
     return { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe };
   },

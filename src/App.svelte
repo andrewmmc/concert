@@ -28,7 +28,15 @@
 
   onMount(() => {
     route = parseHash();
-    const off = onRoute((r) => { route = r; });
+    const off = onRoute((r) => {
+      // The scene is built once for the initial venue/layout; a route that
+      // resolves to a different one needs a full rebuild, so reload.
+      if (r.venue.id !== route.venue.id || r.layout?.id !== route.layout?.id) {
+        location.reload();
+        return;
+      }
+      route = r;
+    });
     return off;
   });
 
@@ -112,7 +120,7 @@
       }
       if (hit.object === stage) {
         if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
-        tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: 'Centre Stage 中央舞台', sub: 'Performance area' };
+        tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: stage.userData.label, sub: 'Performance area' };
         canvas.classList.add('hovering'); return;
       }
       if (hit.object.userData.wp) {
