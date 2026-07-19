@@ -65,6 +65,9 @@ export const hkc = {
     };
     const MAX_ROWS = 39;
     const ROWS_UPPER_TOTAL = 33;   // straights stop at 33
+    // corner sections have no seats in the inner cutaway: they only begin
+    // seating at row 21 (rows 1-20 are void, per the LCSD plan)
+    const CORNER_MIN_ROW = 21;   // 1-based
     const isCornerSec = (sec) => [40, 49, 50, 59, 60, 69, 70, 79].includes(sec);
 
     const WP_SECTIONS = [41, 44, 47, 51, 54, 56, 61, 64, 67, 72, 75];
@@ -72,20 +75,34 @@ export const hkc = {
     const WALK = { S0: 33.9, S1: 35.2, y: 6.9 };
 
     const terraceMat = new THREE.MeshStandardMaterial({ color: 0x1c2432, roughness: 0.95, metalness: 0.05 });
-    const strip = (rings) => ringStripGeo(ringR, rings);
+    const strip = (rings, th0, th1) => ringStripGeo(ringR, rings, 200, th0, th1);
+    const CORNER_START = CORNER_MIN_ROW;   // corner sections only begin seating at this row
 
-    function buildTierRows(rowStart, rowEnd, base) {
+    function ringsFor(rowStart, rowEnd, base) {
       const rings = [];
       for (let r = rowStart; r <= rowEnd; r++) {
         const g = rowGeo(r - 1), dr = base;
         rings.push({ S: g.S, y: g.y }, { S: g.S + dr * 0.995, y: g.y });
         if (r < rowEnd) rings.push({ S: g.S + dr * 0.995, y: g.y + (rowGeo(r).y - g.y) });
       }
-      return new THREE.Mesh(strip(rings), terraceMat);
+      return rings;
     }
-    scene.add(buildTierRows(1, 13, TIER.lower.dr));
-    scene.add(buildTierRows(14, 15, TIER.prom.dr));
-    scene.add(buildTierRows(16, 39, TIER.upper.dr));
+    // full-ring tier, optionally leaving the four corner wedges empty below
+    // CORNER_START (the inner-corner cutaway on the LCSD plan)
+    function buildTier(rowStart, rowEnd, base, cutCornersBelow) {
+      const rings = ringsFor(rowStart, rowEnd, base);
+      if (!cutCornersBelow) { scene.add(new THREE.Mesh(strip(rings), terraceMat)); return; }
+      // add only the angular parts that are NOT corner wedges
+      for (let c = 0; c < 4; c++) {
+        const cutStart = (45 + c * 90) * DEG, cutEnd = (135 + c * 90) * DEG;
+        const t0 = cutEnd, t1 = cutStart + Math.PI * 2;   // the complement arc
+        scene.add(new THREE.Mesh(strip(rings, t0, t1), terraceMat));
+      }
+    }
+    buildTier(1, 13, TIER.lower.dr, true);      // lower tier, corners cut
+    buildTier(14, 15, TIER.prom.dr, true);      // promenade-level rows, corners cut
+    buildTier(16, 20, TIER.upper.dr, true);     // upper tier rows 16-20, corners cut
+    buildTier(CORNER_START, 39, TIER.upper.dr, false);  // rows 21-39 full ring (corners present)
 
     scene.add(new THREE.Mesh(strip([{ S: WALK.S0, y: WALK.y }, { S: WALK.S1, y: WALK.y }]),
       new THREE.MeshStandardMaterial({ color: 0x232f42, roughness: 0.9 })));
@@ -197,10 +214,13 @@ export const hkc = {
         const secNo = S.base + j;
         const corner = isCornerSec(secNo);
         const lastRow = corner ? MAX_ROWS : ROWS_UPPER_TOTAL;
+        // corner sections have no seats in the inner cutaway: they only begin
+        // at CORNER_MIN_ROW (lower rows are void, per the LCSD plan)
+        const firstRow = corner ? CORNER_MIN_ROW - 1 : 0;   // 0-based
         const w0 = (S.center / DEG - 45 + j * SEC_DEG) * DEG;
         const w1 = w0 + SEC_DEG * DEG;
         const wpSec = WP_SET.has(secNo);
-        for (let row = 0; row < lastRow; row++) {
+        for (let row = firstRow; row < lastRow; row++) {
           const rg = rowGeo(row);
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;

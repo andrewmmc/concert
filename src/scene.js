@@ -15,11 +15,12 @@ export function makeRingR(P) {
 }
 
 /* lofted ring strip from a list of {S, y} rings */
-export function ringStripGeo(ringR, rings, segs = 200) {
+export function ringStripGeo(ringR, rings, segs = 200, th0 = 0, th1 = Math.PI * 2) {
   const pos = [], idx = [];
+  const span = th1 - th0;
   rings.forEach((r, k) => {
     for (let i = 0; i <= segs; i++) {
-      const t = (i / segs) * Math.PI * 2, rad = ringR(t, r.S);
+      const t = th0 + (i / segs) * span, rad = ringR(t, r.S);
       pos.push(rad * Math.cos(t), r.y, rad * Math.sin(t));
     }
   });

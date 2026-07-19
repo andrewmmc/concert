@@ -54,9 +54,14 @@
     function clearInfo() { seatMain = '— hover a seat —'; seatSub = 'Click to pin a selection'; }
 
     function clearPin() {
-      if (pinnedId < 0) return;
-      const i = pinnedId; pinnedId = -1;
-      setColor(i, base(i));
+      // clear every highlighted seat (pinned + hovered)
+      const hover = hoveredId; hoveredId = -1;
+      if (hover >= 0) setColor(hover, base(hover));
+      tooltip = { ...tooltip, show: false };
+      if (pinnedId >= 0) {
+        const i = pinnedId; pinnedId = -1;
+        setColor(i, base(i));
+      }
       pinned = false; clearInfo();
     }
 
