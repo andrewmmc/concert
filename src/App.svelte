@@ -16,8 +16,8 @@
   let showLabels = $state(true);
   let inSec = $state(''), inRow = $state(''), inSeat = $state('');
   let searchMsg = $state('');
-  let seatMain = $state('— hover a seat —');
-  let seatSub = $state('Click to pin a selection');
+  let seatMain = $state('— no seat selected —');
+  let seatSub = $state('Click a seat to select it');
   let pinned = $state(false);
   let countText = $state('…');
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
@@ -51,7 +51,7 @@
     restoreFn = (i) => { if (i < 0 || i === pinnedId) return; setColor(i, base(i)); };
 
     function showInfo(p) { const d = describe(p); seatMain = d.main; seatSub = d.sub; }
-    function clearInfo() { seatMain = '— hover a seat —'; seatSub = 'Click to pin a selection'; }
+    function clearInfo() { seatMain = '— no seat selected —'; seatSub = 'Click a seat to select it'; }
 
     function clearPin() {
       // clear every highlighted seat (pinned + hovered)
@@ -119,7 +119,6 @@
         setColor(hoveredId, HOVER);
         const p = placements[hoveredId], d = describe(p);
         tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: d.main, sub: d.sub };
-        showInfo(p);
         canvas.classList.add('hovering');
       }
     };
