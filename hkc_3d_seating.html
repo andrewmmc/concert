@@ -112,6 +112,9 @@
   <div class="cap">Seat</div>
   <div class="seat" id="infoSeat">— hover a seat —</div>
   <div class="sub" id="infoSub">Click to pin a selection</div>
+  <button id="btnClear" style="display:none;margin-top:9px;width:100%;background:rgba(34,211,238,.14);
+    border:1px solid rgba(34,211,238,.5);color:#22d3ee;font-size:12px;font-weight:600;
+    padding:6px 0;border-radius:7px;cursor:pointer">✕ Unselect seat</button>
 </div>
 
 <div id="hint" class="card">Drag&nbsp;·&nbsp;orbit&nbsp;&nbsp;|&nbsp;&nbsp;Scroll&nbsp;·&nbsp;zoom&nbsp;&nbsp;|&nbsp;&nbsp;Right-drag&nbsp;·&nbsp;pan</div>
@@ -306,19 +309,26 @@ stageGroup.add(stage);
 const trim = new THREE.Mesh(new THREE.BoxGeometry(16.3, 0.12, 12.3),
   new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0xffc44d, emissiveIntensity: 0.55 }));
 trim.position.y = 1.22; stageGroup.add(trim);
-{ // stage top label
+{ // stage top label — 正面 (front) faces the Green Gate side (+Z)
   const c = document.createElement('canvas'); c.width = 1024; c.height = 768;
   const x = c.getContext('2d');
   x.fillStyle = '#232b3a'; x.fillRect(0, 0, 1024, 768);
   x.fillStyle = '#ffd34d'; x.font = '700 96px system-ui'; x.textAlign = 'center';
-  x.fillText('CENTRE STAGE', 512, 372);
+  x.fillText('CENTRE STAGE', 512, 340);
   x.font = '600 56px system-ui'; x.fillStyle = '#8fa3c0';
-  x.fillText('中央舞台', 512, 466);
+  x.fillText('中央舞台', 512, 436);
+  x.font = '600 44px system-ui'; x.fillStyle = '#46d39a';
+  x.fillText('正面 →', 512, 700);
   const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
   const top = new THREE.Mesh(new THREE.PlaneGeometry(14.5, 10.8),
     new THREE.MeshBasicMaterial({ map: tex }));
-  top.rotation.x = -Math.PI / 2; top.rotation.z = Math.PI; top.position.y = 1.33;
+  top.rotation.x = -Math.PI / 2; top.rotation.z = 0; top.position.y = 1.33;
   stageGroup.add(top);
+  // small front marker on the green-facing edge
+  const front = new THREE.Mesh(new THREE.BoxGeometry(16.3, 0.16, 0.5),
+    new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0x46d39a, emissiveIntensity: 0.7 }));
+  front.position.set(0, 1.22, 6.15);
+  stageGroup.add(front);
 }
 scene.add(stageGroup);
 
@@ -562,14 +572,27 @@ canvas.addEventListener('pointerleave', () => {
 canvas.addEventListener('pointerdown', () => canvas.classList.add('dragging'));
 addEventListener('pointerup', () => canvas.classList.remove('dragging'));
 
+const btnClear = document.getElementById('btnClear');
+function clearPin(){
+  if (pinned < 0) return;
+  const i = pinned; pinned = -1;
+  paint(i, new THREE.Color(baseColors[i * 3], baseColors[i * 3 + 1], baseColors[i * 3 + 2]));
+  btnClear.style.display = 'none';
+  infoSeat.textContent = '— hover a seat —';
+  infoSub.textContent  = 'Click to pin a selection';
+}
+btnClear.addEventListener('click', clearPin);
+
 canvas.addEventListener('click', () => {
   if (hovered >= 0){
     restore(pinned);
     pinned = hovered;
     paint(pinned, PIN);
     showInfo(placements[pinned]);
+    btnClear.style.display = 'block';
   } else {
     restore(pinned); pinned = -1;
+    btnClear.style.display = 'none';
   }
 });
 
@@ -626,6 +649,7 @@ document.getElementById('btnGo').addEventListener('click', () => {
   msg.textContent = '';
   restore(pinned); pinned = i; paint(i, PIN);
   const p = placements[i]; showInfo(p);
+  btnClear.style.display = 'block';
   const target = new THREE.Vector3(p.x, p.y + 0.5, p.z);
   const camPos = new THREE.Vector3(p.x * 0.45, p.y + 15, p.z * 0.45);
   flyTo(target, camPos);
