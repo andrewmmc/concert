@@ -77,8 +77,9 @@
     }
     function onClick() {
       if (hoveredId >= 0) {
-        restoreFn(pinnedId);
+        const previousPinnedId = pinnedId;
         pinnedId = hoveredId;
+        restoreFn(previousPinnedId);
         setColor(pinnedId, PIN);
         showInfo(placements[pinnedId]);
         pinned = true;
@@ -135,7 +136,8 @@
       const i = seatIndex.get(`${+inSec}-${+inRow}-${+inSeat}`);
       if (i === undefined) { searchMsg = 'Seat not found — check Sec / Row / Seat.'; return; }
       searchMsg = '';
-      restoreFn(pinnedId); pinnedId = i; setColor(i, PIN);
+      const previousPinnedId = pinnedId;
+      pinnedId = i; restoreFn(previousPinnedId); setColor(i, PIN);
       showInfo(placements[i]); pinned = true;
       const p = placements[i];
       const target = new engine.THREE.Vector3(p.x, p.y + 0.5, p.z);
