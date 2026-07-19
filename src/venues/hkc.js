@@ -309,10 +309,20 @@ export const hkc = {
           const tMid = (w0 + w1) / 2;
           const leftStep = (tMid - tL) / 9;
           const rightStep = (tR - tMid) / 9;
-          const put = (t, slot) => {
+          const put = (t, slot, angularStep) => {
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
-            placements.push({ x, y: rg.y, z, yaw: Math.atan2(-x, -z), sec: secNo, row: row + 1, seat: slot, tier: rg.name, side });
+            const beforeT = t - angularStep / 2, afterT = t + angularStep / 2;
+            const beforeR = ringR(beforeT, rg.S) + 0.16, afterR = ringR(afterT, rg.S) + 0.16;
+            const spacing = Math.hypot(
+              afterR * Math.cos(afterT) - beforeR * Math.cos(beforeT),
+              afterR * Math.sin(afterT) - beforeR * Math.sin(beforeT),
+            );
+            placements.push({
+              x, y: rg.y, z, yaw: Math.atan2(-x, -z),
+              sec: secNo, row: row + 1, seat: slot, tier: rg.name, side,
+              widthScale: spacing * 0.82 / seatWidth,
+            });
           };
           const leftSlots = [], rightSlots = [];
           for (let slot = SLOT_LEFT_START; slot <= SLOT_LEFT_MAX; slot++) {
@@ -323,11 +333,11 @@ export const hkc = {
           }
           if (leftSlots.length && rightSlots.length) {
             const slots = [...leftSlots, ...rightSlots];
-            const step = (tR - tL) / 18;
-            slots.forEach((slot, i) => put(tMid + (i - (slots.length - 1) / 2) * step, slot));
+            const step = (tR - tL) / slots.length;
+            slots.forEach((slot, i) => put(tL + (i + 0.5) * step, slot, step));
           } else {
-            leftSlots.forEach((slot, i) => put(tL + (i + 0.5) * leftStep, slot));
-            rightSlots.forEach((slot, i) => put(tR - (rightSlots.length - i - 0.5) * rightStep, slot));
+            leftSlots.forEach((slot, i) => put(tL + (i + 0.5) * leftStep, slot, leftStep));
+            rightSlots.forEach((slot, i) => put(tR - (rightSlots.length - i - 0.5) * rightStep, slot, rightStep));
           }
         }
       }
@@ -341,11 +351,13 @@ export const hkc = {
     const baseColors = new Float32Array(placements.length * 3);
     const seatIndex = new Map();
     {
-      const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3();
-      const regularScale = new THREE.Vector3(1, 1, 1), upperScale = new THREE.Vector3(1.12, 1, 1);
+      const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler();
+      const V = new THREE.Vector3(), scale = new THREE.Vector3();
       placements.forEach((p, i) => {
         E.set(0, p.yaw, 0); Q.setFromEuler(E); V.set(p.x, p.y, p.z);
-        M.compose(V, Q, p.tier === 'Upper Tier' ? upperScale : regularScale); seats.setMatrixAt(i, M);
+        const preferredWidthScale = p.tier === 'Upper Tier' ? 1.12 : 1;
+        scale.set(Math.min(preferredWidthScale, p.widthScale), 1, 1);
+        M.compose(V, Q, scale); seats.setMatrixAt(i, M);
         const c = new THREE.Color(SIDES[p.side].color);
         const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82;
         c.multiplyScalar(shade + (p.row % 2) * 0.05);
