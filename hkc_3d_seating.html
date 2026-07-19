@@ -169,8 +169,12 @@ const SIDES = [
 const SECS_PER_SIDE = 10, SEC_DEG = 9;
 const isCornerSec = sec => [40, 49, 50, 59, 60, 69, 70, 79].includes(sec);
 
-// sections that hold wheelchair platforms WP1–WP11 at rows 14–15
-const WP_SECTIONS = new Set([41, 44, 47, 51, 54, 57, 61, 64, 67, 72, 75]);
+// sections that hold wheelchair platforms WP1–WP11, on the flat promenade
+// walkway at rows 14–15 (from the LCSD plan: roughly every 3 sections)
+const WP_SECTIONS = [41, 44, 47, 51, 54, 56, 61, 64, 67, 72, 75];
+const WP_SET = new Set(WP_SECTIONS);
+// promenade walkway geometry (must match the walkway ring below)
+const WALK = { S0: 33.9, S1: 35.2, y: 6.9 };
 
 /* superellipse ring radius at angle θ for "square size" S */
 function ringR(theta, S){
@@ -244,7 +248,7 @@ scene.add(buildTierRows(16, 39, TIER.upper.dr));          // upper tier (full co
 
 // promenade walkway ring behind row 15
 scene.add(new THREE.Mesh(
-  ringStripGeo([{ S: 33.9, y: 6.9 }, { S: 35.2, y: 6.9 }]),
+  ringStripGeo([{ S: WALK.S0, y: WALK.y }, { S: WALK.S1, y: WALK.y }]),
   new THREE.MeshStandardMaterial({ color: 0x232f42, roughness: 0.9 })));
 
 // front apron (floor edge -> first row) + arena floor 40 m × 40 m
@@ -265,10 +269,20 @@ scene.add(floor);
 
 // arena-floor wheelchair seating zones (2 zones, per LCSD plan)
 {
-  const g = new THREE.BoxGeometry(3.2, 0.06, 1.6);
+  // two arena-floor wheelchair zones at diagonally-opposite corners, each a
+  // pad angled to face the stage (LCSD: 2 zones × 4 wheelchairs + 4 minders)
   const m = new THREE.MeshStandardMaterial({ color: 0x2b6ea8, roughness: 0.8 });
-  [[14.5, -14.5], [-14.5, 14.5]].forEach(([x, z]) => {
-    const p = new THREE.Mesh(g, m); p.position.set(x, 0.05, z); scene.add(p);
+  const edge = new THREE.LineBasicMaterial({ color: 0x9fd4ff });
+  [[16.2, -16.2, 45 * DEG], [-16.2, 16.2, 45 * DEG]].forEach(([x, z, ry]) => {
+    const g = new THREE.BoxGeometry(4.4, 0.06, 2.2);
+    const p = new THREE.Mesh(g, m);
+    p.position.set(x, 0.05, z); p.rotation.y = ry;
+    scene.add(p);
+    const eg = new THREE.EdgesGeometry(g);
+    const line = new THREE.LineSegments(eg, edge);
+    line.position.copy(p.position); line.rotation.copy(p.rotation);
+    line.position.y = 0.085;
+    scene.add(line);
   });
 }
 
@@ -309,24 +323,56 @@ trim.position.y = 1.22; stageGroup.add(trim);
 scene.add(stageGroup);
 
 /* ================================================================ wheelchair platforms (WP1–WP11) */
+/* wedge-shaped platforms laid flush on the flat promenade walkway, one per
+   WP section, following the bowl's superellipse curve */
 const wpMeshes = [];
+function wpLabelTexture(text){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#e8edf4'; x.fillRect(0, 0, 256, 128);
+  x.fillStyle = '#1c2432'; x.font = '800 78px system-ui'; x.textAlign = 'center';
+  x.fillText(text, 128, 92);
+  return new THREE.CanvasTexture(c);
+}
 {
-  const g = new THREE.BoxGeometry(4.2, 0.18, 1.9);
-  const m = new THREE.MeshStandardMaterial({ color: 0x5a6673, roughness: 0.85 });
+  const wpMat = new THREE.MeshStandardMaterial({ color: 0x6b7684, roughness: 0.85 });
   let n = 0;
   for (let side = 0; side < 4; side++){
     const S = SIDES[side];
     for (let j = 0; j < SECS_PER_SIDE; j++){
       const sec = S.base + j;
-      if (!WP_SECTIONS.has(sec)) continue;
-      const t = (S.center / DEG - 45 + (j + 0.5) * SEC_DEG) * DEG;
-      const g14 = rowGeo(13);
-      const rad = ringR(t, g14.S + 0.4);
-      const p = new THREE.Mesh(g, m);
-      p.position.set(rad * Math.cos(t), g14.y + 0.1, rad * Math.sin(t));
-      p.rotation.y = -t + Math.PI / 2;
-      p.userData.wp = ++n;
+      if (!WP_SET.has(sec)) continue;
+      const id = ++n;
+      const tMid = (S.center / DEG - 45 + (j + 0.5) * SEC_DEG) * DEG;
+      // platform spans ~70% of the section width, both edges inset from the walkway rim
+      const halfW = SEC_DEG * DEG * 0.35;
+      const segs = 16, pos = [], idx = [];
+      for (let k = 0; k <= segs; k++){
+        const t = tMid - halfW + (k / segs) * halfW * 2;
+        const rOut = ringR(t, WALK.S1 - 0.12), rIn = ringR(t, WALK.S0 + 0.12);
+        pos.push(rIn * Math.cos(t), 0, rIn * Math.sin(t));
+        pos.push(rOut * Math.cos(t), 0, rOut * Math.sin(t));
+      }
+      for (let k = 0; k < segs; k++){
+        const a = k * 2, b = a + 1, c = a + 2, d = a + 3;
+        idx.push(a, c, b, b, c, d);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      g.setIndex(idx); g.computeVertexNormals();
+      const p = new THREE.Mesh(g, wpMat);
+      p.position.y = WALK.y + 0.045;
+      p.material.side = THREE.DoubleSide;
+      p.userData.wp = id;
       scene.add(p); wpMeshes.push(p);
+      // "WPn" decal at the platform centre
+      const tex = wpLabelTexture(`WP${id}`);
+      const decal = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.95),
+        new THREE.MeshBasicMaterial({ map: tex, transparent: false }));
+      const rMid = ringR(tMid, (WALK.S0 + WALK.S1) / 2);
+      decal.position.set(rMid * Math.cos(tMid), WALK.y + 0.06, rMid * Math.sin(tMid));
+      decal.rotation.x = -Math.PI / 2; decal.rotation.z = -tMid - Math.PI / 2;
+      scene.add(decal);
     }
   }
 }
@@ -347,7 +393,7 @@ for (let side = 0; side < 4; side++){
     const lastRow = corner ? MAX_ROWS : ROWS_LOWER + ROWS_PROM + ROWS_UPPER; // 39 vs 33
     const w0 = (S.center / DEG - 45 + j * SEC_DEG) * DEG;
     const w1 = w0 + SEC_DEG * DEG;
-    const wpSec = WP_SECTIONS.has(secNo);
+    const wpSec = WP_SET.has(secNo);
 
     for (let row = 0; row < lastRow; row++){
       const rg = rowGeo(row);
@@ -546,7 +592,7 @@ function pickSeat(){
   }
   if (hit.object.userData.wp){
     if (hovered >= 0){ restore(hovered); hovered = -1; }
-    tooltip.innerHTML = `<b>Wheelchair Platform WP${hit.object.userData.wp}</b><br><span class="dim">Rows 14–15 · wheelchair patron + minder</span>`;
+    tooltip.innerHTML = `<b>Wheelchair Platform WP${hit.object.userData.wp}</b><br><span class="dim">Promenade · rows 14–15 · wheelchair patron + minder</span>`;
     tooltip.style.display = 'block';
     canvas.classList.add('hovering');
     return;
