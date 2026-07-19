@@ -294,7 +294,7 @@ export const hkc = {
 
     /* seats (instanced) */
     const SLOT_LEFT_START = 90, SLOT_LEFT_MAX = 98, SLOT_RIGHT_START = 89, SLOT_RIGHT_MIN = 81;
-    const aisleInset = 0.45, seatWidth = 0.44;
+    const aisleInset = 0.45, seatWidth = 0.56;
     const placements = [];
     for (let side = 0; side < 4; side++) {
       const S = SIDES[side];
