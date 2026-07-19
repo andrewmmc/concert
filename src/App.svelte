@@ -14,12 +14,12 @@
   let autoRotate = $state(false);
   let showRoof = $state(true);
   let showLabels = $state(true);
+  let settingsOpen = $state(false);
   let inSec = $state(''), inRow = $state(''), inSeat = $state('');
   let searchMsg = $state('');
   let seatMain = $state('— no seat selected —');
   let seatSub = $state('Click a seat to select it');
   let pinned = $state(false);
-  let countText = $state('…');
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
 
   let engine, model, controlsRef, cameraRef;
@@ -38,8 +38,6 @@
     controlsRef = controls; cameraRef = camera;
     model = venue.build({ scene }, { layout: layout?.id });
     const { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe } = model;
-
-    countText = `${placements.length.toLocaleString()} seats · 40 sections · rows 1–39`;
 
     const raycaster = new engine.THREE.Raycaster();
     const mouseNDC = new engine.THREE.Vector2();
@@ -162,6 +160,13 @@
 
   function goSeat() { window.__goSeat && window.__goSeat(); }
   function unselect() { window.__clearPin && window.__clearPin(); }
+  function resetCamera() {
+    if (!engine || !flyFn) return;
+    flyFn(
+      new engine.THREE.Vector3(0, 4, 0),
+      new engine.THREE.Vector3(76, 58, 76)
+    );
+  }
   function onKey(e) { if (e.key === 'Enter') goSeat(); }
   function selectVenue(e) { goTo(e.currentTarget.value, layout?.id); }
   function selectLayout(e) { goTo(venue.id, e.currentTarget.value); }
@@ -206,23 +211,45 @@
   </div>
 </div>
 
-<div id="controls" class="card">
-  <div class="row"><span>Auto-rotate</span>
-    <label class="switch"><input type="checkbox" bind:checked={autoRotate}><span class="slider"></span></label></div>
-  <div class="row"><span>Roof shell (inverted pyramid)</span>
-    <label class="switch"><input type="checkbox" bind:checked={showRoof}><span class="slider"></span></label></div>
-  <div class="row"><span>Side labels</span>
-    <label class="switch"><input type="checkbox" bind:checked={showLabels}><span class="slider"></span></label></div>
-  <div id="search">
-    <div class="search-label">Find a seat</div>
+<button
+  id="settings-button"
+  class="card"
+  class:active={settingsOpen}
+  onclick={() => settingsOpen = !settingsOpen}
+  aria-label="Settings"
+  aria-expanded={settingsOpen}
+  aria-controls="settings"
+  title="Settings"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.12.38.33.72.6 1 .3.3.68.5 1.1.4h.09v4h-.09a1.7 1.7 0 0 0-1.7.6Z"></path>
+  </svg>
+</button>
+
+{#if settingsOpen}
+  <div id="settings" class="card">
+    <div class="settings-title">Settings</div>
+    <div class="row"><span>Auto-rotate</span>
+      <label class="switch"><input type="checkbox" bind:checked={autoRotate}><span class="slider"></span></label></div>
+    <div class="row"><span>Roof shell (inverted pyramid)</span>
+      <label class="switch"><input type="checkbox" bind:checked={showRoof}><span class="slider"></span></label></div>
+    <div class="row"><span>Side labels</span>
+      <label class="switch"><input type="checkbox" bind:checked={showLabels}><span class="slider"></span></label></div>
+  </div>
+{/if}
+
+<div id="search" class="card">
+  <div class="search-label">Find a seat</div>
+  <div class="search-content">
     <div class="fields">
-      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="2">
-      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Row"  maxlength="2">
-      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="2">
+      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="2" aria-label="Section">
+      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Row"  maxlength="2" aria-label="Row">
+      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="2" aria-label="Seat">
     </div>
     <button class="go" onclick={goSeat}>Go to seat</button>
-    <div id="searchmsg">{searchMsg}</div>
   </div>
+  <div id="searchmsg">{searchMsg}</div>
 </div>
 
 <div id="info" class="card">
@@ -235,7 +262,9 @@
 </div>
 
 <div id="hint" class="card">Drag · orbit&nbsp;&nbsp;|&nbsp;&nbsp;Scroll · zoom&nbsp;&nbsp;|&nbsp;&nbsp;Right-drag · pan</div>
-<div id="count">{countText}</div>
+<button id="reset-camera" class="card" onclick={resetCamera} aria-label="Reset camera position" title="Reset camera position">
+  <span aria-hidden="true">↺</span> Reset view
+</button>
 
 {#if tooltip.show}
   <div id="tooltip" style="left:{tooltip.x}px;top:{tooltip.y}px">
@@ -275,23 +304,31 @@
     padding: 3px 8px; border: 1px solid rgba(120,150,200,.22); border-radius: 999px; background: rgba(255,255,255,.03); }
   .chip i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 
-  #controls { top: 16px; right: 16px; padding: 12px 14px; width: 228px; }
-  #controls .row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 5px 0; }
+  #settings-button { top: 16px; right: 16px; width: 42px; height: 42px; padding: 10px; color: #9fb2d0;
+    cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+  #settings-button:hover, #settings-button.active { color: #fff; border-color: rgba(47,111,237,.8); background: rgba(32,49,82,.92); }
+  #settings-button svg { display: block; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7;
+    stroke-linecap: round; stroke-linejoin: round; }
+  #settings { top: 68px; right: 16px; padding: 12px 14px; width: 228px; }
+  #settings .settings-title { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+  #settings .row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 5px 0; }
   .switch { position: relative; width: 34px; height: 19px; flex: 0 0 auto; }
   .switch input { opacity: 0; width: 0; height: 0; }
   .slider { position: absolute; inset: 0; background: #26314a; border-radius: 999px; transition: .2s; cursor: pointer; }
   .slider:before { content: ""; position: absolute; width: 13px; height: 13px; left: 3px; top: 3px; background: #9fb2d0; border-radius: 50%; transition: .2s; }
   .switch input:checked + .slider { background: #2f6fed; }
   .switch input:checked + .slider:before { transform: translateX(15px); background: #fff; }
-  #search { border-top: 1px solid rgba(120,150,200,.22); margin-top: 8px; padding-top: 10px; }
-  #search .search-label { font-size: 11px; color: #7d8ca3; margin-bottom: 6px; }
+  #search { left: 50%; bottom: 16px; transform: translateX(-50%); width: min(420px, calc(100vw - 32px)); padding: 11px 13px; }
+  #search .search-label { font-size: 15px; font-weight: 600; color: #dbe6f5; margin-bottom: 8px; }
+  #search .search-content { display: flex; gap: 7px; }
   #search .fields { display: flex; gap: 6px; }
-  #search input { width: 100%; background: #0b1120; border: 1px solid rgba(120,150,200,.22); color: #dbe6f5;
-    border-radius: 7px; padding: 6px 7px; font-size: 12px; outline: none; }
+  #search input { width: 68px; background: #0b1120; border: 1px solid rgba(120,150,200,.22); color: #dbe6f5;
+    border-radius: 7px; padding: 7px; font-size: 14px; outline: none; }
   #search input:focus { border-color: #2f6fed; }
-  button.go { margin-top: 7px; width: 100%; background: #2f6fed; border: none; color: #fff; font-size: 12px; font-weight: 600; padding: 7px 0; border-radius: 7px; cursor: pointer; }
+  button.go { flex: 1; white-space: nowrap; background: #2f6fed; border: none; color: #fff; font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 7px; cursor: pointer; }
   button.go:hover { background: #3d7dff; }
-  #searchmsg { font-size: 11px; color: #ff8a8a; margin-top: 5px; min-height: 13px; }
+  #searchmsg { font-size: 13px; color: #ff8a8a; margin-top: 5px; min-height: 0; }
+  #searchmsg:not(:empty) { min-height: 13px; }
 
   #info { left: 16px; bottom: 16px; padding: 12px 16px; min-width: 230px; }
   #info .cap { font-size: 10.5px; color: #7d8ca3; text-transform: uppercase; letter-spacing: 1px; }
@@ -301,10 +338,11 @@
     color: #22d3ee; font-size: 12px; font-weight: 600; padding: 6px 0; border-radius: 7px; cursor: pointer; }
   button.clear:hover { background: rgba(34,211,238,.28); }
 
-  #hint { right: 16px; bottom: 16px; padding: 8px 12px; font-size: 11px; color: #7d8ca3; }
-  #count { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 9;
-    font-size: 11px; color: #7d8ca3; background: rgba(13,18,28,.86); border: 1px solid rgba(120,150,200,.22);
-    padding: 5px 12px; border-radius: 999px; }
+  #hint { right: 16px; bottom: 62px; padding: 8px 12px; font-size: 11px; color: #7d8ca3; }
+  #reset-camera { right: 16px; bottom: 16px; padding: 9px 13px; color: #dbe6f5; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+  #reset-camera span { display: inline-block; margin-right: 4px; font-size: 17px; line-height: 10px; vertical-align: -1px; }
+  #reset-camera:hover { color: #fff; border-color: rgba(47,111,237,.8); background: rgba(32,49,82,.92); }
 
   #tooltip { position: fixed; pointer-events: none; z-index: 20; background: rgba(8,12,20,.94);
     border: 1px solid rgba(255,211,77,.5); border-radius: 9px; padding: 8px 11px; font-size: 12px; line-height: 1.5;
@@ -314,7 +352,17 @@
 
   @media (max-width: 760px) {
     #header { max-width: 250px; }
-    #controls { display: none; }
     #hint { display: none; }
+    #info { bottom: 112px; }
+    #reset-camera { bottom: 112px; }
+  }
+
+  @media (max-width: 460px) {
+    #search .search-content { display: block; }
+    #search .fields { width: 100%; }
+    #search input { flex: 1; min-width: 0; }
+    button.go { width: 100%; margin-top: 7px; }
+    #info { bottom: 145px; }
+    #reset-camera { bottom: 145px; }
   }
 </style>
