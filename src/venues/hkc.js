@@ -120,6 +120,10 @@ function seatRangeAfterAisle(aisle, row) {
 }
 
 export function seatExistsOnPlan(aisle, row, seat) {
+  if (!Number.isInteger(aisle) || aisle < 40 || aisle > 79 ||
+      !Number.isInteger(row) || row < 1 || row > 39 ||
+      !Number.isInteger(seat) || seat < 81 || seat > 98) return false;
+
   const blockAisle = blockAfterAisleForSeat(aisle, seat);
   if (row > rowLimitAfterAisle(blockAisle)) return false;
 

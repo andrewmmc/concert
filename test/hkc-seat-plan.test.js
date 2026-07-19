@@ -21,6 +21,19 @@ test('maps all eleven official wheelchair platform IDs', () => {
   );
 });
 
+test('rejects coordinates outside the official seat-number domain', () => {
+  const invalidSeats = [
+    [39, 1, 90], [80, 1, 90],
+    [40, 0, 90], [40, 40, 90],
+    [40, 1, 80], [40, 1, 99],
+    [40.5, 1, 90], [40, 1.5, 90], [40, 1, 90.5],
+  ];
+
+  for (const coordinates of invalidSeats) {
+    assert.equal(seatExistsOnPlan(...coordinates), false, coordinates.join('-'));
+  }
+});
+
 test('WP6 has only rows 9-13 before the platform', () => {
   assert.equal(seatExistsOnPlan(41, 1, 90), false);
   assert.equal(seatExistsOnPlan(41, 8, 90), false);
@@ -29,6 +42,13 @@ test('WP6 has only rows 9-13 before the platform', () => {
   assert.equal(seatExistsOnPlan(41, 14, 90), false);
   assert.equal(seatExistsOnPlan(42, 14, 89), false);
   assert.equal(seatExistsOnPlan(41, 1, 89), true);
+});
+
+test('applies a wheelchair platform to both halves of its physical block', () => {
+  assert.equal(seatExistsOnPlan(41, 14, 90), false);
+  assert.equal(seatExistsOnPlan(42, 14, 89), false);
+  assert.equal(seatExistsOnPlan(41, 14, 89), true);
+  assert.equal(seatExistsOnPlan(42, 14, 90), true);
 });
 
 test('applies the PDF seat-number ranges by row', () => {
@@ -68,4 +88,17 @@ test('matches the PDF seat totals for representative outer blocks', () => {
   assert.equal(outerBlockTotal(62, 36), 152);
   assert.equal(outerBlockTotal(63, 33), 169);
   assert.equal(outerBlockTotal(64, 34), 182);
+});
+
+test('produces the expected total number of modelled seats', () => {
+  let total = 0;
+  for (let aisle = 40; aisle <= 79; aisle++) {
+    for (let row = 1; row <= 39; row++) {
+      for (let seat = 81; seat <= 98; seat++) {
+        total += Number(seatExistsOnPlan(aisle, row, seat));
+      }
+    }
+  }
+
+  assert.equal(total, 16106);
 });
