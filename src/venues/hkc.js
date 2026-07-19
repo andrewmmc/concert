@@ -287,9 +287,15 @@ export const hkc = {
           scene.add(p); wpMeshes.push(p);
           const decal = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.95),
             new THREE.MeshBasicMaterial({ map: wpLabelTexture(`WP${wp.id}`) }));
-          const rMid = ringR(tMid, (WALK.S0 + WALK.S1) / 2);
+          const labelS = (WALK.S0 + WALK.S1) / 2;
+          const rMid = ringR(tMid, labelS);
+          const tangentDelta = 0.001;
+          const rBefore = ringR(tMid - tangentDelta, labelS);
+          const rAfter = ringR(tMid + tangentDelta, labelS);
+          const tangentX = rAfter * Math.cos(tMid + tangentDelta) - rBefore * Math.cos(tMid - tangentDelta);
+          const tangentZ = rAfter * Math.sin(tMid + tangentDelta) - rBefore * Math.sin(tMid - tangentDelta);
           decal.position.set(rMid * Math.cos(tMid), WALK.y + 0.06, rMid * Math.sin(tMid));
-          decal.rotation.x = -Math.PI / 2; decal.rotation.z = -tMid - Math.PI / 2;
+          decal.rotation.x = -Math.PI / 2; decal.rotation.z = -Math.atan2(tangentZ, tangentX);
           scene.add(decal);
       }
     }
@@ -312,18 +318,24 @@ export const hkc = {
           const leftStep = (tMid - tL) / 9;
           const rightStep = (tR - tMid) / 9;
           const put = (t, slot) => {
-            if (!seatExistsOnPlan(secNo, row + 1, slot)) return;
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
             placements.push({ x, y: rg.y, z, yaw: Math.atan2(-x, -z), sec: secNo, row: row + 1, seat: slot, tier: rg.name, side });
           };
-          for (let i = 0; ; i++) {
-            const slot = SLOT_LEFT_START + i; if (slot > SLOT_LEFT_MAX) break;
-            put(tL + (i + 0.5) * leftStep, slot);
+          const leftSlots = [], rightSlots = [];
+          for (let slot = SLOT_LEFT_START; slot <= SLOT_LEFT_MAX; slot++) {
+            if (seatExistsOnPlan(secNo, row + 1, slot)) leftSlots.push(slot);
           }
-          for (let i = 0; ; i++) {
-            const slot = SLOT_RIGHT_START - i; if (slot < SLOT_RIGHT_MIN) break;
-            put(tR - (i + 0.5) * rightStep, slot);
+          for (let slot = SLOT_RIGHT_MIN; slot <= SLOT_RIGHT_START; slot++) {
+            if (seatExistsOnPlan(secNo, row + 1, slot)) rightSlots.push(slot);
+          }
+          if (leftSlots.length && rightSlots.length) {
+            const slots = [...leftSlots, ...rightSlots];
+            const step = (tR - tL) / 18;
+            slots.forEach((slot, i) => put(tMid + (i - (slots.length - 1) / 2) * step, slot));
+          } else {
+            leftSlots.forEach((slot, i) => put(tL + (i + 0.5) * leftStep, slot));
+            rightSlots.forEach((slot, i) => put(tR - (rightSlots.length - i - 0.5) * rightStep, slot));
           }
         }
       }
@@ -337,10 +349,11 @@ export const hkc = {
     const baseColors = new Float32Array(placements.length * 3);
     const seatIndex = new Map();
     {
-      const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3(), one = new THREE.Vector3(1, 1, 1);
+      const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler(), V = new THREE.Vector3();
+      const regularScale = new THREE.Vector3(1, 1, 1), upperScale = new THREE.Vector3(1.12, 1, 1);
       placements.forEach((p, i) => {
         E.set(0, p.yaw, 0); Q.setFromEuler(E); V.set(p.x, p.y, p.z);
-        M.compose(V, Q, one); seats.setMatrixAt(i, M);
+        M.compose(V, Q, p.tier === 'Upper Tier' ? upperScale : regularScale); seats.setMatrixAt(i, M);
         const c = new THREE.Color(SIDES[p.side].color);
         const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82;
         c.multiplyScalar(shade + (p.row % 2) * 0.05);
