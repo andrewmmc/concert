@@ -291,7 +291,7 @@ export const hkc = {
        (+Z).  正面 (front) faces +Z in the 四面台 layout and -Z in the
        三面台 layout; `front` is the sign of the facing direction. */
     const STAGE = endStage
-      ? { w: 24, d: 9, z: 14.5, title: 'END STAGE', zh: '三面台', arrow: '正面 ↑', front: -1 }
+      ? { w: 24, d: 9, z: 14.5, title: 'END STAGE', zh: '三面台', arrow: '正面 ↓', front: -1 }
       : { w: 16, d: 12, z: 0, title: 'CENTRE STAGE', zh: '中央舞台', arrow: '正面 →', front: 1 };
     const stageGroup = new THREE.Group();
     const stage = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w, 1.2, STAGE.d),
@@ -312,7 +312,10 @@ export const hkc = {
       x.font = '600 44px system-ui'; x.fillStyle = '#46d39a'; x.fillText(STAGE.arrow, 512, c.height - 40);
       const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
       const top = new THREE.Mesh(new THREE.PlaneGeometry(STAGE.w - 1.5, STAGE.d - 1.2), new THREE.MeshBasicMaterial({ map: tex }));
-      top.rotation.x = -Math.PI / 2; top.rotation.z = 0; top.position.set(0, 1.33, STAGE.z); stageGroup.add(top);
+      // Rotate the texture 180° for the end stage so the text reads upright
+      // from the audience side (the stage front faces -Z there).
+      top.rotation.x = -Math.PI / 2; top.rotation.z = endStage ? Math.PI : 0;
+      top.position.set(0, 1.33, STAGE.z); stageGroup.add(top);
       const front = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w + 0.3, 0.16, 0.5),
         new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0x46d39a, emissiveIntensity: 0.7 }));
       front.position.set(0, 1.22, STAGE.z + (STAGE.d / 2 + 0.15) * STAGE.front); stageGroup.add(front);
