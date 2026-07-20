@@ -3,8 +3,10 @@ import test from 'node:test';
 
 import {
   ROW_LIMITS_BY_GATE,
+  TEMPORARY_CENTER_STAGE_ROWS,
   WHEELCHAIR_PLATFORMS,
   seatExistsOnPlan,
+  temporaryCenterStageSeatExists,
   standSeatPositionInBlock,
 } from '../src/venues/hkc.js';
 
@@ -20,6 +22,23 @@ test('maps all eleven official wheelchair platform IDs', () => {
     WHEELCHAIR_PLATFORMS.map(({ id, aisle }) => [id, aisle]).sort((a, b) => a[0] - b[0]),
     [[1, 61], [2, 64], [3, 67], [4, 72], [5, 75], [6, 41], [7, 44], [8, 47], [9, 51], [10, 54], [11, 56]],
   );
+});
+
+test('uses row 1 seat-number ranges for temporary centre-stage rows A-D', () => {
+  assert.deepEqual(TEMPORARY_CENTER_STAGE_ROWS, ['A', 'B', 'C', 'D']);
+
+  for (const row of TEMPORARY_CENTER_STAGE_ROWS) {
+    for (let aisle = 40; aisle <= 79; aisle++) {
+      for (let seat = 81; seat <= 98; seat++) {
+        assert.equal(
+          temporaryCenterStageSeatExists(aisle, row, seat),
+          seatExistsOnPlan(aisle, 1, seat),
+          `${aisle}-${row}-${seat}`,
+        );
+      }
+    }
+  }
+  assert.equal(temporaryCenterStageSeatExists(40, 'E', 90), false);
 });
 
 test('rejects coordinates outside the official seat-number domain', () => {

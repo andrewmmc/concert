@@ -147,7 +147,8 @@
 
     // search
     window.__goSeat = () => {
-      const i = seatIndex.get(`${+inSec}-${+inRow}-${+inSeat}`);
+      const row = inRow.trim().toUpperCase();
+      const i = seatIndex.get(`${+inSec}-${row}-${+inSeat}`);
       if (i === undefined) { searchMsg = 'Seat not found — check Sec / Row / Seat.'; return; }
       searchMsg = '';
       selectSeat(i);
@@ -209,7 +210,7 @@
   </div>
 
   <p>Interactive 3D seating model — <b>{layout ? `${layout.label} ${layout.zh}` : venue.subtitle}</b>.<br>{venue.dims}.<br>
-     Hover any seat for its <b>section · row · seat number</b> (rows 1–39, seats 81–98).</p>
+     Hover any seat for its <b>section · row · seat number</b> ({layout?.id === 'center-stage' ? 'temporary rows A–D and rows 1–39' : 'rows 1–39'}, seats 81–98).</p>
 
   {#if layout?.planUrl || venue.planUrl}
     <a class="plan" href={layout?.planUrl || venue.planUrl} target="_blank" rel="noopener noreferrer">
@@ -257,7 +258,7 @@
   <div class="search-content">
     <div class="fields">
       <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="2" aria-label="Section">
-      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Row"  maxlength="2" aria-label="Row">
+      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Row"  maxlength="2" aria-label="Row">
       <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="2" aria-label="Seat">
     </div>
     <button class="go" onclick={goSeat}>Go to seat</button>

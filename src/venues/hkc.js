@@ -50,6 +50,10 @@ export const WHEELCHAIR_PLATFORMS = [
 
 const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
 
+// Temporary centre-stage rows nearest the stage. Their seat ranges match row 1,
+// including the split numbered blocks on either side of each aisle.
+export const TEMPORARY_CENTER_STAGE_ROWS = ['A', 'B', 'C', 'D'];
+
 // End-stage 三面台 arena floor (Brown Gate 啡閘): thirteen flat-floor
 // blocks in three banks facing the stage — a back bank of three 12-seat
 // blocks (rows AA-AG) flanked by the two WZ wheelchair seating zones, then
@@ -210,6 +214,10 @@ export function seatExistsOnPlan(aisle, row, seat) {
   return seat >= 90 ? seat <= highMax : seat >= lowMin;
 }
 
+export function temporaryCenterStageSeatExists(aisle, row, seat) {
+  return TEMPORARY_CENTER_STAGE_ROWS.includes(row) && seatExistsOnPlan(aisle, 1, seat);
+}
+
 export const hkc = {
   id: 'hkc',
   name: 'Hong Kong Coliseum',
@@ -251,6 +259,7 @@ export const hkc = {
     const SECS_PER_SIDE = 10, SEC_DEG = 9;
 
     const TIER = {
+      temp: { r0: 19.3, y0: 0.02, dr: 0.80, dy: 0.25 },
       lower: { r0: 22.5, y0: 1.00, dr: 0.80, dy: 0.42 },
       prom:  { r0: 32.9, y0: 6.04, dr: 0.80, dy: 0.42 },
       upperInner: { r0: 34.9, y0: 7.30, dr: 0.85, dy: 0.50 },
@@ -262,6 +271,11 @@ export const hkc = {
       if (i < 20)  { const k = i - 15; return { S: TIER.upperInner.r0 + k * TIER.upperInner.dr, y: TIER.upperInner.y0 + k * TIER.upperInner.dy, name: 'Upper Tier' }; }
       const k = i - 20; return { S: TIER.upperOuter.r0 + k * TIER.upperOuter.dr, y: TIER.upperOuter.y0 + k * TIER.upperOuter.dy, name: 'Upper Tier' };
     };
+    const temporaryRowGeo = (i) => ({
+      S: TIER.temp.r0 + i * TIER.temp.dr,
+      y: TIER.temp.y0 + i * TIER.temp.dy,
+      name: 'Temporary Seating',
+    });
     const WALK = { S0: 33.9, S1: 35.2, y: 6.9 };
     const UPPER_WALK = { S0: 38.5, S1: 39.8, y: 9.74 };
 
@@ -277,6 +291,16 @@ export const hkc = {
       }
       return new THREE.Mesh(strip(rings), terraceMat);
     }
+    if (!endStage) {
+      const rings = [];
+      for (let i = 0; i < TEMPORARY_CENTER_STAGE_ROWS.length; i++) {
+        const g = temporaryRowGeo(i);
+        const nextY = i < TEMPORARY_CENTER_STAGE_ROWS.length - 1 ? temporaryRowGeo(i + 1).y : rowGeo(0).y;
+        rings.push({ S: g.S, y: g.y }, { S: g.S + TIER.temp.dr * 0.995, y: g.y });
+        rings.push({ S: g.S + TIER.temp.dr * 0.995, y: nextY });
+      }
+      scene.add(new THREE.Mesh(strip(rings), terraceMat));
+    }
     scene.add(buildTierRows(1, 13, TIER.lower.dr));
     scene.add(buildTierRows(14, 15, TIER.prom.dr));
     scene.add(buildTierRows(16, 20, TIER.upperInner.dr));
@@ -285,7 +309,10 @@ export const hkc = {
     const walkwayMat = new THREE.MeshStandardMaterial({ color: 0x232f42, roughness: 0.9 });
     scene.add(new THREE.Mesh(strip([{ S: WALK.S0, y: WALK.y }, { S: WALK.S1, y: WALK.y }]), walkwayMat));
     scene.add(new THREE.Mesh(strip([{ S: UPPER_WALK.S0, y: UPPER_WALK.y }, { S: UPPER_WALK.S1, y: UPPER_WALK.y }]), walkwayMat));
-    scene.add(new THREE.Mesh(strip([{ S: 20.0, y: 0.02 }, { S: TIER.lower.r0 + 0.05, y: 0.02 }]), terraceMat));
+    const innerTerrace = endStage
+      ? [{ S: 20.0, y: 0.02 }, { S: TIER.lower.r0 + 0.05, y: 0.02 }]
+      : [{ S: TIER.temp.r0 - 0.5, y: 0.02 }, { S: TIER.temp.r0 + 0.05, y: 0.02 }];
+    scene.add(new THREE.Mesh(strip(innerTerrace), terraceMat));
 
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40),
       new THREE.MeshStandardMaterial({ color: 0x11161f, roughness: 0.9 }));
@@ -400,8 +427,16 @@ export const hkc = {
         const prevSide = Math.floor((prevSec - 40) / 10);
         const w0 = (S.center / DEG - 45 + j * SEC_DEG) * DEG;
         const w1 = w0 + SEC_DEG * DEG;
-        for (let row = 0; row < 39; row++) {
-          const rg = rowGeo(row);
+        const standRows = [
+          ...(!endStage ? TEMPORARY_CENTER_STAGE_ROWS.map((label, index) => ({
+            label, index, planRow: 1, geo: temporaryRowGeo(index), temporary: true,
+          })) : []),
+          ...Array.from({ length: 39 }, (_, index) => ({
+            label: index + 1, index, planRow: index + 1, geo: rowGeo(index), temporary: false,
+          })),
+        ];
+        for (const row of standRows) {
+          const rg = row.geo;
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;
           const put = (t, slot, angularStep, sec, seatSide) => {
@@ -415,16 +450,21 @@ export const hkc = {
             );
             placements.push({
               x, y: rg.y, z, yaw: Math.atan2(-x, -z),
-              sec, row: row + 1, seat: slot, tier: rg.name, side: seatSide,
+              sec, row: row.label, seat: slot, tier: rg.name, side: seatSide,
+              alt: row.temporary ? row.index % 2 : undefined,
               widthScale: spacing * 0.82 / seatWidth,
             });
           };
           const lowSlots = [], highSlots = [];
           for (let slot = SLOT_LOW_MIN; slot <= SLOT_LOW_MAX; slot++) {
-            if (seatExistsOnPlan(prevSec, row + 1, slot)) lowSlots.push(slot);
+            if (row.temporary
+              ? temporaryCenterStageSeatExists(prevSec, row.label, slot)
+              : seatExistsOnPlan(prevSec, row.planRow, slot)) lowSlots.push(slot);
           }
           for (let slot = SLOT_HIGH_MIN; slot <= SLOT_HIGH_MAX; slot++) {
-            if (seatExistsOnPlan(secNo, row + 1, slot)) highSlots.push(slot);
+            if (row.temporary
+              ? temporaryCenterStageSeatExists(secNo, row.label, slot)
+              : seatExistsOnPlan(secNo, row.planRow, slot)) highSlots.push(slot);
           }
           // Physical order from tL to tR: 89,88…lowMin of gate prevSec,
           // then highMax…91,90 of gate secNo.  Each contiguous range fills its
@@ -501,7 +541,7 @@ export const hkc = {
         scale.set(Math.min(preferredWidthScale, p.widthScale), 1, 1);
         M.compose(V, Q, scale); seats.setMatrixAt(i, M);
         const c = new THREE.Color(p.color || SIDES[p.side].color);
-        const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82;
+        const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : p.tier === 'Temporary Seating' ? 0.86 : 0.82;
         c.multiplyScalar(shade + (p.alt ?? p.row % 2) * 0.05);
         seats.setColorAt(i, c);
         baseColors.set([c.r, c.g, c.b], i * 3);
