@@ -9,10 +9,10 @@ import {
 } from '../src/venues/hkc.js';
 
 test('uses the PDF row limits for each gate', () => {
-  assert.deepEqual(ROW_LIMITS_BY_GATE[0], [39, 39, 36, 36, 36, 36, 36, 36, 39, 39]);
-  assert.deepEqual(ROW_LIMITS_BY_GATE[1], [39, 39, 36, 36, 36, 36, 36, 36, 39, 39]);
-  assert.deepEqual(ROW_LIMITS_BY_GATE[2], [39, 39, 36, 33, 34, 34, 34, 33, 36, 39]);
-  assert.deepEqual(ROW_LIMITS_BY_GATE[3], [39, 39, 36, 36, 36, 36, 36, 36, 39, 39]);
+  assert.deepEqual(ROW_LIMITS_BY_GATE[0], [39, 36, 36, 36, 36, 36, 36, 36, 39, 39]);
+  assert.deepEqual(ROW_LIMITS_BY_GATE[1], [39, 36, 36, 36, 36, 36, 36, 36, 39, 39]);
+  assert.deepEqual(ROW_LIMITS_BY_GATE[2], [39, 36, 33, 34, 34, 34, 33, 36, 39, 39]);
+  assert.deepEqual(ROW_LIMITS_BY_GATE[3], [39, 36, 36, 36, 36, 36, 36, 36, 39, 39]);
 });
 
 test('maps all eleven official wheelchair platform IDs', () => {
@@ -112,17 +112,18 @@ test('applies the PDF seat-number ranges by row', () => {
 test('shortens straight and corner blocks at their actual outer rows', () => {
   assert.equal(seatExistsOnPlan(65, 34, 90), true);
   assert.equal(seatExistsOnPlan(65, 35, 90), false);
-  assert.equal(seatExistsOnPlan(45, 36, 90), true);
-  assert.equal(seatExistsOnPlan(45, 37, 90), false);
+  assert.equal(seatExistsOnPlan(44, 36, 89), true);
+  assert.equal(seatExistsOnPlan(45, 36, 90), false);
+  assert.equal(seatExistsOnPlan(44, 37, 89), false);
   assert.equal(seatExistsOnPlan(40, 39, 90), true);
   assert.equal(seatExistsOnPlan(40, 39, 98), false);
 });
 
-test('matches the PDF seat totals for representative outer blocks', () => {
+test('matches all forty upper-block totals printed in the PDF', () => {
   const nextAisle = (aisle) => aisle === 79 ? 40 : aisle + 1;
-  const outerBlockTotal = (aisle, lastRow) => {
+  const outerBlockTotal = (aisle) => {
     let total = 0;
-    for (let row = 21; row <= lastRow; row++) {
+    for (let row = 21; row <= 39; row++) {
       // The block between `aisle` and the next one holds the low seats of
       // gate `aisle` and the high seats of the next gate.
       for (let seat = 81; seat <= 89; seat++) total += Number(seatExistsOnPlan(aisle, row, seat));
@@ -131,27 +132,32 @@ test('matches the PDF seat totals for representative outer blocks', () => {
     return total;
   };
 
-  assert.equal(outerBlockTotal(40, 39), 205);
-  assert.equal(outerBlockTotal(41, 39), 188);
-  assert.equal(outerBlockTotal(42, 36), 154);
-  assert.equal(outerBlockTotal(43, 36), 214);
-  assert.equal(outerBlockTotal(44, 36), 224);
-  assert.equal(outerBlockTotal(60, 39), 199);
-  assert.equal(outerBlockTotal(61, 39), 186);
-  assert.equal(outerBlockTotal(62, 36), 152);
-  assert.equal(outerBlockTotal(63, 33), 169);
-  assert.equal(outerBlockTotal(64, 34), 182);
+  const expected = [
+    [188, 154, 214, 224, 203, 224, 214, 154, 188, 205],
+    [188, 154, 214, 224, 204, 224, 214, 154, 188, 205],
+    [186, 152, 169, 182, 182, 182, 169, 152, 186, 199],
+    [186, 154, 214, 224, 204, 224, 214, 154, 187, 205],
+  ];
+
+  for (let gate = 0; gate < expected.length; gate++) {
+    for (let offset = 0; offset < expected[gate].length; offset++) {
+      const aisle = 40 + gate * 10 + offset;
+      assert.equal(outerBlockTotal(aisle), expected[gate][offset], `block after aisle ${aisle}`);
+    }
+  }
 });
 
 test('produces the expected total number of modelled seats', () => {
-  let total = 0;
+  const byTier = [0, 0, 0];
   for (let aisle = 40; aisle <= 79; aisle++) {
     for (let row = 1; row <= 39; row++) {
       for (let seat = 81; seat <= 98; seat++) {
-        total += Number(seatExistsOnPlan(aisle, row, seat));
+        const tier = row <= 15 ? 0 : row <= 20 ? 1 : 2;
+        byTier[tier] += Number(seatExistsOnPlan(aisle, row, seat));
       }
     }
   }
 
-  assert.equal(total, 16554);
+  assert.deepEqual(byTier, [7030, 1720, 7662]);
+  assert.equal(byTier.reduce((total, seats) => total + seats, 0), 16412);
 });

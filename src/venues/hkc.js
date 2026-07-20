@@ -24,10 +24,10 @@ const DEG = Math.PI / 180;
 // block the numbers run 89,88…81 then 98…91,90.  Row depth therefore has to
 // be stored per block and applied independently to each half of a block.
 export const ROW_LIMITS_BY_GATE = [
-  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Red 40-49
-  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Blue 50-59
-  [39, 39, 36, 33, 34, 34, 34, 33, 36, 39], // Green 60-69
-  [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Yellow 70-79
+  [39, 36, 36, 36, 36, 36, 36, 36, 39, 39], // Red 40-49
+  [39, 36, 36, 36, 36, 36, 36, 36, 39, 39], // Blue 50-59
+  [39, 36, 33, 34, 34, 34, 33, 36, 39, 39], // Green 60-69
+  [39, 36, 36, 36, 36, 36, 36, 36, 39, 39], // Yellow 70-79
 ];
 
 // Each platform occupies rows 14-15 of the block after `aisle`.  At compact
@@ -155,6 +155,12 @@ function narrowOuterRange(row, extraHighSeat = 0) {
   return { highMax: 89 + highCount, lowMin: 90 - lowCount };
 }
 
+function mirrorRange({ highMax, lowMin }) {
+  const highCount = highMax - 89;
+  const lowCount = 90 - lowMin;
+  return { highMax: 89 + lowCount, lowMin: 90 - highCount };
+}
+
 function seatRangeAfterAisle(aisle, row) {
   const platform = PLATFORM_BY_AISLE.get(aisle);
   if (platform?.lowFirstRow === 9 && row >= 9 && row <= 13) {
@@ -166,31 +172,49 @@ function seatRangeAfterAisle(aisle, row) {
   if (row <= 20) return { highMax: 94, lowMin: 86 };
 
   const { gate, offset } = gateAndOffset(aisle);
-  if (offset === 1 || offset === 9) {
-    // Corner shoulders total 188 seats (186 at Green Gate) in the PDF.
-    const widen = gate === 2 ? row >= 32 && row <= 36 : row >= 30 && row <= 36;
-    return narrowOuterRange(row, widen ? 1 : 0);
+  if (offset === 0 || offset === 8) {
+    // The two shoulders total 188 seats at Red/Blue, 186 at Green.  Yellow
+    // is asymmetric in the drawing: 186 seats on its 70-side and 187 on
+    // its 78-side.
+    const narrowShoulder = gate === 2 || (gate === 3 && offset === 0);
+    const widen = narrowShoulder ? row >= 32 && row <= 36 : row >= 30 && row <= 36;
+    const range = narrowOuterRange(row, widen ? 1 : 0);
+    if (gate === 3 && offset === 8 && row === 30) range.highMax -= 1;
+    return offset === 8 ? mirrorRange(range) : range;
   }
-  if (offset === 0) {
-    // The corner block itself totals 205 seats (199 at Green Gate).
+  if (offset === 9) {
+    // The gate-corner block totals 205 seats, or 199 at Green Gate.
     const range = narrowOuterRange(row, gate === 2 ? (row <= 38 ? 1 : 0) : 1);
     if (gate !== 2 && row >= 30 && row <= 34) range.lowMin -= 1;
-    return range;
+    return mirrorRange(range);
   }
-  if (offset === 2 || offset === 8) {
+  if (offset === 1 || offset === 7) {
     // These tapering blocks total 154 seats, or 152 at Green Gate.
     const range = narrowOuterRange(row);
     if ((gate === 2 && row >= 33 && row <= 35) || (gate !== 2 && row === 35)) {
       range.highMax -= 1;
     }
-    return range;
+    return offset === 7 ? mirrorRange(range) : range;
   }
 
-  // The Green Gate's straight upper blocks contain 13 seats per row.  The
-  // other straight gates contain 14, with the shoulder blocks widening from
-  // 13 to 14 seats over their final six rows.
-  if (gate === 2) return { highMax: 96, lowMin: 84 };
-  if ((offset === 3 || offset === 7) && row <= 30) return { highMax: 96, lowMin: 84 };
+  // The central Red/Blue/Yellow block is shortened on its final three rows:
+  // the PDF prints 203 seats at Red and 204 at Blue/Yellow.  Management
+  // seats remain part of these fixed-seat totals.
+  if (offset === 4 && gate !== 2 && row >= 34) {
+    return { highMax: row === 34 && gate !== 0 ? 90 : 89, lowMin: 83 };
+  }
+
+  // Green straight blocks contain 13 seats per row.  Other gates contain
+  // 14, except the two 214-seat blocks which widen from 13 to 14 seats for
+  // their final six rows.  Blocks on the latter half of a gate are mirrored.
+  if (gate === 2) {
+    const range = { highMax: 96, lowMin: 84 };
+    return offset === 6 ? mirrorRange(range) : range;
+  }
+  if ((offset === 2 || offset === 6) && row <= 30) {
+    const range = { highMax: 96, lowMin: 84 };
+    return offset === 6 ? mirrorRange(range) : range;
+  }
   return { highMax: 96, lowMin: 83 };
 }
 
