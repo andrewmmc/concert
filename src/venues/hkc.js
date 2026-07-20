@@ -106,6 +106,16 @@ export function floorBlockSeatNumbers(seats) {
   return Array.from({ length: seats }, (_, s) => (s < half ? 89 - s : 89 + seats - s));
 }
 
+// Normalized angular position of a fixed stand-seat slot within the physical
+// block between two aisles.  The lower area's seats 89…81 occupy the first
+// half and the higher area's seats 98…90 occupy the second half.  Missing
+// seats leave empty slots instead of shifting the remaining seat numbers or
+// moving the boundary between the two areas.
+export function standSeatPositionInBlock(seat) {
+  if (seat <= 89) return (89 - seat + 0.5) / 18;
+  return 1 - (seat - 90 + 0.5) / 18;
+}
+
 const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;
 const gateAndOffset = (aisle) => {
   const normalized = aisle - 40;
@@ -388,9 +398,7 @@ export const hkc = {
           const rg = rowGeo(row);
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;
-          const tMid = (w0 + w1) / 2;
-          const lowStep = (tMid - tL) / 9;
-          const highStep = (tR - tMid) / 9;
+          const slotStep = (tR - tL) / 18;
           const put = (t, slot, angularStep, sec, seatSide) => {
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
@@ -414,19 +422,18 @@ export const hkc = {
             if (seatExistsOnPlan(secNo, row + 1, slot)) highSlots.push(slot);
           }
           // Physical order from tL to tR: 89,88…lowMin of gate prevSec,
-          // then highMax…91,90 of gate secNo.
+          // then highMax…91,90 of gate secNo.  Every number remains in its
+          // fixed 81–98 slot, so shortened rows retain the same numbering and
+          // the two areas always meet at the centre of the physical block.
           const outward = (slots) => slots.slice().reverse();
-          if (lowSlots.length && highSlots.length) {
-            const slots = [
-              ...outward(lowSlots).map((slot) => ({ slot, sec: prevSec, seatSide: prevSide })),
-              ...outward(highSlots).map((slot) => ({ slot, sec: secNo, seatSide: side })),
-            ];
-            const step = (tR - tL) / slots.length;
-            slots.forEach(({ slot, sec, seatSide }, i) => put(tL + (i + 0.5) * step, slot, step, sec, seatSide));
-          } else {
-            outward(lowSlots).forEach((slot, i) => put(tL + (i + 0.5) * lowStep, slot, lowStep, prevSec, prevSide));
-            outward(highSlots).forEach((slot, i) => put(tR - (highSlots.length - i - 0.5) * highStep, slot, highStep, secNo, side));
-          }
+          const slots = [
+            ...outward(lowSlots).map((slot) => ({ slot, sec: prevSec, seatSide: prevSide })),
+            ...outward(highSlots).map((slot) => ({ slot, sec: secNo, seatSide: side })),
+          ];
+          slots.forEach(({ slot, sec, seatSide }) => {
+            const t = tL + standSeatPositionInBlock(slot) * (tR - tL);
+            put(t, slot, slotStep, sec, seatSide);
+          });
         }
       }
     }
