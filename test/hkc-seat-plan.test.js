@@ -72,27 +72,33 @@ test('attributes the two halves of a block to the correct gates', () => {
 test('includes section 76 row 6 seat 93 shown on the centre-stage plan', () => {
   assert.equal(seatExistsOnPlan(76, 6, 93), true);
 });
-test('keeps every stand seat number in its fixed slot and area half', () => {
-  assert.equal(standSeatPositionInBlock(89), 0.5 / 18);
-  assert.equal(standSeatPositionInBlock(81), 8.5 / 18);
-  assert.equal(standSeatPositionInBlock(98), 9.5 / 18);
-  assert.equal(standSeatPositionInBlock(90), 17.5 / 18);
 
-  for (let seat = 81; seat <= 89; seat++) {
-    assert.ok(standSeatPositionInBlock(seat) < 0.5, `seat ${seat} remains in the lower area's half`);
-  }
-  for (let seat = 90; seat <= 98; seat++) {
-    assert.ok(standSeatPositionInBlock(seat) > 0.5, `seat ${seat} remains in the higher area's half`);
-  }
-});
+test('packs shortened 8X and 9X ranges together in their area halves', () => {
+  const lowCount = 6;
+  const highCount = 7;
 
-test('inner-tier rows leave their missing centre slots empty', () => {
-  assert.equal(seatExistsOnPlan(73, 1, 84), true);
-  assert.equal(seatExistsOnPlan(73, 1, 83), false);
-  assert.equal(seatExistsOnPlan(74, 1, 96), true);
-  assert.equal(seatExistsOnPlan(74, 1, 97), false);
+  assert.equal(standSeatPositionInBlock(89, lowCount, highCount), 0.5 / (lowCount * 2));
+  assert.equal(standSeatPositionInBlock(84, lowCount, highCount), 0.5 - 0.5 / (lowCount * 2));
+  assert.equal(standSeatPositionInBlock(96, lowCount, highCount), 0.5 + 0.5 / (highCount * 2));
+  assert.equal(standSeatPositionInBlock(90, lowCount, highCount), 1 - 0.5 / (highCount * 2));
+
+  for (let seat = 84; seat <= 89; seat++) {
+    assert.ok(
+      standSeatPositionInBlock(seat, lowCount, highCount) < 0.5,
+      `seat ${seat} remains in the lower area's half`,
+    );
+  }
+  for (let seat = 90; seat <= 96; seat++) {
+    assert.ok(
+      standSeatPositionInBlock(seat, lowCount, highCount) > 0.5,
+      `seat ${seat} remains in the higher area's half`,
+    );
+  }
+
+  const centreSpacing = standSeatPositionInBlock(96, lowCount, highCount) -
+    standSeatPositionInBlock(84, lowCount, highCount);
   assert.ok(Math.abs(
-    standSeatPositionInBlock(96) - standSeatPositionInBlock(84) - 6 / 18,
+    centreSpacing - (0.25 / lowCount + 0.25 / highCount),
   ) < Number.EPSILON);
 });
 

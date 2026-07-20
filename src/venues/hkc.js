@@ -7,9 +7,9 @@
 //   · rows 1-13 lower tier · 14-15 promenade level (11 wheelchair platforms)
 //   · rows 16-39 upper tier; row limits differ by gate and by the two seat
 //     blocks adjoining each numbered aisle
-//   · seat numbers are fixed "column" slots 81-98 repeated in every row;
-//     seats 90-98 of a gate lie in the block before its aisle and seats
-//     81-89 in the block after it (see blockAfterAisleForSeat)
+//   · seat numbers span 81-98: seats 90-98 of a gate lie in the block before
+//     its aisle and seats 81-89 in the block after it; shortened ranges remain
+//     contiguous within their half-block (see blockAfterAisleForSeat)
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { makeRingR, ringStripGeo } from '../scene.js';
@@ -107,14 +107,13 @@ export function floorBlockSeatNumbers(seats) {
   return Array.from({ length: seats }, (_, s) => (s < half ? 89 - s : 89 + seats - s));
 }
 
-// Normalized angular position of a fixed stand-seat slot within the physical
-// block between two aisles.  The lower area's seats 89…81 occupy the first
-// half and the higher area's seats 98…90 occupy the second half.  Missing
-// seats leave empty slots instead of shifting the remaining seat numbers or
-// moving the boundary between the two areas.
-export function standSeatPositionInBlock(seat) {
-  if (seat <= 89) return (89 - seat + 0.5) / 18;
-  return 1 - (seat - 90 + 0.5) / 18;
+// Normalized position within a physical block.  Each area's shortened seat
+// range fills its own half, so the 8X and 9X seats remain together without
+// either area crossing the block's midpoint.
+export function standSeatPositionInBlock(seat, lowCount, highCount) {
+  if (seat <= 89) return (89 - seat + 0.5) / (lowCount * 2);
+  const highMax = 89 + highCount;
+  return 0.5 + (highMax - seat + 0.5) / (highCount * 2);
 }
 
 const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;
@@ -400,7 +399,6 @@ export const hkc = {
           const rg = rowGeo(row);
           const rMid = ringR((w0 + w1) / 2, rg.S);
           const tL = w0 + aisleInset / rMid, tR = w1 - aisleInset / rMid;
-          const slotStep = (tR - tL) / 18;
           const put = (t, slot, angularStep, sec, seatSide) => {
             const rad = ringR(t, rg.S) + 0.16;
             const x = rad * Math.cos(t), z = rad * Math.sin(t);
@@ -424,17 +422,18 @@ export const hkc = {
             if (seatExistsOnPlan(secNo, row + 1, slot)) highSlots.push(slot);
           }
           // Physical order from tL to tR: 89,88…lowMin of gate prevSec,
-          // then highMax…91,90 of gate secNo.  Every number remains in its
-          // fixed 81–98 slot, so shortened rows retain the same numbering and
-          // the two areas always meet at the centre of the physical block.
+          // then highMax…91,90 of gate secNo.  Each contiguous range fills its
+          // own half, so the two areas meet at the centre without a gap.
           const outward = (slots) => slots.slice().reverse();
+          const lowStep = lowSlots.length ? (tR - tL) / (lowSlots.length * 2) : 0;
+          const highStep = highSlots.length ? (tR - tL) / (highSlots.length * 2) : 0;
           const slots = [
-            ...outward(lowSlots).map((slot) => ({ slot, sec: prevSec, seatSide: prevSide })),
-            ...outward(highSlots).map((slot) => ({ slot, sec: secNo, seatSide: side })),
+            ...outward(lowSlots).map((slot) => ({ slot, sec: prevSec, seatSide: prevSide, step: lowStep })),
+            ...outward(highSlots).map((slot) => ({ slot, sec: secNo, seatSide: side, step: highStep })),
           ];
-          slots.forEach(({ slot, sec, seatSide }) => {
-            const t = tL + standSeatPositionInBlock(slot) * (tR - tL);
-            put(t, slot, slotStep, sec, seatSide);
+          slots.forEach(({ slot, sec, seatSide, step }) => {
+            const position = standSeatPositionInBlock(slot, lowSlots.length, highSlots.length);
+            put(tL + position * (tR - tL), slot, step, sec, seatSide);
           });
         }
       }
