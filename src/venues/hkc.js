@@ -49,22 +49,58 @@ export const WHEELCHAIR_PLATFORMS = [
 
 const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
 
-// End-stage 三面台 arena floor (Brown Gate 啡閘): seven flat-floor blocks
-// facing the stage — a back bank of five and a front bank of two wider
-// blocks, numbered 61-67 as on the official plan.  x/z are the centre of
-// the first row on the 40 m × 40 m arena floor; the stage occupies z < -10.
-// Rows are lettered A-H in the back bank and J-Q in the front bank (no I).
+// End-stage 三面台 arena floor (Brown Gate 啡閘): thirteen flat-floor
+// blocks in three banks facing the stage — a back bank of three 12-seat
+// blocks (rows AA-AG) flanked by the two WZ wheelchair seating zones, then
+// middle and front banks of five blocks (rows A-J and K-S) whose outer
+// blocks are 10 seats wide.  Seat numbers within a block run 90…9x then
+// 8x…89 left to right as printed on the plan; following the stands
+// convention the 90s half belongs to the higher of the block's two flanking
+// Brown Gate aisles and the 80s half to the lower one (legend: Brown Gate
+// Aisles 62-67, rows AA-S only).  The plan does not number the blocks;
+// gateHigh/gateLow are the aisles flanking each block, numbered like the
+// Green Gate below them (decreasing from the Yellow side to the Blue side).
+// x/z are the centre of the first row on the 40 m × 40 m arena floor,
+// placed to scale from the plan (seat pitch ≈ 0.55 m, row pitch ≈ 0.78 m);
+// the stage occupies z < -10.
 export const END_STAGE_FLOOR_BLOCKS = [
-  { id: 62, x: 15.2, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
-  { id: 61, x: 7.6, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
-  { id: 67, x: 0, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
-  { id: 63, x: -7.6, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
-  { id: 66, x: -15.2, z: -8.6, rows: 8, seats: 9, rowOffset: 0 },
-  { id: 64, x: 6.6, z: 1.6, rows: 8, seats: 18, rowOffset: 8 },
-  { id: 65, x: -6.6, z: 1.6, rows: 8, seats: 18, rowOffset: 8 },
+  // back bank, rows AA-AG (7 rows × 12 seats)
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
+  // middle bank, rows A-J (10 rows; side blocks 10 seats, centre blocks 12)
+  { gateHigh: 67, gateLow: 66, x: -14.49, z: -1.15, rows: 10, seats: 10, rowOffset: 7 },
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 63, gateLow: 62, x: 14.49, z: -1.15, rows: 10, seats: 10, rowOffset: 7 },
+  // front bank, rows K-S (9 rows; same column layout as the middle bank)
+  { gateHigh: 67, gateLow: 66, x: -14.49, z: 7.80, rows: 9, seats: 10, rowOffset: 17 },
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 63, gateLow: 62, x: 14.49, z: 7.80, rows: 9, seats: 10, rowOffset: 17 },
 ];
 
-export const FLOOR_ROW_LETTERS = 'ABCDEFGHJKLMNOPQR'; // no I
+// The two arena-floor wheelchair seating zones (WZ) flanking the back bank;
+// x/z are each zone's centre.
+export const END_STAGE_FLOOR_WZ = [
+  { x: -12.8, z: -5.15 },
+  { x: 12.8, z: -5.15 },
+];
+
+// Rows AA-AG in the back bank, then A-S across the middle and front banks.
+export const FLOOR_ROW_LETTERS = [
+  'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG',
+  ...'ABCDEFGHIJKLMNOPQRS',
+];
+
+// Seat numbers within a floor block, left to right: 90…(90+half-1) of the
+// higher gate, then (90-half)…89 of the lower gate.
+export function floorBlockSeatNumbers(seats) {
+  const half = seats / 2;
+  return Array.from({ length: seats }, (_, s) => (s < half ? 90 + s : s + 90 - seats));
+}
 
 const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;
 const gateAndOffset = (aisle) => {
@@ -390,22 +426,40 @@ export const hkc = {
     /* arena floor seats (end stage 三面台 only) — Brown Gate 啡閘 blocks
        standing on the flat floor and facing the stage at the -Z end */
     if (endStage) {
-      const pitch = 0.6, rowPitch = 0.95;
+      const pitch = 0.55, rowPitch = 0.78;
       for (const block of END_STAGE_FLOOR_BLOCKS) {
+        const seatNumbers = floorBlockSeatNumbers(block.seats);
         for (let r = 0; r < block.rows; r++) {
           for (let s = 0; s < block.seats; s++) {
+            const seat = seatNumbers[s];
             placements.push({
               x: block.x + (s - (block.seats - 1) / 2) * pitch,
               y: 0,
               z: block.z + r * rowPitch,
               yaw: Math.PI,
-              sec: block.id, row: FLOOR_ROW_LETTERS[block.rowOffset + r], seat: s + 1,
+              sec: seat >= 90 ? block.gateHigh : block.gateLow,
+              row: FLOOR_ROW_LETTERS[block.rowOffset + r], seat,
               tier: 'Arena Floor', zone: 'Brown Gate 啡閘', color: '#cf8f52', side: 0,
               alt: r % 2,
               widthScale: pitch * 0.82 / seatWidth,
             });
           }
         }
+      }
+
+      /* the two arena-floor wheelchair seating zones (WZ) flanking the
+         back bank of floor blocks */
+      const wzMat = new THREE.MeshStandardMaterial({ color: 0x3a4a42, roughness: 0.85 });
+      for (const zone of END_STAGE_FLOOR_WZ) {
+        const slab = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.08, 3.8), wzMat);
+        slab.position.set(zone.x, 0.04, zone.z);
+        slab.userData.label = 'Arena Floor Wheelchair Seating Zone 輪椅座位區';
+        scene.add(slab);
+        const decal = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.1),
+          new THREE.MeshBasicMaterial({ map: wpLabelTexture('WZ') }));
+        decal.position.set(zone.x, 0.1, zone.z);
+        decal.rotation.x = -Math.PI / 2;
+        scene.add(decal);
       }
     }
 
