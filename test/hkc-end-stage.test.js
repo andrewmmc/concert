@@ -39,13 +39,14 @@ test('floor banks match the plan: 3 blocks AA-AG, then 5 blocks A-J and K-S', ()
 });
 
 test('floor blocks fit the arena floor in front of the stage', () => {
-  // Arena floor is 40 m × 40 m; the stage occupies z < -10.
+  // Arena floor is 40 m × 40 m; the stage occupies z > 10 and each bank's
+  // rows step towards -Z.
   for (const block of END_STAGE_FLOOR_BLOCKS) {
     const halfWidth = (block.seats - 1) * 0.55 / 2;
-    const zEnd = block.z + (block.rows - 1) * 0.78;
+    const zEnd = block.z - (block.rows - 1) * 0.78;
     assert.ok(Math.abs(block.x) + halfWidth < 20, `block at x ${block.x} x extent`);
-    assert.ok(block.z > -10, `block at z ${block.z} clears the stage`);
-    assert.ok(zEnd < 20, `block at z ${block.z} z extent`);
+    assert.ok(block.z < 10, `block at z ${block.z} clears the stage`);
+    assert.ok(zEnd > -20, `block at z ${block.z} z extent`);
   }
 });
 
@@ -90,12 +91,12 @@ test('two WZ zones flank the back bank without overlapping seats', () => {
   assert.equal(END_STAGE_FLOOR_WZ.length, 2);
   for (const zone of END_STAGE_FLOOR_WZ) {
     assert.ok(Math.abs(zone.x) < 20 && Math.abs(zone.z) < 20, 'zone on the arena floor');
-    assert.ok(zone.z > -10, 'zone clears the stage');
+    assert.ok(zone.z < 10, 'zone clears the stage');
     for (const block of END_STAGE_FLOOR_BLOCKS) {
       const halfWidth = (block.seats - 1) * 0.55 / 2;
-      const zEnd = block.z + (block.rows - 1) * 0.78;
+      const zEnd = block.z - (block.rows - 1) * 0.78;
       const overlapX = Math.abs(zone.x - block.x) < halfWidth + 2.1;
-      const overlapZ = zone.z + 1.9 > block.z && zone.z - 1.9 < zEnd;
+      const overlapZ = zone.z - 1.9 < block.z && zone.z + 1.9 > zEnd;
       assert.ok(!(overlapX && overlapZ), `zone at x ${zone.x} overlaps a seat block`);
     }
   }

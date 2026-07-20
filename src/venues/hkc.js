@@ -62,31 +62,32 @@ const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp
 // Green Gate below them (decreasing from the Yellow side to the Blue side).
 // x/z are the centre of the first row on the 40 m × 40 m arena floor,
 // placed to scale from the plan (seat pitch ≈ 0.55 m, row pitch ≈ 0.78 m);
-// the stage occupies z < -10.
+// the stage occupies z > 10, so the back bank (rows AA-AG) sits closest to
+// it and the rows of each bank run towards -Z.
 export const END_STAGE_FLOOR_BLOCKS = [
   // back bank, rows AA-AG (7 rows × 12 seats)
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: -7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
   // middle bank, rows A-J (10 rows; side blocks 10 seats, centre blocks 12)
-  { gateHigh: 67, gateLow: 66, x: -14.49, z: -1.15, rows: 10, seats: 10, rowOffset: 7 },
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: -1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 63, gateLow: 62, x: 14.49, z: -1.15, rows: 10, seats: 10, rowOffset: 7 },
+  { gateHigh: 67, gateLow: 66, x: -14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 63, gateLow: 62, x: 14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
   // front bank, rows K-S (9 rows; same column layout as the middle bank)
-  { gateHigh: 67, gateLow: 66, x: -14.49, z: 7.80, rows: 9, seats: 10, rowOffset: 17 },
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: 7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 63, gateLow: 62, x: 14.49, z: 7.80, rows: 9, seats: 10, rowOffset: 17 },
+  { gateHigh: 67, gateLow: 66, x: -14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
+  { gateHigh: 66, gateLow: 65, x: -7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 65, gateLow: 64, x: 0, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 64, gateLow: 63, x: 7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 63, gateLow: 62, x: 14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
 ];
 
 // The two arena-floor wheelchair seating zones (WZ) flanking the back bank;
 // x/z are each zone's centre.
 export const END_STAGE_FLOOR_WZ = [
-  { x: -12.8, z: -5.15 },
-  { x: 12.8, z: -5.15 },
+  { x: -12.8, z: 5.15 },
+  { x: 12.8, z: 5.15 },
 ];
 
 // Rows AA-AG in the back bank, then A-S across the middle and front banks.
@@ -228,7 +229,7 @@ export const hkc = {
   build(ctx, opts = {}) {
     const { scene } = ctx;
     // The bowl is identical for both layouts; the end-stage 三面台 layout
-    // moves the stage to the Red Gate (40s) end and adds floor blocks.
+    // moves the stage to the Green Gate (60s) end and adds floor blocks.
     const endStage = opts.layout === 'end-stage';
     const P_SUPER = 3.2;
     const ringR = makeRingR(P_SUPER);
@@ -283,11 +284,12 @@ export const hkc = {
       new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 1 }));
     ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
 
-    /* stage — 四面台: centred box; 三面台: box against the Red Gate end (-Z),
-       正面 (front) faces the Green Gate side (+Z) in both layouts */
+    /* stage — 四面台: centred box; 三面台: box against the Green Gate end
+       (+Z).  正面 (front) faces +Z in the 四面台 layout and -Z in the
+       三面台 layout; `front` is the sign of the facing direction. */
     const STAGE = endStage
-      ? { w: 24, d: 9, z: -14.5, title: 'END STAGE', zh: '三面台', arrow: '正面 ↓' }
-      : { w: 16, d: 12, z: 0, title: 'CENTRE STAGE', zh: '中央舞台', arrow: '正面 →' };
+      ? { w: 24, d: 9, z: 14.5, title: 'END STAGE', zh: '三面台', arrow: '正面 ↑', front: -1 }
+      : { w: 16, d: 12, z: 0, title: 'CENTRE STAGE', zh: '中央舞台', arrow: '正面 →', front: 1 };
     const stageGroup = new THREE.Group();
     const stage = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w, 1.2, STAGE.d),
       new THREE.MeshStandardMaterial({ color: 0x2a3242, roughness: 0.6 }));
@@ -310,7 +312,7 @@ export const hkc = {
       top.rotation.x = -Math.PI / 2; top.rotation.z = 0; top.position.set(0, 1.33, STAGE.z); stageGroup.add(top);
       const front = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w + 0.3, 0.16, 0.5),
         new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0x46d39a, emissiveIntensity: 0.7 }));
-      front.position.set(0, 1.22, STAGE.z + STAGE.d / 2 + 0.15); stageGroup.add(front);
+      front.position.set(0, 1.22, STAGE.z + (STAGE.d / 2 + 0.15) * STAGE.front); stageGroup.add(front);
     }
     scene.add(stageGroup);
 
@@ -424,7 +426,8 @@ export const hkc = {
     }
 
     /* arena floor seats (end stage 三面台 only) — Brown Gate 啡閘 blocks
-       standing on the flat floor and facing the stage at the -Z end */
+       standing on the flat floor and facing the stage at the +Z end, so
+       each bank's rows step towards -Z */
     if (endStage) {
       const pitch = 0.55, rowPitch = 0.78;
       for (const block of END_STAGE_FLOOR_BLOCKS) {
@@ -435,8 +438,8 @@ export const hkc = {
             placements.push({
               x: block.x + (s - (block.seats - 1) / 2) * pitch,
               y: 0,
-              z: block.z + r * rowPitch,
-              yaw: Math.PI,
+              z: block.z - r * rowPitch,
+              yaw: 0,
               sec: seat >= 90 ? block.gateHigh : block.gateLow,
               row: FLOOR_ROW_LETTERS[block.rowOffset + r], seat,
               tier: 'Arena Floor', zone: 'Brown Gate 啡閘', color: '#cf8f52', side: 0,
