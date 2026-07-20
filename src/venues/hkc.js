@@ -30,21 +30,22 @@ export const ROW_LIMITS_BY_GATE = [
   [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Yellow 70-79
 ];
 
-// Each platform occupies rows 14-15 of the block after `aisle`.  The compact
-// corner platforms only have rows 9-13 in front of them; the central
-// platforms retain rows 1-13.  IDs and anchors follow the labels in the PDF.
+// Each platform occupies rows 14-15 of the block after `aisle`.  At compact
+// corner platforms, the low-seat half begins at row 9 while the adjacent
+// area's 90-series half retains rows 1-13.  Central platforms retain rows
+// 1-13 on both halves.  IDs and anchors follow the labels in the PDF.
 export const WHEELCHAIR_PLATFORMS = [
-  { id: 6, aisle: 41, firstRow: 9 },
-  { id: 7, aisle: 44, firstRow: 1 },
-  { id: 8, aisle: 47, firstRow: 9 },
-  { id: 9, aisle: 51, firstRow: 9 },
-  { id: 10, aisle: 54, firstRow: 1 },
-  { id: 11, aisle: 56, firstRow: 9 },
-  { id: 1, aisle: 61, firstRow: 9 },
-  { id: 2, aisle: 64, firstRow: 9 },
-  { id: 3, aisle: 67, firstRow: 9 },
-  { id: 4, aisle: 72, firstRow: 1 },
-  { id: 5, aisle: 75, firstRow: 9 },
+  { id: 6, aisle: 41, lowFirstRow: 9 },
+  { id: 7, aisle: 44, lowFirstRow: 1 },
+  { id: 8, aisle: 47, lowFirstRow: 9 },
+  { id: 9, aisle: 51, lowFirstRow: 9 },
+  { id: 10, aisle: 54, lowFirstRow: 1 },
+  { id: 11, aisle: 56, lowFirstRow: 9 },
+  { id: 1, aisle: 61, lowFirstRow: 9 },
+  { id: 2, aisle: 64, lowFirstRow: 9 },
+  { id: 3, aisle: 67, lowFirstRow: 9 },
+  { id: 4, aisle: 72, lowFirstRow: 1 },
+  { id: 5, aisle: 75, lowFirstRow: 9 },
 ];
 
 const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
@@ -157,7 +158,7 @@ function narrowOuterRange(row, extraHighSeat = 0) {
 
 function seatRangeAfterAisle(aisle, row) {
   const platform = PLATFORM_BY_AISLE.get(aisle);
-  if (platform?.firstRow === 9 && row >= 9 && row <= 13) {
+  if (platform?.lowFirstRow === 9 && row >= 9 && row <= 13) {
     return compactPlatformRange(platform, row);
   }
 
@@ -203,7 +204,8 @@ export function seatExistsOnPlan(aisle, row, seat) {
   if (row > rowLimitAfterAisle(blockAisle)) return false;
 
   const platform = PLATFORM_BY_AISLE.get(blockAisle);
-  if (platform && (row === 14 || row === 15 || row < platform.firstRow)) return false;
+  if (platform && (row === 14 || row === 15)) return false;
+  if (platform && seat < 90 && row < platform.lowFirstRow) return false;
 
   const { highMax, lowMin } = seatRangeAfterAisle(blockAisle, row);
   return seat >= 90 ? seat <= highMax : seat >= lowMin;

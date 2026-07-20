@@ -35,15 +35,17 @@ test('rejects coordinates outside the official seat-number domain', () => {
   }
 });
 
-test('WP6 has only rows 9-13 before the platform', () => {
+test('WP6 keeps rows 1-8 on the adjacent 90-series half', () => {
   // WP6 occupies the block between aisles 41 and 42, which holds the high
-  // seats of gate 42 and the low seats of gate 41.
-  assert.equal(seatExistsOnPlan(42, 1, 90), false);
-  assert.equal(seatExistsOnPlan(42, 8, 90), false);
+  // seats of gate 42 and the low seats of gate 41.  Only the low half starts
+  // at row 9.
+  assert.equal(seatExistsOnPlan(42, 1, 90), true);
+  assert.equal(seatExistsOnPlan(42, 8, 90), true);
   assert.equal(seatExistsOnPlan(42, 9, 90), true);
   assert.equal(seatExistsOnPlan(42, 13, 90), true);
   assert.equal(seatExistsOnPlan(42, 14, 90), false);
   assert.equal(seatExistsOnPlan(41, 1, 89), false);
+  assert.equal(seatExistsOnPlan(41, 8, 89), false);
   assert.equal(seatExistsOnPlan(41, 9, 89), true);
 });
 
@@ -55,9 +57,9 @@ test('applies a wheelchair platform to both halves of its physical block', () =>
 });
 
 test('attributes the two halves of a block to the correct gates', () => {
-  // WP1 occupies the block between aisles 61 and 62, so gate 62's high
-  // seats and gate 61's low seats both start only at row 9 there.
-  assert.equal(seatExistsOnPlan(62, 8, 90), false);
+  // WP1 occupies the block between aisles 61 and 62.  Gate 62's high seats
+  // retain rows 1-8 while gate 61's low seats start at row 9.
+  assert.equal(seatExistsOnPlan(62, 8, 90), true);
   assert.equal(seatExistsOnPlan(61, 8, 89), false);
   assert.equal(seatExistsOnPlan(62, 9, 90), true);
   assert.equal(seatExistsOnPlan(61, 9, 89), true);
@@ -65,6 +67,10 @@ test('attributes the two halves of a block to the correct gates', () => {
   // gate 62's low seats in the next one (aisles 62-63), both unaffected.
   assert.equal(seatExistsOnPlan(61, 1, 90), true);
   assert.equal(seatExistsOnPlan(62, 1, 89), true);
+});
+
+test('includes section 76 row 6 seat 93 shown on the centre-stage plan', () => {
+  assert.equal(seatExistsOnPlan(76, 6, 93), true);
 });
 test('keeps every stand seat number in its fixed slot and area half', () => {
   assert.equal(standSeatPositionInBlock(89), 0.5 / 18);
@@ -141,5 +147,5 @@ test('produces the expected total number of modelled seats', () => {
     }
   }
 
-  assert.equal(total, 16106);
+  assert.equal(total, 16554);
 });
