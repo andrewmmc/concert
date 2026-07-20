@@ -27,7 +27,7 @@ Modelled from the official LCSD arena plans with the real HKC conventions:
 and the column-slot seat numbering (81–98) repeated per section row. Arena
 40 m × 40 m · ceiling 23 m · inverted-pyramid roof 41 m. The end-stage
 layout moves the stage to the Green Gate (60s) end and adds 1,316 flat-floor
-seats in thirteen Brown Gate (啡閘) blocks (aisles 62–67, rows AA–S) plus
+seats in thirteen Brown Gate (啡閘) blocks (gates 42–47, rows AA–S) plus
 two arena-floor wheelchair seating zones.
 
 - [Centre-stage seating plan (PDF)](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_center_stage.pdf)

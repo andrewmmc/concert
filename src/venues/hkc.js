@@ -53,34 +53,36 @@ const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp
 // blocks in three banks facing the stage — a back bank of three 12-seat
 // blocks (rows AA-AG) flanked by the two WZ wheelchair seating zones, then
 // middle and front banks of five blocks (rows A-J and K-S) whose outer
-// blocks are 10 seats wide.  Seat numbers within a block run 90…9x then
-// 8x…89 left to right as printed on the plan; following the stands
-// convention the 90s half belongs to the higher of the block's two flanking
-// Brown Gate aisles and the 80s half to the lower one (legend: Brown Gate
-// Aisles 62-67, rows AA-S only).  The plan does not number the blocks;
-// gateHigh/gateLow are the aisles flanking each block, numbered like the
-// Green Gate below them (decreasing from the Yellow side to the Blue side).
-// x/z are the centre of the first row on the 40 m × 40 m arena floor,
-// placed to scale from the plan (seat pitch ≈ 0.55 m, row pitch ≈ 0.78 m);
-// the stage occupies z > 10, so the back bank (rows AA-AG) sits closest to
-// it and the rows of each bank run towards -Z.
+// blocks are 10 seats wide.  The stage stands at the Green Gate end, so the
+// Red Gate is 正面 to the stage and the floor gates take Red-range numbers
+// 42-47 (the Red-side counterpart of the 62-67 shown on the LCSD plan,
+// where the stage is drawn at the Red end).  Aisle numbers increase from
+// the Yellow side (-x) to the Blue side (+x) like the Red Gate stands; as
+// in the stands, seat 89 and seat 90 sit beside their own gate's aisle, so
+// within a block the 80s half of the lower gate comes first, then the 90s
+// half of the higher gate.  gateHigh/gateLow are the gates owning the
+// 90s/80s halves of each block.  x/z are the centre of the first row on the
+// 40 m × 40 m arena floor, placed to scale from the plan (seat pitch
+// ≈ 0.55 m, row pitch ≈ 0.78 m); the stage occupies z > 10, so the back
+// bank (rows AA-AG) sits closest to it and the rows of each bank run
+// towards -Z.
 export const END_STAGE_FLOOR_BLOCKS = [
   // back bank, rows AA-AG (7 rows × 12 seats)
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 44, gateLow: 43, x: -7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 45, gateLow: 44, x: 0, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
+  { gateHigh: 46, gateLow: 45, x: 7.55, z: 7.56, rows: 7, seats: 12, rowOffset: 0 },
   // middle bank, rows A-J (10 rows; side blocks 10 seats, centre blocks 12)
-  { gateHigh: 67, gateLow: 66, x: -14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
-  { gateHigh: 63, gateLow: 62, x: 14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
+  { gateHigh: 43, gateLow: 42, x: -14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
+  { gateHigh: 44, gateLow: 43, x: -7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 45, gateLow: 44, x: 0, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 46, gateLow: 45, x: 7.55, z: 1.15, rows: 10, seats: 12, rowOffset: 7 },
+  { gateHigh: 47, gateLow: 46, x: 14.49, z: 1.15, rows: 10, seats: 10, rowOffset: 7 },
   // front bank, rows K-S (9 rows; same column layout as the middle bank)
-  { gateHigh: 67, gateLow: 66, x: -14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
-  { gateHigh: 66, gateLow: 65, x: -7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 65, gateLow: 64, x: 0, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 64, gateLow: 63, x: 7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
-  { gateHigh: 63, gateLow: 62, x: 14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
+  { gateHigh: 43, gateLow: 42, x: -14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
+  { gateHigh: 44, gateLow: 43, x: -7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 45, gateLow: 44, x: 0, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 46, gateLow: 45, x: 7.55, z: -7.80, rows: 9, seats: 12, rowOffset: 17 },
+  { gateHigh: 47, gateLow: 46, x: 14.49, z: -7.80, rows: 9, seats: 10, rowOffset: 17 },
 ];
 
 // The two arena-floor wheelchair seating zones (WZ) flanking the back bank;
@@ -96,11 +98,12 @@ export const FLOOR_ROW_LETTERS = [
   ...'ABCDEFGHIJKLMNOPQRS',
 ];
 
-// Seat numbers within a floor block, left to right: 90…(90+half-1) of the
-// higher gate, then (90-half)…89 of the lower gate.
+// Seat numbers within a floor block, left to right (-x to +x): 89…(90-half)
+// of the lower gate, then (89+half)…90 of the higher gate, so seats 89 and
+// 90 sit beside their own gate's aisle as in the stands.
 export function floorBlockSeatNumbers(seats) {
   const half = seats / 2;
-  return Array.from({ length: seats }, (_, s) => (s < half ? 90 + s : s + 90 - seats));
+  return Array.from({ length: seats }, (_, s) => (s < half ? 89 - s : 89 + seats - s));
 }
 
 const previousAisle = (aisle) => aisle === 40 ? 79 : aisle - 1;

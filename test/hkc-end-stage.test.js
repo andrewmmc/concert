@@ -16,14 +16,14 @@ test('end-stage layout is registered and selectable', () => {
   assert.equal(layout.comingSoon, undefined);
 });
 
-test('floor blocks cover the Brown Gate aisles 62-67 from the plan legend', () => {
+test('floor blocks cover the Red-range floor gates 42-47', () => {
   const gates = new Set();
   for (const block of END_STAGE_FLOOR_BLOCKS) {
     gates.add(block.gateHigh);
     gates.add(block.gateLow);
     assert.equal(block.gateHigh, block.gateLow + 1, 'each block straddles two aisles');
   }
-  assert.deepEqual([...gates].sort((a, b) => a - b), [62, 63, 64, 65, 66, 67]);
+  assert.deepEqual([...gates].sort((a, b) => a - b), [42, 43, 44, 45, 46, 47]);
 });
 
 test('floor banks match the plan: 3 blocks AA-AG, then 5 blocks A-J and K-S', () => {
@@ -69,9 +69,9 @@ test('floor row lettering follows the plan: AA-AG back bank, A-J and K-S banks',
   }
 });
 
-test('floor seat numbers match the plan: 90s half then 80s half', () => {
-  assert.deepEqual(floorBlockSeatNumbers(12), [90, 91, 92, 93, 94, 95, 84, 85, 86, 87, 88, 89]);
-  assert.deepEqual(floorBlockSeatNumbers(10), [90, 91, 92, 93, 94, 85, 86, 87, 88, 89]);
+test('floor seat numbers: 80s half then 90s half, 89 and 90 at the aisles', () => {
+  assert.deepEqual(floorBlockSeatNumbers(12), [89, 88, 87, 86, 85, 84, 95, 94, 93, 92, 91, 90]);
+  assert.deepEqual(floorBlockSeatNumbers(10), [89, 88, 87, 86, 85, 94, 93, 92, 91, 90]);
 });
 
 test('column totals match the plan totals (312) and (190)', () => {
