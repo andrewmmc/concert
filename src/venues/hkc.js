@@ -30,6 +30,11 @@ export const ROW_LIMITS_BY_GATE = [
   [39, 39, 36, 36, 36, 36, 36, 36, 39, 39], // Yellow 70-79
 ];
 
+// Section 72 is absent from row 20 onwards in the supplied centre-stage plan.
+// This is separate from the physical-block limits above, which are shared by
+// the neighbouring section's opposite seat-number half.
+export const ROW_LIMIT_OVERRIDES_BY_SECTION = new Map([[72, 19]]);
+
 // Each platform occupies rows 14-15 of the block after `aisle`.  At compact
 // corner platforms, the low-seat half begins at row 9 while the adjacent
 // area's 90-series half retains rows 1-13.  Central platforms retain rows
@@ -50,9 +55,16 @@ export const WHEELCHAIR_PLATFORMS = [
 
 const PLATFORM_BY_AISLE = new Map(WHEELCHAIR_PLATFORMS.map((wp) => [wp.aisle, wp]));
 
-// Temporary centre-stage rows nearest the stage. Their seat ranges match row 1,
-// including the split numbered blocks on either side of each aisle.
+// Temporary centre-stage rows nearest the stage are not part of the official
+// fixed-seat plan. Keep their visible seat ranges explicit instead of deriving
+// them from row 1: the temporary layout has partial sections.
 export const TEMPORARY_CENTER_STAGE_ROWS = ['A', 'B', 'C', 'D'];
+export const TEMPORARY_CENTER_STAGE_SEAT_RANGES = {
+  A: { 73: [[84, 89]] },
+  B: {},
+  C: {},
+  D: {},
+};
 
 // End-stage 三面台 arena floor (Brown Gate 啡閘): thirteen flat-floor
 // blocks in three banks facing the stage — a back bank of three 12-seat
@@ -203,6 +215,9 @@ export function seatExistsOnPlan(aisle, row, seat) {
       !Number.isInteger(row) || row < 1 || row > 39 ||
       !Number.isInteger(seat) || seat < 81 || seat > 98) return false;
 
+  const sectionRowLimit = ROW_LIMIT_OVERRIDES_BY_SECTION.get(aisle);
+  if (sectionRowLimit && row > sectionRowLimit) return false;
+
   const blockAisle = blockAfterAisleForSeat(aisle, seat);
   if (row > rowLimitAfterAisle(blockAisle)) return false;
 
@@ -215,7 +230,10 @@ export function seatExistsOnPlan(aisle, row, seat) {
 }
 
 export function temporaryCenterStageSeatExists(aisle, row, seat) {
-  return TEMPORARY_CENTER_STAGE_ROWS.includes(row) && seatExistsOnPlan(aisle, 1, seat);
+  if (!Number.isInteger(aisle) || aisle < 40 || aisle > 79 ||
+      !Number.isInteger(seat) || seat < 81 || seat > 98) return false;
+  return (TEMPORARY_CENTER_STAGE_SEAT_RANGES[row]?.[aisle] || [])
+    .some(([first, last]) => seat >= first && seat <= last);
 }
 
 export const hkc = {

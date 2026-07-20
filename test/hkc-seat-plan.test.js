@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  ROW_LIMIT_OVERRIDES_BY_SECTION,
   ROW_LIMITS_BY_GATE,
   TEMPORARY_CENTER_STAGE_ROWS,
+  TEMPORARY_CENTER_STAGE_SEAT_RANGES,
   WHEELCHAIR_PLATFORMS,
   seatExistsOnPlan,
   temporaryCenterStageSeatExists,
@@ -15,6 +17,7 @@ test('uses the PDF row limits for each gate', () => {
   assert.deepEqual(ROW_LIMITS_BY_GATE[1], [39, 39, 36, 36, 36, 36, 36, 36, 39, 39]);
   assert.deepEqual(ROW_LIMITS_BY_GATE[2], [39, 39, 36, 33, 34, 34, 34, 33, 36, 39]);
   assert.deepEqual(ROW_LIMITS_BY_GATE[3], [39, 39, 36, 36, 36, 36, 36, 36, 39, 39]);
+  assert.equal(ROW_LIMIT_OVERRIDES_BY_SECTION.get(72), 19);
 });
 
 test('maps all eleven official wheelchair platform IDs', () => {
@@ -24,20 +27,17 @@ test('maps all eleven official wheelchair platform IDs', () => {
   );
 });
 
-test('uses row 1 seat-number ranges for temporary centre-stage rows A-D', () => {
+test('uses the explicit partial-seat ranges for temporary centre-stage rows', () => {
   assert.deepEqual(TEMPORARY_CENTER_STAGE_ROWS, ['A', 'B', 'C', 'D']);
+  assert.deepEqual(TEMPORARY_CENTER_STAGE_SEAT_RANGES.A[73], [[84, 89]]);
 
-  for (const row of TEMPORARY_CENTER_STAGE_ROWS) {
-    for (let aisle = 40; aisle <= 79; aisle++) {
-      for (let seat = 81; seat <= 98; seat++) {
-        assert.equal(
-          temporaryCenterStageSeatExists(aisle, row, seat),
-          seatExistsOnPlan(aisle, 1, seat),
-          `${aisle}-${row}-${seat}`,
-        );
-      }
-    }
+  for (let seat = 84; seat <= 89; seat++) {
+    assert.equal(temporaryCenterStageSeatExists(73, 'A', seat), true, `73-A-${seat}`);
   }
+  assert.equal(temporaryCenterStageSeatExists(73, 'A', 83), false);
+  assert.equal(temporaryCenterStageSeatExists(73, 'A', 90), false);
+  assert.equal(temporaryCenterStageSeatExists(72, 'A', 89), false);
+  assert.equal(temporaryCenterStageSeatExists(73, 'B', 84), false);
   assert.equal(temporaryCenterStageSeatExists(40, 'E', 90), false);
 });
 
@@ -129,6 +129,8 @@ test('applies the PDF seat-number ranges by row', () => {
 });
 
 test('shortens straight and corner blocks at their actual outer rows', () => {
+  assert.equal(seatExistsOnPlan(72, 19, 90), true);
+  assert.equal(seatExistsOnPlan(72, 20, 90), false);
   assert.equal(seatExistsOnPlan(65, 34, 90), true);
   assert.equal(seatExistsOnPlan(65, 35, 90), false);
   assert.equal(seatExistsOnPlan(45, 36, 90), true);
@@ -172,5 +174,5 @@ test('produces the expected total number of modelled seats', () => {
     }
   }
 
-  assert.equal(total, 16554);
+  assert.equal(total, 16370);
 });
