@@ -253,14 +253,17 @@ export const hkc = {
     const TIER = {
       lower: { r0: 22.5, y0: 1.00, dr: 0.80, dy: 0.42 },
       prom:  { r0: 32.9, y0: 6.04, dr: 0.80, dy: 0.42 },
-      upper: { r0: 34.9, y0: 7.30, dr: 0.85, dy: 0.50 },
+      upperInner: { r0: 34.9, y0: 7.30, dr: 0.85, dy: 0.50 },
+      upperOuter: { r0: 39.55, y0: 10.14, dr: 0.85, dy: 0.50 },
     };
     const rowGeo = (i) => {
       if (i < 13)  { const k = i;      return { S: TIER.lower.r0 + k * TIER.lower.dr, y: TIER.lower.y0 + k * TIER.lower.dy, name: 'Lower Tier' }; }
       if (i < 15)  { const k = i - 13; return { S: TIER.prom.r0  + k * TIER.prom.dr,  y: TIER.prom.y0  + k * TIER.prom.dy,  name: 'Promenade Level' }; }
-      const k = i - 15; return { S: TIER.upper.r0 + k * TIER.upper.dr, y: TIER.upper.y0 + k * TIER.upper.dy, name: 'Upper Tier' };
+      if (i < 20)  { const k = i - 15; return { S: TIER.upperInner.r0 + k * TIER.upperInner.dr, y: TIER.upperInner.y0 + k * TIER.upperInner.dy, name: 'Upper Tier' }; }
+      const k = i - 20; return { S: TIER.upperOuter.r0 + k * TIER.upperOuter.dr, y: TIER.upperOuter.y0 + k * TIER.upperOuter.dy, name: 'Upper Tier' };
     };
     const WALK = { S0: 33.9, S1: 35.2, y: 6.9 };
+    const UPPER_WALK = { S0: 38.5, S1: 39.8, y: 9.74 };
 
     const terraceMat = new THREE.MeshStandardMaterial({ color: 0x1c2432, roughness: 0.95, metalness: 0.05 });
     const strip = (rings) => ringStripGeo(ringR, rings);
@@ -276,10 +279,12 @@ export const hkc = {
     }
     scene.add(buildTierRows(1, 13, TIER.lower.dr));
     scene.add(buildTierRows(14, 15, TIER.prom.dr));
-    scene.add(buildTierRows(16, 39, TIER.upper.dr));
+    scene.add(buildTierRows(16, 20, TIER.upperInner.dr));
+    scene.add(buildTierRows(21, 39, TIER.upperOuter.dr));
 
-    scene.add(new THREE.Mesh(strip([{ S: WALK.S0, y: WALK.y }, { S: WALK.S1, y: WALK.y }]),
-      new THREE.MeshStandardMaterial({ color: 0x232f42, roughness: 0.9 })));
+    const walkwayMat = new THREE.MeshStandardMaterial({ color: 0x232f42, roughness: 0.9 });
+    scene.add(new THREE.Mesh(strip([{ S: WALK.S0, y: WALK.y }, { S: WALK.S1, y: WALK.y }]), walkwayMat));
+    scene.add(new THREE.Mesh(strip([{ S: UPPER_WALK.S0, y: UPPER_WALK.y }, { S: UPPER_WALK.S1, y: UPPER_WALK.y }]), walkwayMat));
     scene.add(new THREE.Mesh(strip([{ S: 20.0, y: 0.02 }, { S: TIER.lower.r0 + 0.05, y: 0.02 }]), terraceMat));
 
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40),
@@ -291,8 +296,8 @@ export const hkc = {
       new THREE.LineBasicMaterial({ color: 0x3a4a66 })));
 
     const topRow = rowGeo(38);
-    scene.add(new THREE.Mesh(strip([{ S: topRow.S + TIER.upper.dr, y: topRow.y + TIER.upper.dy },
-      { S: topRow.S + TIER.upper.dr + 2.6, y: 0 }]),
+    scene.add(new THREE.Mesh(strip([{ S: topRow.S + TIER.upperOuter.dr, y: topRow.y + TIER.upperOuter.dy },
+      { S: topRow.S + TIER.upperOuter.dr + 2.6, y: 0 }]),
       new THREE.MeshStandardMaterial({ color: 0x151b26, roughness: 1, side: THREE.DoubleSide })));
     const ground = new THREE.Mesh(new THREE.CircleGeometry(220, 64),
       new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 1 }));
