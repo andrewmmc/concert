@@ -1,7 +1,8 @@
 // Registry of available venues. Add new venue modules here.
 import { hkc } from './hkc.js';
+import { qes } from './qes.js';
 
-export const venues = [hkc];
+export const venues = [hkc, qes];
 export const defaultVenue = hkc;
 
 export function getVenue(id) {
