@@ -5,13 +5,11 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const DEG = Math.PI / 180;
-
 export const QES_STAND_SECTIONS = [
   { id: 1, label: 'Section 1', total: 395, rows: 22, side: 'east', center: -9, color: '#52b7ff' },
-  { id: 2, label: 'Section 2', total: 645, rows: 30, side: 'south', center: 8.5, color: '#41d37d' },
+  { id: 2, label: 'Section 2', total: 345, rows: 18, side: 'south', center: 8.5, color: '#41d37d' },
   { id: 3, label: 'Section 3', total: 337, rows: 20, side: 'south', center: -8.5, color: '#8fdc63' },
-  { id: 4, label: 'Section 4', total: 395, rows: 22, side: 'west', center: -9, color: '#f1c84c' },
+  { id: 4, label: 'Section 4', total: 396, rows: 22, side: 'west', center: -9, color: '#f1c84c' },
   { id: 5, label: 'Section 5', total: 398, rows: 22, side: 'west', center: 9, color: '#f59b5f' },
   { id: 6, label: 'Section 6', total: 325, rows: 18, side: 'north', center: -8.5, color: '#ee6a78' },
   { id: 7, label: 'Section 7', total: 274, rows: 17, side: 'north', center: 8.5, color: '#b789ff' },
@@ -23,47 +21,54 @@ export const QES_LAYOUTS = [
     id: 'end-stage',
     label: 'End Stage',
     zh: '正面舞台',
-    stage: { kind: 'end', label: 'End Stage 正面舞台', x: -12.8, z: 0, w: 8.3, d: 20.2, rotation: 90 * DEG, arrow: '正面 →' },
+    // 32' x 48' platform stage against the west stand; floor rows face it.
+    stage: { kind: 'end', label: 'End Stage 正面舞台', x: -13.6, z: 0, w: 9.75, d: 14.63, rotation: 0, arrow: '正面 →' },
     floorSections: [
-      { id: 9, label: 'Section 9', total: 800, rows: 20, side: 'floor', x: 4.8, z: -5.6, w: 16.2, d: 11.1, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 690, rows: 18, side: 'floor', x: 4.8, z: 6.6, w: 16.2, d: 9.3, color: '#d9a45f' },
+      { id: 9, label: 'Section 9', total: 308, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: -5.0, w: 17.5, d: 9.4, color: '#cf8f52' },
+      { id: 10, label: 'Section 10', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: 5.0, w: 17.5, d: 9.4, color: '#d9a45f' },
     ],
   },
   {
     id: '3-side-end-stage',
     label: '3-side End Stage',
     zh: '三面台',
-    stage: { kind: 'end', label: '3-side End Stage 三面台', x: -12.8, z: 0, w: 8.3, d: 20.2, rotation: 90 * DEG, arrow: '正面 →' },
+    // Same stage and floor plan as End Stage, but west-stand sections 4 and 5
+    // behind the stage are closed off on the official plan.
+    stage: { kind: 'end', label: '3-side End Stage 三面台', x: -13.6, z: 0, w: 9.75, d: 14.63, rotation: 0, arrow: '三面 →' },
+    closedStands: [4, 5],
     floorSections: [
-      { id: 9, label: 'Section 9', total: 800, rows: 20, side: 'floor', x: 4.8, z: -5.6, w: 16.2, d: 11.1, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 595, rows: 17, side: 'floor', x: 4.8, z: 6.5, w: 16.2, d: 9.0, color: '#d9a45f' },
+      { id: 9, label: 'Section 9', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: -5.0, w: 17.5, d: 9.4, color: '#cf8f52' },
+      { id: 10, label: 'Section 10', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: 5.0, w: 17.5, d: 9.4, color: '#d9a45f' },
     ],
   },
   {
     id: 'central-stage',
     label: 'Central Stage',
     zh: '中央舞台',
-    stage: { kind: 'central', label: 'Central Stage 中央舞台', x: 0, z: 0, w: 7.4, d: 7.4, rotation: 0, arrow: '360°' },
+    // 28' x 28' central stage with tiered platforms flanking it east and west.
+    stage: { kind: 'central', label: 'Central Stage 中央舞台', x: 0, z: 0, w: 8.5, d: 8.5, rotation: 0, arrow: '360°' },
     floorSections: [
-      { id: 9, label: 'Section 9', total: 320, rows: 12, side: 'floor', x: 0, z: -10.6, w: 16.2, d: 4.0, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 320, rows: 12, side: 'floor', x: 0, z: 10.6, w: 16.2, d: 4.0, color: '#d9a45f', yaw: Math.PI },
+      { id: 9, label: 'Section 9', total: 320, rows: 10, side: 'floor', x: 0, z: -9.3, w: 22, d: 6.0, color: '#cf8f52' },
+      { id: 10, label: 'Section 10', total: 314, rows: 10, side: 'floor', x: 0, z: 9.3, w: 22, d: 6.0, color: '#d9a45f', yaw: Math.PI },
     ],
   },
   {
     id: 'boxing-ring',
     label: 'Boxing Ring',
     zh: '擂台',
-    stage: { kind: 'ring', label: 'Boxing Ring 擂台', x: 0, z: 0, w: 7.4, d: 7.4, rotation: 0, arrow: 'RING' },
+    // 24' x 24' ring with tiered platforms flanking it east and west.
+    stage: { kind: 'ring', label: 'Boxing Ring 擂台', x: 0, z: 0, w: 7.3, d: 7.3, rotation: 0, arrow: 'RING' },
     floorSections: [
-      { id: 9, label: 'Section 9', total: 240, rows: 10, side: 'floor', x: 0, z: -10.2, w: 15.8, d: 3.8, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 222, rows: 9, side: 'floor', x: 0, z: 10.2, w: 15.8, d: 3.8, color: '#d9a45f', yaw: Math.PI },
+      { id: 9, label: 'Section 9', total: 240, rows: 8, side: 'floor', x: 0, z: -8.1, w: 26, d: 5.2, color: '#cf8f52' },
+      { id: 10, label: 'Section 10', total: 222, rows: 8, side: 'floor', x: 0, z: 8.1, w: 26, d: 5.2, color: '#d9a45f', yaw: Math.PI },
     ],
   },
   {
     id: 'central-court',
     label: 'Central Court',
     zh: '中央場地',
-    stage: { kind: 'court', label: 'Central Court 中央場地', x: 0, z: 0, w: 28.2, d: 19.7, rotation: 0, arrow: 'COURT' },
+    // 104' x 60' court covering most of the arena floor.
+    stage: { kind: 'court', label: 'Central Court 中央場地', x: 0, z: 0, w: 31.7, d: 18.3, rotation: 0, arrow: 'COURT' },
     floorSections: [],
   },
 ];
@@ -80,7 +85,8 @@ export function rowSeatCounts(total, rows) {
 
 export function layoutSeatTotal(layoutId) {
   const layout = qesLayout(layoutId);
-  const stands = QES_STAND_SECTIONS.reduce((sum, section) => sum + section.total, 0);
+  const closed = new Set(layout.closedStands || []);
+  const stands = QES_STAND_SECTIONS.reduce((sum, section) => sum + (closed.has(section.id) ? 0 : section.total), 0);
   const floor = layout.floorSections.reduce((sum, section) => sum + section.total, 0);
   return stands + floor;
 }
@@ -114,9 +120,9 @@ function sectionPosition(section, rowIndex, seatIndex, seatsInRow) {
     return { x: section.center - lateral, y: standY, z: -16.3 - rowIndex * rowPitch, yaw: 0 };
   }
   if (section.side === 'east') {
-    return { x: 20.5 + rowIndex * rowPitch, y: standY, z: section.center + lateral, yaw: Math.PI / 2 };
+    return { x: 20.5 + rowIndex * rowPitch, y: standY, z: section.center + lateral, yaw: -Math.PI / 2 };
   }
-  return { x: -20.5 - rowIndex * rowPitch, y: standY, z: section.center - lateral, yaw: -Math.PI / 2 };
+  return { x: -20.5 - rowIndex * rowPitch, y: standY, z: section.center - lateral, yaw: Math.PI / 2 };
 }
 
 function addBlockOutline(scene, x, z, w, d, color = 0x284466, y = 0.045) {
@@ -142,14 +148,21 @@ function labelTexture(text, sub, color) {
 
 function addFloorSectionPlacements(placements, section) {
   const counts = rowSeatCounts(section.total, section.rows);
-  const rowPitch = section.d / Math.max(1, section.rows - 1);
+  // axis 'x': rows step along x away from the (west) stage and seats run
+  // along z facing it; otherwise rows step along z with seats along x.
+  const rowPitch = (section.axis === 'x' ? section.w : section.d) / Math.max(1, section.rows - 1);
   counts.forEach((count, rowIndex) => {
-    const seatPitch = section.w / Math.max(1, count);
+    const seatPitch = (section.axis === 'x' ? section.d : section.w) / Math.max(1, count);
     for (let seatIndex = 0; seatIndex < count; seatIndex++) {
+      const along = seatPitch * (seatIndex + 0.5);
       placements.push({
-        x: section.x - section.w / 2 + seatPitch * (seatIndex + 0.5),
+        x: section.axis === 'x'
+          ? section.x - section.w / 2 + rowPitch * rowIndex
+          : section.x - section.w / 2 + along,
         y: 0,
-        z: section.z + section.d / 2 - rowPitch * rowIndex,
+        z: section.axis === 'x'
+          ? section.z - section.d / 2 + along
+          : section.z + section.d / 2 - rowPitch * rowIndex,
         yaw: section.yaw || 0,
         sec: section.id,
         row: String.fromCharCode(65 + rowIndex),
@@ -164,8 +177,9 @@ function addFloorSectionPlacements(placements, section) {
   });
 }
 
-function addStandPlacements(placements) {
+function addStandPlacements(placements, closedStands) {
   for (const section of QES_STAND_SECTIONS) {
+    if (closedStands.has(section.id)) continue;
     const counts = rowSeatCounts(section.total, section.rows);
     counts.forEach((count, rowIndex) => {
       for (let seatIndex = 0; seatIndex < count; seatIndex++) {
@@ -269,7 +283,7 @@ export const qes = {
       scene.add(slab);
     }
 
-    addStandPlacements(placements);
+    addStandPlacements(placements, new Set(layout.closedStands || []));
     for (const floorSection of layout.floorSections) {
       addBlockOutline(scene, floorSection.x, floorSection.z, floorSection.w, floorSection.d, 0x806132, 0.075);
       addFloorSectionPlacements(placements, floorSection);
