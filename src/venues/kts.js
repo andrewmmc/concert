@@ -7,11 +7,22 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const DEG = Math.PI / 180;
-const ROW_LABELS = [
+export const KTS_ROW_LABELS = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
   'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
-  'V', 'W', 'X', 'Y', 'Z', 'AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG',
+  'V', 'W', 'X', 'Y', 'Z', 'AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH',
+  'JJ', 'KK', 'LL', 'MM', 'NN', 'PP', 'QQ',
 ];
+
+// Totals printed in the BOWL SEAT / COMPANION / WHEELCHAIR tables beside
+// every L1/L2/L5 gate in the source drawing. Hospitality loge and corporate
+// suite seats are separate from these fixed-bowl figures.
+export const KTS_PDF_TOTALS = {
+  bowl: 47459,
+  companion: 512,
+  wheelchair: 512,
+  fixed: 48483,
+};
 
 export const KTS_GATES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K'];
 
@@ -59,23 +70,100 @@ function sectionBaseSeats(tier, angle) {
   return northSouth ? 16 : corner ? 18 : 24;
 }
 
-function makeSection(id, tier, angle, span, rows, color) {
+// L1/L2 gate tables map one-to-one to the 42 lower-bowl seating blocks.
+// These are the exact BOWL SEAT values printed beneath those gates.
+export const KTS_LOWER_BOWL_TOTALS = {
+  101: 374, 102: 374, 103: 103, 104: 150, 105: 65,
+  106: 150, 107: 103, 108: 374, 109: 374, 110: 329,
+  201: 425, 202: 661, 203: 329,
+  212: 649, 213: 343, 214: 371, 215: 509,
+  216: 810, 217: 810, 218: 810, 219: 810, 220: 510,
+  221: 371, 222: 343, 223: 717,
+  224: 783, 225: 783, 226: 783, 227: 783, 228: 783,
+  229: 783, 230: 783, 231: 728, 232: 400, 233: 428,
+  234: 726, 235: 1101, 236: 1095, 237: 1095,
+  238: 1101, 239: 726, 240: 453,
+};
+
+export const KTS_UPPER_GATE_TOTALS = [
+  461, 574, 574, 633, 600, 692, 449, 363, 363, 363,
+  449, 692, 600, 634, 575, 575, 641, 772, 692, 615,
+  692, 772, 641, 575, 575, 634, 600, 692, 615, 692,
+  615, 692, 615, 692, 600, 633, 574, 574, 461,
+];
+
+function makeSection(id, tier, angle, span, rowEnd, color, officialTotal = null) {
   return {
     id,
     tier,
     angle,
     span,
-    rows,
+    rows: KTS_ROW_LABELS.indexOf(rowEnd) + 1,
+    rowEnd,
     color,
     baseSeats: sectionBaseSeats(tier, angle),
+    officialTotal,
   };
 }
 
 export const KTS_SECTIONS = [
-  ...INNER_SECTION_IDS.map((id) => makeSection(id, 'Inner Bowl', innerSectionAngle(id), 6.4 * DEG, 19, '#d92b9b')),
-  ...MAIN_SECTION_IDS.map((id) => makeSection(id, 'Lower Level', mainSectionAngle(id), 8.2 * DEG, 21, '#a93694')),
-  ...UPPER_SECTION_IDS.map((id) => makeSection(id, 'Upper Level', upperSectionAngle(id), 8.2 * DEG, 30, '#a88bc8')),
+  ...INNER_SECTION_IDS.map((id) => makeSection(
+    id, 'Inner Bowl', innerSectionAngle(id), 6.4 * DEG, 'V', '#d92b9b', KTS_LOWER_BOWL_TOTALS[id],
+  )),
+  ...MAIN_SECTION_IDS.map((id) => {
+    const rowEnd = id <= 214 ? 'DD' : id <= 222 ? 'HH' : id <= 233 ? 'FF' : 'HH';
+    return makeSection(
+      id, 'Lower Level', mainSectionAngle(id), 8.2 * DEG, rowEnd, '#a93694', KTS_LOWER_BOWL_TOTALS[id],
+    );
+  }),
+  ...UPPER_SECTION_IDS.map((id) => makeSection(
+    id, 'Upper Level', upperSectionAngle(id), 8.2 * DEG, 'QQ', '#a88bc8', null,
+  )),
 ];
+
+function allocateWeightedCounts(total, entries) {
+  const weightTotal = entries.reduce((sum, entry) => sum + entry.weight, 0);
+  const allocated = entries.map((entry) => {
+    const exact = total * entry.weight / weightTotal;
+    return { ...entry, count: Math.floor(exact), fraction: exact - Math.floor(exact) };
+  });
+  let remaining = total - allocated.reduce((sum, entry) => sum + entry.count, 0);
+  allocated.sort((a, b) => b.fraction - a.fraction || a.section.id - b.section.id || a.rowIndex - b.rowIndex);
+  for (let i = 0; i < remaining; i++) allocated[i].count++;
+  return allocated;
+}
+
+for (const section of KTS_SECTIONS.filter((candidate) => candidate.tier !== 'Upper Level')) {
+  const entries = Array.from({ length: section.rows }, (_, rowIndex) => ({
+    section,
+    rowIndex,
+    weight: section.baseSeats + rowIndex / Math.max(1, section.rows - 1) * 4,
+  }));
+  section.rowCounts = allocateWeightedCounts(section.officialTotal, entries)
+    .sort((a, b) => a.rowIndex - b.rowIndex)
+    .map((entry) => entry.count);
+}
+
+const upperSections = KTS_SECTIONS.filter((section) => section.tier === 'Upper Level');
+const upperEntries = upperSections.flatMap((section) =>
+  Array.from({ length: section.rows }, (_, rowIndex) => ({
+    section,
+    rowIndex,
+    weight: section.baseSeats + rowIndex / Math.max(1, section.rows - 1) * 5,
+  })),
+);
+// The L5 drawing prints totals by 39 upper gate zones rather than by the 40
+// numbered seating sections. Preserve the verified combined gate total while
+// distributing the rendered instances across all 501-540 section wedges.
+const upperRows = allocateWeightedCounts(
+  KTS_UPPER_GATE_TOTALS.reduce((sum, total) => sum + total, 0),
+  upperEntries,
+);
+for (const section of upperSections) {
+  section.rowCounts = upperRows.filter((entry) => entry.section === section)
+    .sort((a, b) => a.rowIndex - b.rowIndex)
+    .map((entry) => entry.count);
+}
 
 const SECTION_BY_ID = new Map(KTS_SECTIONS.map((section) => [section.id, section]));
 
@@ -99,15 +187,14 @@ export function ktsSection(id) {
 
 export function ktsRowLabels(sectionId) {
   const section = ktsSection(sectionId);
-  return section ? ROW_LABELS.slice(0, section.rows) : [];
+  return section ? KTS_ROW_LABELS.slice(0, section.rows) : [];
 }
 
 export function ktsSeatCount(sectionId, row) {
   const section = ktsSection(sectionId);
   const rowIndex = section ? ktsRowLabels(sectionId).indexOf(String(row).toUpperCase()) : -1;
   if (!section || rowIndex < 0) return 0;
-  const growthEvery = section.tier === 'Upper Level' ? 5 : 6;
-  return section.baseSeats + Math.floor(rowIndex / growthEvery);
+  return section.rowCounts[rowIndex];
 }
 
 export function ktsSeatNumbers(sectionId, row) {
@@ -168,13 +255,14 @@ function stadiumStripGeometry(rings, segments = 240) {
 }
 
 function rowGeometry(section, rowIndex) {
+  const progress = rowIndex / Math.max(1, section.rows - 1);
   if (section.tier === 'Inner Bowl') {
-    return { a: 29 + rowIndex * 0.64, b: 21 + rowIndex * 0.56, y: 0.7 + rowIndex * 0.35 };
+    return { a: 29 + progress * 12, b: 21 + progress * 9, y: 0.7 + progress * 6.3 };
   }
   if (section.tier === 'Lower Level') {
-    return { a: 31 + rowIndex * 0.78, b: 23 + rowIndex * 0.64, y: 0.8 + rowIndex * 0.40 };
+    return { a: 31 + progress * 16, b: 23 + progress * 11, y: 0.8 + progress * 9.0 };
   }
-  return { a: 47.5 + rowIndex * 0.48, b: 35 + rowIndex * 0.40, y: 12.0 + rowIndex * 0.40 };
+  return { a: 47.5 + progress * 14.7, b: 35 + progress * 12.2, y: 12.0 + progress * 12.4 };
 }
 
 function makeLabelTexture(text, sub, color, large = false) {
@@ -247,7 +335,7 @@ export const kts = {
   name: 'Kai Tak Stadium',
   zh: '啟德主場館',
   subtitle: 'Fixed stadium seating plan',
-  dims: 'Sections 101-110, 201-240 and 501-540 · upper gates A-H, J and K',
+  dims: '47,459 bowl seats · 512 companion + 512 wheelchair positions · sections 101-110, 201-240 and 501-540',
   roofLabel: 'Retractable roof structure',
   defaultLayout: 'stadium',
   layouts: [{ id: 'stadium', label: 'Stadium', zh: '主場館' }],

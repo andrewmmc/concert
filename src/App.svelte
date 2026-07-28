@@ -262,9 +262,9 @@
   <div class="search-label">Find a seat</div>
   <div class="search-content">
     <div class="fields">
-      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="2" aria-label="Section">
+      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="3" aria-label="Section">
       <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Row"  maxlength="3" aria-label="Row">
-      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="3" aria-label="Seat">
+      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="4" aria-label="Seat">
     </div>
     <button class="go" onclick={goSeat}>Go to seat</button>
   </div>

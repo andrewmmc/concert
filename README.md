@@ -24,6 +24,12 @@ for a specific seat, and fly the camera straight to it.
 | **Queen Elizabeth Stadium** 伊利沙伯體育館 | Five arena layouts | `#/qes/end-stage` |
 | **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `#/kts/stadium` |
 
+The Kai Tak Stadium model follows the row domains and gate totals printed on
+the project source drawing. Level 2 row depth varies by stand: the inset north
+blocks end at V, north outer blocks at DD, the south stand at FF, and the long
+east/west blocks at HH. Level 5 continues through QQ. The drawing totals
+47,459 bowl seats, 512 companion positions, and 512 wheelchair positions.
+
 Modelled from the official LCSD arena plans with the real HKC conventions:
 40 sections (Red 40–49, Blue 50–59, Green 60–69, Yellow 70–79), rows 1–39,
 and the column-slot seat numbering (81–98) repeated per section row. Arena
