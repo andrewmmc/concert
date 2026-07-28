@@ -21,6 +21,8 @@ for a specific seat, and fly the camera straight to it.
 |-------|---------|-------|
 | **Hong Kong Coliseum** 香港體育館 | Centre Stage 四面台 (360°) | `#/hkc/center-stage` |
 | | End Stage 三面台 (with arena-floor Brown Gate blocks) | `#/hkc/end-stage` |
+| **Queen Elizabeth Stadium** 伊利沙伯體育館 | Five arena layouts | `#/qes/end-stage` |
+| **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `#/kts/stadium` |
 
 Modelled from the official LCSD arena plans with the real HKC conventions:
 40 sections (Red 40–49, Blue 50–59, Green 60–69, Yellow 70–79), rows 1–39,
@@ -35,8 +37,6 @@ two arena-floor wheelchair seating zones.
 
 ## Known limitations
 
-- Only the **Hong Kong Coliseum** venue is modelled so far — see the roadmap
-  for other venues still to come.
 - Seat dimensions are visual approximations and are scaled to fit the available
   spacing in each section, so their size is not physically exact.
 
@@ -44,7 +44,6 @@ two arena-floor wheelchair seating zones.
 
 - AsiaWorld-Expo Hall 1
 - AsiaWorld-Expo Hall 10
-- Kai Tak Stadium
 - Kai Tak Arena
 - …and others
 
@@ -85,3 +84,5 @@ Venues are data modules under `src/venues/`:
 - Hong Kong Coliseum end-stage seating plan —
   [LCSD](https://www.lcsd.gov.hk/en/hkc/common/form/hkc_end_stage.pdf)
 - LCSD technical information (dimensions, capacity).
+- Kai Tak Stadium seating plan — project source drawing in
+  `misc/kts/stadium_seating_plan.pdf`.

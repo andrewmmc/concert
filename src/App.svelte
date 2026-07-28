@@ -125,7 +125,13 @@
       }
       if (hit.object.userData.wp) {
         if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
-        tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: `Wheelchair Platform WP${hit.object.userData.wp}`, sub: 'Promenade · rows 14–15 · wheelchair patron + minder' };
+        tooltip = {
+          show: true,
+          x: tooltip.x,
+          y: tooltip.y,
+          main: hit.object.userData.main || `Wheelchair Platform WP${hit.object.userData.wp}`,
+          sub: hit.object.userData.sub || 'Promenade · rows 14–15 · wheelchair patron + minder',
+        };
         canvas.classList.add('hovering'); return;
       }
       const id = hit.instanceId;
@@ -245,7 +251,7 @@
     <div class="settings-title">Settings</div>
     <div class="row"><span>Auto-rotate</span>
       <label class="switch"><input type="checkbox" bind:checked={autoRotate}><span class="slider"></span></label></div>
-    <div class="row"><span>Roof shell (inverted pyramid)</span>
+    <div class="row"><span>{venue.roofLabel || 'Roof structure'}</span>
       <label class="switch"><input type="checkbox" bind:checked={showRoof}><span class="slider"></span></label></div>
     <div class="row"><span>Side labels</span>
       <label class="switch"><input type="checkbox" bind:checked={showLabels}><span class="slider"></span></label></div>
