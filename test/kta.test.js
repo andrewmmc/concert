@@ -33,6 +33,14 @@ test('places the 102 and 109 section runs on opposite arena sides', () => {
   for (const id of [109, 110, 111, 112, 113]) assert.equal(side(id), 'south');
 });
 
+test('runs floor Blocks A-J from the 102 side to the 113 side', () => {
+  const z = (id) => KTA_FLOOR_BLOCKS.find((block) => block.id === id).z;
+  for (const id of ['A', 'B', 'C']) assert.ok(z(id) > 0, `Block ${id} is on the 102 side`);
+  assert.ok(z('D') > z('E'));
+  assert.ok(z('E') > z('F'));
+  for (const id of ['G', 'H', 'J']) assert.ok(z(id) < 0, `Block ${id} is on the 113 side`);
+});
+
 test('omits rows I, O, U and W from every single-letter row domain', () => {
   assert.deepEqual(KTA_OMITTED_ROWS, ['I', 'O', 'U', 'W']);
   for (const section of [...KTA_BOWL_SECTIONS, ...KTA_FLOOR_BLOCKS]) {
