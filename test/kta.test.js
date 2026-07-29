@@ -57,7 +57,27 @@ test('uses global bowl seat-number bands printed around the arena', () => {
   assert.deepEqual(ktaSeatNumbers(106, 'X'), Array.from({ length: 29 }, (_, i) => 151 + i));
   assert.equal(ktaSeatExists(113, 'X', 444), true);
   assert.equal(ktaSeatExists(113, 'W', 444), false);
-  assert.equal(ktaSeatExists(208, 'HH', 293), true);
+});
+
+test('chamfers the west blocks and keeps the upper-stand back-row strips', () => {
+  // Block 108: far-side row A tops out early, row M keeps the full height.
+  assert.equal(ktaSeatExists(108, 'M', 279), true);
+  assert.equal(ktaSeatExists(108, 'A', 279), false);
+  assert.equal(ktaSeatExists(108, 'A', 271), true);
+  // Block 107: far-side row A loses its lowest seats to the cut corner.
+  assert.equal(ktaSeatExists(107, 'M', 195), true);
+  assert.equal(ktaSeatExists(107, 'A', 195), false);
+  assert.equal(ktaSeatExists(107, 'A', 203), true);
+  // Block 208: chamfered top (row HH stops at 278) plus the FF-GG-HH strip.
+  assert.equal(ktaSeatExists(208, 'AA', 293), true);
+  assert.equal(ktaSeatExists(208, 'HH', 293), false);
+  assert.equal(ktaSeatExists(208, 'HH', 278), true);
+  assert.equal(ktaSeatExists(208, 'HH', 224), true);
+  assert.equal(ktaSeatExists(208, 'EE', 224), false);
+  // Block 207: full main body plus the BB-through-HH strip below it.
+  assert.equal(ktaSeatExists(207, 'BB', 180), true);
+  assert.equal(ktaSeatExists(207, 'AA', 180), false);
+  assert.equal(ktaSeatExists(207, 'BB', 193), false);
 });
 
 test('uses floor row and central-aisle seat hints from the concert plan', () => {

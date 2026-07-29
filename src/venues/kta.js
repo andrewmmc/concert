@@ -19,15 +19,19 @@ export const KTA_BOWL_SECTIONS = [
   { id: 104, side: 'north', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 91, lastSeat: 120, color: '#7310dc' },
   { id: 105, side: 'north', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 121, lastSeat: 150, color: '#7310dc' },
   { id: 106, side: 'north', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 151, lastSeat: 179, color: '#ed65ed' },
-  { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), firstSeat: 195, lastSeat: 224, color: '#ed65ed' },
-  { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), firstSeat: 250, lastSeat: 279, color: '#ed65ed' },
+  // Row A sits on the arena-floor side; the drawings cut its far corner, so the
+  // seat band tapers from row A (chamfered) to row M (full height).
+  { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), firstSeat: 195, lastSeat: 224, color: '#ed65ed', shape: { top: [221, 224], bottom: [203, 195] } },
+  { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), firstSeat: 250, lastSeat: 279, color: '#ed65ed', shape: { top: [271, 279], bottom: [253, 250] } },
   { id: 109, side: 'south', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 296, lastSeat: 324, color: '#ed65ed' },
   { id: 110, side: 'south', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 325, lastSeat: 354, color: '#7310dc' },
   { id: 111, side: 'south', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 355, lastSeat: 384, color: '#7310dc' },
   { id: 112, side: 'south', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 385, lastSeat: 414, color: '#7310dc' },
   { id: 113, side: 'south', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 415, lastSeat: 444, color: '#24c4cf' },
-  { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 180, lastSeat: 221, color: '#ed65ed' },
-  { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 252, lastSeat: 293, color: '#ed65ed' },
+  // Upper west stand. Both blocks keep a short low-numbered strip (rows toward
+  // the back wall) below the main body, and Block 208's top edge is chamfered.
+  { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 180, lastSeat: 221, color: '#ed65ed', shape: { top: 221, bottom: 195, strip: { fromRow: 'BB', min: 180, max: 192 } } },
+  { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 252, lastSeat: 293, color: '#ed65ed', shape: { top: [293, 278], bottom: 252, strip: { fromRow: 'FF', min: 224, max: 249 } } },
 ];
 
 export const KTA_FLOOR_BLOCKS = [
@@ -59,6 +63,26 @@ export function ktaRowLabels(sectionId) {
   return (BOWL_BY_ID.get(Number(key)) || FLOOR_BY_ID.get(key))?.rows.slice() || [];
 }
 
+function rangeInclusive(a, b) {
+  const lo = Math.min(a, b);
+  const hi = Math.max(a, b);
+  return Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
+}
+
+function shapedBowlSeats(section, row) {
+  const { shape, rows } = section;
+  const rowIndex = rows.indexOf(String(row).toUpperCase());
+  const t = rows.length <= 1 ? 0 : rowIndex / (rows.length - 1);
+  const interp = (value) => (Array.isArray(value)
+    ? Math.round(value[0] + (value[1] - value[0]) * t)
+    : value);
+  const seats = rangeInclusive(interp(shape.bottom), interp(shape.top));
+  if (shape.strip && rowIndex >= rows.indexOf(shape.strip.fromRow)) {
+    return [...rangeInclusive(shape.strip.min, shape.strip.max), ...seats];
+  }
+  return seats;
+}
+
 export function ktaSeatNumbers(sectionId, row) {
   const key = String(sectionId).toUpperCase();
   const section = BOWL_BY_ID.get(Number(key));
@@ -66,10 +90,8 @@ export function ktaSeatNumbers(sectionId, row) {
   const rows = section?.rows || block?.rows;
   if (!rows?.includes(String(row).toUpperCase())) return [];
   if (block) return floorSeatNumbers(block);
-  return Array.from(
-    { length: section.lastSeat - section.firstSeat + 1 },
-    (_, i) => section.firstSeat + i,
-  );
+  if (section.shape) return shapedBowlSeats(section, row);
+  return rangeInclusive(section.firstSeat, section.lastSeat);
 }
 
 export function ktaSeatExists(sectionId, row, seat) {
@@ -81,9 +103,8 @@ export function ktaSeatTotal() {
     total + section.rows.reduce((sum, row) => sum + ktaSeatNumbers(section.id, row).length, 0), 0);
 }
 
-function bowlPlacement(section, rowIndex, seatIndex, count) {
+function bowlPlacement(section, rowIndex, lateral) {
   const rowDepth = section.side === 'west-upper' ? 0.9 : 0.72;
-  const lateral = (seatIndex - (count - 1) / 2) * 0.38;
   const y = 0.65 + rowIndex * (section.side === 'west-upper' ? 0.55 : 0.38);
   if (section.side === 'north') {
     return { x: section.center - lateral, y, z: 17.5 + rowIndex * rowDepth, yaw: Math.PI };
@@ -100,12 +121,28 @@ function bowlPlacement(section, rowIndex, seatIndex, count) {
   };
 }
 
+// Anchors each seat to its printed number so chamfered rows and the upper-stand
+// strips line up on the correct side (rather than being centred per row).
+function sectionSeatMid(section) {
+  let min = Infinity;
+  let max = -Infinity;
+  for (const row of section.rows) {
+    const numbers = ktaSeatNumbers(section.id, row);
+    if (numbers.length) {
+      min = Math.min(min, numbers[0]);
+      max = Math.max(max, numbers.at(-1));
+    }
+  }
+  return (min + max) / 2;
+}
+
 function addBowlPlacements(placements) {
   for (const section of KTA_BOWL_SECTIONS) {
+    const seatMid = sectionSeatMid(section);
     section.rows.forEach((row, rowIndex) => {
       const numbers = ktaSeatNumbers(section.id, row);
-      numbers.forEach((seat, seatIndex) => {
-        const point = bowlPlacement(section, rowIndex, seatIndex, numbers.length);
+      numbers.forEach((seat) => {
+        const point = bowlPlacement(section, rowIndex, (seat - seatMid) * 0.38);
         placements.push({
           ...point,
           sec: section.id,
@@ -206,7 +243,7 @@ function addLabels(scene) {
   const specs = [
     ...KTA_BOWL_SECTIONS.map((section) => {
       const rowIndex = section.rows.length + 1;
-      const p = bowlPlacement(section, rowIndex, 0, 1);
+      const p = bowlPlacement(section, rowIndex, 0);
       return [String(section.id), section.id >= 200 ? 'UPPER' : 'BOWL', section.color, p.x, Math.max(8, p.y + 2), p.z];
     }),
     ...KTA_FLOOR_BLOCKS.map((block) => [`BLOCK ${block.id}`, 'FLOOR', '#9b6cff', block.x, 3.2, block.z]),
