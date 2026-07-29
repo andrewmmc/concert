@@ -188,8 +188,8 @@ function labelTexture(text, sub, color) {
 
 function addStage(scene) {
   const material = new THREE.MeshStandardMaterial({ color: 0xc9005c, roughness: 0.72 });
-  const stage = new THREE.Mesh(new THREE.BoxGeometry(19, 0.9, 6), material);
-  stage.position.set(16.5, 0.47, 0);
+  const stage = new THREE.Mesh(new THREE.BoxGeometry(31, 0.9, 6), material);
+  stage.position.set(10.5, 0.47, 0);
   stage.userData.label = 'End Stage 舞台';
   scene.add(stage);
   const thrust = new THREE.Mesh(new THREE.BoxGeometry(6, 0.9, 20), material);
