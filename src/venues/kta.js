@@ -14,18 +14,18 @@ function rowsBetween(first, last) {
 }
 
 export const KTA_BOWL_SECTIONS = [
-  { id: 102, side: 'south', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 31, lastSeat: 60, color: '#24c4cf' },
-  { id: 103, side: 'south', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 61, lastSeat: 90, color: '#7310dc' },
-  { id: 104, side: 'south', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 91, lastSeat: 120, color: '#7310dc' },
-  { id: 105, side: 'south', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 121, lastSeat: 150, color: '#7310dc' },
-  { id: 106, side: 'south', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 151, lastSeat: 179, color: '#ed65ed' },
+  { id: 102, side: 'north', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 31, lastSeat: 60, color: '#24c4cf' },
+  { id: 103, side: 'north', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 61, lastSeat: 90, color: '#7310dc' },
+  { id: 104, side: 'north', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 91, lastSeat: 120, color: '#7310dc' },
+  { id: 105, side: 'north', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 121, lastSeat: 150, color: '#7310dc' },
+  { id: 106, side: 'north', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 151, lastSeat: 179, color: '#ed65ed' },
   { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), firstSeat: 195, lastSeat: 224, color: '#ed65ed' },
   { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), firstSeat: 250, lastSeat: 279, color: '#ed65ed' },
-  { id: 109, side: 'north', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 296, lastSeat: 324, color: '#ed65ed' },
-  { id: 110, side: 'north', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 325, lastSeat: 354, color: '#7310dc' },
-  { id: 111, side: 'north', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 355, lastSeat: 384, color: '#7310dc' },
-  { id: 112, side: 'north', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 385, lastSeat: 414, color: '#7310dc' },
-  { id: 113, side: 'north', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 415, lastSeat: 444, color: '#24c4cf' },
+  { id: 109, side: 'south', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 296, lastSeat: 324, color: '#ed65ed' },
+  { id: 110, side: 'south', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 325, lastSeat: 354, color: '#7310dc' },
+  { id: 111, side: 'south', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 355, lastSeat: 384, color: '#7310dc' },
+  { id: 112, side: 'south', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 385, lastSeat: 414, color: '#7310dc' },
+  { id: 113, side: 'south', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 415, lastSeat: 444, color: '#24c4cf' },
   { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 180, lastSeat: 221, color: '#ed65ed' },
   { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 252, lastSeat: 293, color: '#ed65ed' },
 ];
@@ -86,10 +86,10 @@ function bowlPlacement(section, rowIndex, seatIndex, count) {
   const lateral = (seatIndex - (count - 1) / 2) * 0.38;
   const y = 0.65 + rowIndex * (section.side === 'west-upper' ? 0.55 : 0.38);
   if (section.side === 'north') {
-    return { x: section.center + lateral, y, z: 17.5 + rowIndex * rowDepth, yaw: Math.PI / 2 };
+    return { x: section.center + lateral, y, z: 17.5 + rowIndex * rowDepth, yaw: Math.PI };
   }
   if (section.side === 'south') {
-    return { x: section.center - lateral, y, z: -17.5 - rowIndex * rowDepth, yaw: Math.PI / 2 };
+    return { x: section.center - lateral, y, z: -17.5 - rowIndex * rowDepth, yaw: 0 };
   }
   const upperOffset = section.side === 'west-upper' ? 7 : 0;
   return {

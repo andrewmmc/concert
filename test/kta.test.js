@@ -27,6 +27,12 @@ test('matches the bowl and floor blocks shown by the reference plans', () => {
   assert.deepEqual(KTA_FLOOR_BLOCKS.map((block) => block.id), ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J']);
 });
 
+test('places the 102 and 109 section runs on opposite arena sides', () => {
+  const side = (id) => KTA_BOWL_SECTIONS.find((section) => section.id === id).side;
+  for (const id of [102, 103, 104, 105, 106]) assert.equal(side(id), 'north');
+  for (const id of [109, 110, 111, 112, 113]) assert.equal(side(id), 'south');
+});
+
 test('omits rows I, O, U and W from every single-letter row domain', () => {
   assert.deepEqual(KTA_OMITTED_ROWS, ['I', 'O', 'U', 'W']);
   for (const section of [...KTA_BOWL_SECTIONS, ...KTA_FLOOR_BLOCKS]) {
