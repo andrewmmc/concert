@@ -31,6 +31,12 @@ blocks end at V, north outer blocks at DD, the south stand at FF, and the long
 east/west blocks at HH. Level 5 continues through QQ. The drawing totals
 47,459 bowl seats, 512 companion positions, and 512 wheelchair positions.
 
+The Kai Tak Arena end-stage plan reconstructs the two project source drawings
+in `misc/kta/`: a globally numbered lower bowl and upper west stand (Blocks
+102–113, 207–208) around an event floor of Blocks A–J. The floor is arranged
+around a central T-stage thrust, so the flanking blocks A–C and G–J face
+inward toward the runway while Blocks D–F face the main stage down the centre.
+
 Modelled from the official LCSD arena plans with the real HKC conventions:
 40 sections (Red 40–49, Blue 50–59, Green 60–69, Yellow 70–79), rows 1–39,
 and the column-slot seat numbering (81–98) repeated per section row. Arena
