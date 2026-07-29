@@ -124,20 +124,21 @@ function addBowlPlacements(placements) {
 function addFloorPlacements(placements) {
   for (const block of KTA_FLOOR_BLOCKS) {
     const numbers = floorSeatNumbers(block);
+    const firstSeat = numbers[0];
+    const lastSeat = numbers.at(-1);
     block.rows.forEach((row, rowIndex) => {
-      numbers.forEach((seat, seatIndex) => {
-        const seatProgress = numbers.length === 1 ? 0.5 : seatIndex / (numbers.length - 1);
+      numbers.forEach((seat) => {
+        const seatProgress = firstSeat === lastSeat ? 0.5 : (seat - firstSeat) / (lastSeat - firstSeat);
         const rowProgress = block.rows.length === 1 ? 0.5 : rowIndex / (block.rows.length - 1);
-        const aisleOffset = seat >= 15 ? 0.62 : 0;
         let x;
         let z;
         if (block.axis === 'x') {
           x = block.x + block.w / 2 - rowProgress * block.w;
           z = block.reverseSeats
-            ? block.z + block.d / 2 - seatProgress * block.d - aisleOffset
-            : block.z - block.d / 2 + seatProgress * block.d + aisleOffset;
+            ? block.z + block.d / 2 - seatProgress * block.d
+            : block.z - block.d / 2 + seatProgress * block.d;
         } else {
-          x = block.x + block.w / 2 - seatProgress * block.w - aisleOffset;
+          x = block.x + block.w / 2 - seatProgress * block.w;
           z = block.reverse
             ? block.z + block.d / 2 - rowProgress * block.d
             : block.z - block.d / 2 + rowProgress * block.d;

@@ -61,8 +61,12 @@ test('uses global bowl seat-number bands printed around the arena', () => {
 });
 
 test('uses floor row and central-aisle seat hints from the concert plan', () => {
-  assert.deepEqual(ktaSeatNumbers('A', 'A'), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]);
-  assert.deepEqual(ktaSeatNumbers('C', 'J'), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  const seats26 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26];
+  const seats12 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  for (const block of ['A', 'B', 'D', 'F', 'H', 'J']) assert.deepEqual(ktaSeatNumbers(block, 'A'), seats26);
+  for (const block of ['C', 'E', 'G']) assert.deepEqual(ktaSeatNumbers(block, 'A'), seats12);
+  for (const block of ['A', 'B', 'C', 'G', 'H', 'J']) assert.equal(ktaRowLabels(block).at(-1), 'J');
+  for (const block of ['D', 'E', 'F']) assert.equal(ktaRowLabels(block).at(-1), 'K');
   assert.equal(ktaSeatExists('D', 'K', 26), true);
   assert.equal(ktaSeatExists('A', 'K', 1), false);
   assert.equal(ktaSeatExists('A', 'A', 13), false);
