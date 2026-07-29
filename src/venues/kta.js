@@ -86,10 +86,10 @@ function bowlPlacement(section, rowIndex, seatIndex, count) {
   const lateral = (seatIndex - (count - 1) / 2) * 0.38;
   const y = 0.65 + rowIndex * (section.side === 'west-upper' ? 0.55 : 0.38);
   if (section.side === 'north') {
-    return { x: section.center + lateral, y, z: 17.5 + rowIndex * rowDepth, yaw: Math.PI };
+    return { x: section.center + lateral, y, z: 17.5 + rowIndex * rowDepth, yaw: Math.PI / 2 };
   }
   if (section.side === 'south') {
-    return { x: section.center - lateral, y, z: -17.5 - rowIndex * rowDepth, yaw: 0 };
+    return { x: section.center - lateral, y, z: -17.5 - rowIndex * rowDepth, yaw: Math.PI / 2 };
   }
   const upperOffset = section.side === 'west-upper' ? 7 : 0;
   return {
