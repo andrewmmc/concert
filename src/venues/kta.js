@@ -34,8 +34,8 @@ export const KTA_FLOOR_BLOCKS = [
   { id: 'A', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 17, z: 9, w: 10.5, d: 5.6 },
   { id: 'B', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: 9, w: 10.5, d: 5.6 },
   { id: 'C', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: 9, w: 5.2, d: 5.6 },
-  { id: 'D', rows: rowsBetween('A', 'K'), seats: [1, 12, 15, 26], x: -9, z: 7, w: 6.0, d: 9.5, axis: 'x', reverseSeats: true },
-  { id: 'E', rows: rowsBetween('A', 'K'), seats: [1, 12], x: -9, z: 0, w: 6.0, d: 4.6, axis: 'x', reverseSeats: true },
+  { id: 'D', rows: rowsBetween('A', 'K'), seats: [1, 12, 15, 26], x: -9, z: 7, w: 6.0, d: 9.5, axis: 'x' },
+  { id: 'E', rows: rowsBetween('A', 'K'), seats: [1, 12], x: -9, z: 0, w: 6.0, d: 4.6, axis: 'x' },
   { id: 'F', rows: rowsBetween('A', 'K'), seats: [1, 12, 15, 26], x: -9, z: -7, w: 6.0, d: 9.5, axis: 'x', reverseSeats: true },
   { id: 'G', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: -9, w: 5.2, d: 5.6, reverse: true },
   { id: 'H', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: -9, w: 10.5, d: 5.6, reverse: true },
@@ -137,7 +137,7 @@ function addFloorPlacements(placements) {
             ? block.z + block.d / 2 - seatProgress * block.d - aisleOffset
             : block.z - block.d / 2 + seatProgress * block.d + aisleOffset;
         } else {
-          x = block.x - block.w / 2 + seatProgress * block.w + aisleOffset;
+          x = block.x + block.w / 2 - seatProgress * block.w - aisleOffset;
           z = block.reverse
             ? block.z + block.d / 2 - rowProgress * block.d
             : block.z - block.d / 2 + rowProgress * block.d;
