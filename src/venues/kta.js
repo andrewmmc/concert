@@ -31,15 +31,15 @@ export const KTA_BOWL_SECTIONS = [
 ];
 
 export const KTA_FLOOR_BLOCKS = [
-  { id: 'A', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 17, z: 9, w: 10.5, d: 5.6 },
-  { id: 'B', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: 9, w: 10.5, d: 5.6 },
-  { id: 'C', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: 9, w: 5.2, d: 5.6 },
+  { id: 'A', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 17, z: 9, w: 10.5, d: 5.6, yaw: Math.PI },
+  { id: 'B', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: 9, w: 10.5, d: 5.6, yaw: Math.PI },
+  { id: 'C', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: 9, w: 5.2, d: 5.6, yaw: Math.PI },
   { id: 'D', rows: rowsBetween('A', 'K'), seats: [1, 12, 15, 26], x: -9, z: 7, w: 6.0, d: 9.5, axis: 'x' },
   { id: 'E', rows: rowsBetween('A', 'K'), seats: [1, 12], x: -9, z: 0, w: 6.0, d: 4.6, axis: 'x' },
   { id: 'F', rows: rowsBetween('A', 'K'), seats: [1, 12, 15, 26], x: -9, z: -7, w: 6.0, d: 9.5, axis: 'x', reverseSeats: true },
-  { id: 'G', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: -9, w: 5.2, d: 5.6, reverse: true },
-  { id: 'H', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: -9, w: 10.5, d: 5.6, reverse: true },
-  { id: 'J', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 17, z: -9, w: 10.5, d: 5.6, reverse: true },
+  { id: 'G', rows: rowsBetween('A', 'J'), seats: [1, 12], x: -2.2, z: -9, w: 5.2, d: 5.6, reverse: true, yaw: 0 },
+  { id: 'H', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 6, z: -9, w: 10.5, d: 5.6, reverse: true, yaw: 0 },
+  { id: 'J', rows: rowsBetween('A', 'J'), seats: [1, 12, 15, 26], x: 17, z: -9, w: 10.5, d: 5.6, reverse: true, yaw: 0 },
 ];
 
 const BOWL_BY_ID = new Map(KTA_BOWL_SECTIONS.map((section) => [section.id, section]));
@@ -147,7 +147,7 @@ function addFloorPlacements(placements) {
           x,
           y: 0.05,
           z,
-          yaw: Math.PI / 2,
+          yaw: block.yaw ?? Math.PI / 2,
           sec: block.id,
           row,
           seat,
