@@ -22,6 +22,7 @@ for a specific seat, and fly the camera straight to it.
 | **Hong Kong Coliseum** 香港體育館 | Centre Stage 四面台 (360°) | `#/hkc/center-stage` |
 | | End Stage 三面台 (with arena-floor Brown Gate blocks) | `#/hkc/end-stage` |
 | **Queen Elizabeth Stadium** 伊利沙伯體育館 | Five arena layouts | `#/qes/end-stage` |
+| **Kai Tak Arena** 啟德體藝館 | End Stage 正面舞台 | `#/kta/end-stage` |
 | **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `#/kts/stadium` |
 
 The Kai Tak Stadium model follows the row domains and gate totals printed on
@@ -50,7 +51,6 @@ two arena-floor wheelchair seating zones.
 
 - AsiaWorld-Expo Hall 1
 - AsiaWorld-Expo Hall 10
-- Kai Tak Arena
 - …and others
 
 ## Tech stack
@@ -92,3 +92,4 @@ Venues are data modules under `src/venues/`:
 - LCSD technical information (dimensions, capacity).
 - Kai Tak Stadium seating plan — project source drawing in
   `misc/kts/stadium_seating_plan.pdf`.
+- Kai Tak Arena seating plans — project source drawings in `misc/kta/`.
