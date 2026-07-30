@@ -5,6 +5,7 @@
 // areas, upper-level gates A-H/J/K, and ground-level gate X.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { KTS_ROW_COUNTS, KTS_ROW_ENDS } from './kts-seat-data.js';
 
 const DEG = Math.PI / 180;
 export const KTS_ROW_LABELS = [
@@ -61,15 +62,6 @@ function upperSectionAngle(id) {
   return (144 - (id - 501) * 9) * DEG;
 }
 
-function sectionBaseSeats(tier, angle) {
-  const degrees = Math.abs(normaliseDegrees(angle / DEG));
-  const northSouth = degrees > 48 && degrees < 132;
-  const corner = (degrees >= 30 && degrees <= 48) || (degrees >= 132 && degrees <= 150);
-  if (tier === 'Inner Bowl') return 11;
-  if (tier === 'Upper Level') return northSouth ? 20 : corner ? 17 : 23;
-  return northSouth ? 16 : corner ? 18 : 24;
-}
-
 // L1/L2 gate tables map one-to-one to the 42 lower-bowl seating blocks.
 // These are the exact BOWL SEAT values printed beneath those gates.
 export const KTS_LOWER_BOWL_TOTALS = {
@@ -92,7 +84,9 @@ export const KTS_UPPER_GATE_TOTALS = [
   615, 692, 615, 692, 600, 633, 574, 574, 461,
 ];
 
-function makeSection(id, tier, angle, span, rowEnd, color, officialTotal = null) {
+function makeSection(id, tier, angle, span, color, officialTotal = null) {
+  const rowEnd = KTS_ROW_ENDS[id];
+  const rowCounts = KTS_ROW_COUNTS[id];
   return {
     id,
     tier,
@@ -101,69 +95,24 @@ function makeSection(id, tier, angle, span, rowEnd, color, officialTotal = null)
     rows: KTS_ROW_LABELS.indexOf(rowEnd) + 1,
     rowEnd,
     color,
-    baseSeats: sectionBaseSeats(tier, angle),
+    rowCounts: [...rowCounts],
     officialTotal,
   };
 }
 
 export const KTS_SECTIONS = [
   ...INNER_SECTION_IDS.map((id) => makeSection(
-    id, 'Inner Bowl', innerSectionAngle(id), 6.4 * DEG, 'V', '#d92b9b', KTS_LOWER_BOWL_TOTALS[id],
+    id, 'Inner Bowl', innerSectionAngle(id), 6.4 * DEG, '#d92b9b', KTS_LOWER_BOWL_TOTALS[id],
   )),
   ...MAIN_SECTION_IDS.map((id) => {
-    const rowEnd = id <= 214 ? 'DD' : id <= 222 ? 'HH' : id <= 233 ? 'FF' : 'HH';
     return makeSection(
-      id, 'Lower Level', mainSectionAngle(id), 8.2 * DEG, rowEnd, '#a93694', KTS_LOWER_BOWL_TOTALS[id],
+      id, 'Lower Level', mainSectionAngle(id), 8.2 * DEG, '#a93694', KTS_LOWER_BOWL_TOTALS[id],
     );
   }),
   ...UPPER_SECTION_IDS.map((id) => makeSection(
-    id, 'Upper Level', upperSectionAngle(id), 8.2 * DEG, 'QQ', '#a88bc8', null,
+    id, 'Upper Level', upperSectionAngle(id), 8.2 * DEG, '#a88bc8', null,
   )),
 ];
-
-function allocateWeightedCounts(total, entries) {
-  const weightTotal = entries.reduce((sum, entry) => sum + entry.weight, 0);
-  const allocated = entries.map((entry) => {
-    const exact = total * entry.weight / weightTotal;
-    return { ...entry, count: Math.floor(exact), fraction: exact - Math.floor(exact) };
-  });
-  let remaining = total - allocated.reduce((sum, entry) => sum + entry.count, 0);
-  allocated.sort((a, b) => b.fraction - a.fraction || a.section.id - b.section.id || a.rowIndex - b.rowIndex);
-  for (let i = 0; i < remaining; i++) allocated[i].count++;
-  return allocated;
-}
-
-for (const section of KTS_SECTIONS.filter((candidate) => candidate.tier !== 'Upper Level')) {
-  const entries = Array.from({ length: section.rows }, (_, rowIndex) => ({
-    section,
-    rowIndex,
-    weight: section.baseSeats + rowIndex / Math.max(1, section.rows - 1) * 4,
-  }));
-  section.rowCounts = allocateWeightedCounts(section.officialTotal, entries)
-    .sort((a, b) => a.rowIndex - b.rowIndex)
-    .map((entry) => entry.count);
-}
-
-const upperSections = KTS_SECTIONS.filter((section) => section.tier === 'Upper Level');
-const upperEntries = upperSections.flatMap((section) =>
-  Array.from({ length: section.rows }, (_, rowIndex) => ({
-    section,
-    rowIndex,
-    weight: section.baseSeats + rowIndex / Math.max(1, section.rows - 1) * 5,
-  })),
-);
-// The L5 drawing prints totals by 39 upper gate zones rather than by the 40
-// numbered seating sections. Preserve the verified combined gate total while
-// distributing the rendered instances across all 501-540 section wedges.
-const upperRows = allocateWeightedCounts(
-  KTS_UPPER_GATE_TOTALS.reduce((sum, total) => sum + total, 0),
-  upperEntries,
-);
-for (const section of upperSections) {
-  section.rowCounts = upperRows.filter((entry) => entry.section === section)
-    .sort((a, b) => a.rowIndex - b.rowIndex)
-    .map((entry) => entry.count);
-}
 
 const SECTION_BY_ID = new Map(KTS_SECTIONS.map((section) => [section.id, section]));
 

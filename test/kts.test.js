@@ -18,6 +18,7 @@ import {
   ktsSection,
 } from '../src/venues/kts.js';
 import { getVenue, resolveLayout } from '../src/venues/index.js';
+import { KTS_ROW_COUNTS, KTS_ROW_ENDS } from '../src/venues/kts-seat-data.js';
 
 test('KTS is registered at the stadium layout route', () => {
   assert.equal(getVenue('kts'), kts);
@@ -36,11 +37,12 @@ test('matches the section ranges printed on the KTS plan', () => {
 
 test('uses the different row domains printed around the KTS bowl', () => {
   assert.deepEqual(ktsRowLabels(101).slice(-3), ['S', 'T', 'V']);
-  assert.deepEqual(ktsRowLabels(201).slice(-4), ['AA', 'BB', 'CC', 'DD']);
-  assert.deepEqual(ktsRowLabels(215).slice(-4), ['EE', 'FF', 'GG', 'HH']);
+  assert.deepEqual(ktsRowLabels(102).slice(-3), ['Q', 'R', 'S']);
+  assert.deepEqual(ktsRowLabels(201).slice(-4), ['CC', 'DD', 'EE', 'FF']);
+  assert.deepEqual(ktsRowLabels(215).slice(-4), ['DD', 'EE', 'FF', 'GG']);
   assert.deepEqual(ktsRowLabels(224).slice(-4), ['CC', 'DD', 'EE', 'FF']);
-  assert.deepEqual(ktsRowLabels(236).slice(-4), ['EE', 'FF', 'GG', 'HH']);
-  assert.deepEqual(ktsRowLabels(501).slice(-4), ['MM', 'NN', 'PP', 'QQ']);
+  assert.deepEqual(ktsRowLabels(236).slice(-4), ['MM', 'NN', 'PP', 'QQ']);
+  assert.deepEqual(ktsRowLabels(501).slice(-4), ['M', 'N', 'P', 'Q']);
   for (const row of ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG']) {
     assert.ok(ktsRowLabels(215).includes(row), `Level 2 side block includes row ${row}`);
   }
@@ -62,15 +64,26 @@ test('seat-number ranges are deterministic and contiguous across each stand side
 
 test('validates section, row and seat boundaries', () => {
   const firstInner = ktsSeatNumbers(101, 'A')[0];
-  const lastNorth = ktsSeatNumbers(201, 'DD').at(-1);
-  const lastUpper = ktsSeatNumbers(501, 'QQ').at(-1);
+  const lastNorth = ktsSeatNumbers(201, 'FF').at(-1);
+  const lastUpper = ktsSeatNumbers(501, 'Q').at(-1);
   assert.equal(ktsSeatExists(101, 'A', firstInner), true);
-  assert.equal(ktsSeatExists(201, 'DD', lastNorth), true);
-  assert.equal(ktsSeatExists(201, 'EE', 1), false);
+  assert.equal(ktsSeatExists(201, 'FF', lastNorth), true);
+  assert.equal(ktsSeatExists(201, 'GG', 1), false);
   assert.equal(ktsSeatExists(215, 'GG', ktsSeatNumbers(215, 'GG')[0]), true);
-  assert.equal(ktsSeatExists(501, 'QQ', lastUpper), true);
+  assert.equal(ktsSeatExists(501, 'Q', lastUpper), true);
+  assert.equal(ktsSeatExists(501, 'R', 1), false);
   assert.equal(ktsSeatExists(501, 'RR', 1), false);
   assert.equal(ktsSeatExists(204, 'A', 1), false);
+});
+
+test('uses static PDF-derived row counts instead of weighted allocation', () => {
+  for (const sectionId of KTS_SECTION_IDS) {
+    assert.equal(KTS_ROW_COUNTS[sectionId].length, ktsRowLabels(sectionId).length, `section ${sectionId}`);
+    assert.equal(KTS_ROW_ENDS[sectionId], ktsRowLabels(sectionId).at(-1), `section ${sectionId}`);
+  }
+  assert.deepEqual(KTS_ROW_COUNTS[216], Array(30).fill(27));
+  assert.deepEqual(KTS_ROW_COUNTS[225], Array(29).fill(27));
+  assert.equal(KTS_ROW_COUNTS[509].reduce((sum, count) => sum + count, 0), 363);
 });
 
 test('matches every printed lower-bowl gate total', () => {
