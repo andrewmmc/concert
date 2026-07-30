@@ -14,24 +14,37 @@ function rowsBetween(first, last) {
 }
 
 export const KTA_BOWL_SECTIONS = [
-  { id: 102, side: 'north', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 31, lastSeat: 60, color: '#24c4cf' },
-  { id: 103, side: 'north', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 61, lastSeat: 90, color: '#7310dc' },
-  { id: 104, side: 'north', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 91, lastSeat: 120, color: '#7310dc' },
-  { id: 105, side: 'north', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 121, lastSeat: 150, color: '#7310dc' },
-  { id: 106, side: 'north', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 151, lastSeat: 179, color: '#ed65ed' },
-  // Row A sits on the arena-floor side; the drawings cut its far corner, so the
-  // seat band tapers from row A (chamfered) to row M (full height).
-  { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), firstSeat: 195, lastSeat: 224, color: '#ed65ed', shape: { top: [221, 224], bottom: [203, 195] } },
-  { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), firstSeat: 250, lastSeat: 279, color: '#ed65ed', shape: { top: [271, 279], bottom: [253, 250] } },
-  { id: 109, side: 'south', center: -24, rows: rowsBetween('K', 'X'), firstSeat: 296, lastSeat: 324, color: '#ed65ed' },
-  { id: 110, side: 'south', center: -12, rows: rowsBetween('A', 'X'), firstSeat: 325, lastSeat: 354, color: '#7310dc' },
-  { id: 111, side: 'south', center: 0, rows: rowsBetween('A', 'X'), firstSeat: 355, lastSeat: 384, color: '#7310dc' },
-  { id: 112, side: 'south', center: 12, rows: rowsBetween('A', 'X'), firstSeat: 385, lastSeat: 414, color: '#7310dc' },
-  { id: 113, side: 'south', center: 24, rows: rowsBetween('A', 'X'), firstSeat: 415, lastSeat: 444, color: '#24c4cf' },
-  // Upper west stand. Both blocks keep a short low-numbered strip (rows toward
-  // the back wall) below the main body, and Block 208's top edge is chamfered.
-  { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 180, lastSeat: 221, color: '#ed65ed', shape: { top: 221, bottom: 195, strip: { fromRow: 'BB', min: 180, max: 192 } } },
-  { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], firstSeat: 252, lastSeat: 293, color: '#ed65ed', shape: { top: [293, 278], bottom: 252, strip: { fromRow: 'FF', min: 224, max: 249 } } },
+  // The drawings split each straight block around a two-seat central aisle.
+  { id: 102, side: 'north', center: 24, rows: rowsBetween('A', 'X'), bands: [[31, 44], [47, 60]], color: '#24c4cf' },
+  { id: 103, side: 'north', center: 12, rows: rowsBetween('A', 'X'), bands: [[61, 74], [77, 90]], color: '#7310dc' },
+  { id: 104, side: 'north', center: 0, rows: rowsBetween('A', 'X'), bands: [[91, 104], [107, 120]], color: '#7310dc' },
+  { id: 105, side: 'north', center: -12, rows: rowsBetween('A', 'X'), bands: [[121, 134], [137, 150]], color: '#7310dc' },
+  { id: 106, side: 'north', center: -24, rows: rowsBetween('K', 'X'), bands: [[151, 164], [167, 179]], color: '#ed65ed' },
+  // Blocks 107 and 108 chamfer only through row F. Block 108 also has the
+  // separate 224-250 band shown below its 253-279 main body.
+  { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), bands: [
+    { min: { from: 'A', to: 'F', start: 203, end: 195 }, max: 221 },
+  ], color: '#ed65ed' },
+  { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), bands: [
+    [224, 250],
+    { min: 253, max: { from: 'A', to: 'F', start: 271, end: 279 } },
+  ], color: '#ed65ed' },
+  { id: 109, side: 'south', center: -24, rows: rowsBetween('K', 'X'), bands: [[296, 308], [311, 324]], color: '#ed65ed' },
+  { id: 110, side: 'south', center: -12, rows: rowsBetween('A', 'X'), bands: [[325, 338], [341, 354]], color: '#7310dc' },
+  { id: 111, side: 'south', center: 0, rows: rowsBetween('A', 'X'), bands: [[355, 368], [371, 384]], color: '#7310dc' },
+  { id: 112, side: 'south', center: 12, rows: rowsBetween('A', 'X'), bands: [[385, 398], [401, 414]], color: '#7310dc' },
+  { id: 113, side: 'south', center: 24, rows: rowsBetween('A', 'X'), bands: [[415, 428], [431, 444]], color: '#24c4cf' },
+  // The upper-west blocks contain disjoint vertical bands. Block 208's upper
+  // 281-293 cap runs only from BB-GG and steps down to seat 284 at row GG.
+  { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
+    { rows: ['BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], min: 180, max: 192 },
+    [195, 221],
+  ], color: '#ed65ed' },
+  { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
+    { rows: ['FF', 'GG', 'HH'], min: 224, max: 249 },
+    [252, 278],
+    { rows: ['BB', 'CC', 'DD', 'EE', 'FF', 'GG'], min: 281, maxByRow: { BB: 293, CC: 293, DD: 293, EE: 290, FF: 287, GG: 284 } },
+  ], color: '#ed65ed' },
 ];
 
 export const KTA_FLOOR_BLOCKS = [
@@ -69,18 +82,25 @@ function rangeInclusive(a, b) {
   return Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
 }
 
-function shapedBowlSeats(section, row) {
-  const { shape, rows } = section;
-  const rowIndex = rows.indexOf(String(row).toUpperCase());
-  const t = rows.length <= 1 ? 0 : rowIndex / (rows.length - 1);
-  const interp = (value) => (Array.isArray(value)
-    ? Math.round(value[0] + (value[1] - value[0]) * t)
-    : value);
-  const seats = rangeInclusive(interp(shape.bottom), interp(shape.top));
-  if (shape.strip && rowIndex >= rows.indexOf(shape.strip.fromRow)) {
-    return [...rangeInclusive(shape.strip.min, shape.strip.max), ...seats];
-  }
-  return seats;
+function bandValue(value, row, rows) {
+  if (typeof value === 'number') return value;
+  const fromIndex = rows.indexOf(value.from);
+  const toIndex = rows.indexOf(value.to);
+  const rowIndex = rows.indexOf(row);
+  const progress = Math.max(0, Math.min(1, (rowIndex - fromIndex) / (toIndex - fromIndex)));
+  return Math.round(value.start + (value.end - value.start) * progress);
+}
+
+function bowlBandSeats(section, row) {
+  return section.bands.flatMap((definition) => {
+    const band = Array.isArray(definition)
+      ? { min: definition[0], max: definition[1] }
+      : definition;
+    if (band.rows && !band.rows.includes(row)) return [];
+    const min = bandValue(band.min, row, section.rows);
+    const max = band.maxByRow?.[row] ?? bandValue(band.max, row, section.rows);
+    return rangeInclusive(min, max);
+  });
 }
 
 export function ktaSeatNumbers(sectionId, row) {
@@ -88,10 +108,10 @@ export function ktaSeatNumbers(sectionId, row) {
   const section = BOWL_BY_ID.get(Number(key));
   const block = FLOOR_BY_ID.get(key);
   const rows = section?.rows || block?.rows;
-  if (!rows?.includes(String(row).toUpperCase())) return [];
+  const normalizedRow = String(row).toUpperCase();
+  if (!rows?.includes(normalizedRow)) return [];
   if (block) return floorSeatNumbers(block);
-  if (section.shape) return shapedBowlSeats(section, row);
-  return rangeInclusive(section.firstSeat, section.lastSeat);
+  return bowlBandSeats(section, normalizedRow);
 }
 
 export function ktaSeatExists(sectionId, row, seat) {

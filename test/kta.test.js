@@ -53,31 +53,69 @@ test('omits rows I, O, U and W from every single-letter row domain', () => {
 });
 
 test('uses global bowl seat-number bands printed around the arena', () => {
-  assert.deepEqual(ktaSeatNumbers(102, 'A'), Array.from({ length: 30 }, (_, i) => 31 + i));
-  assert.deepEqual(ktaSeatNumbers(106, 'X'), Array.from({ length: 29 }, (_, i) => 151 + i));
+  assert.deepEqual(ktaSeatNumbers(102, 'A'), [
+    ...Array.from({ length: 14 }, (_, i) => 31 + i),
+    ...Array.from({ length: 14 }, (_, i) => 47 + i),
+  ]);
+  assert.deepEqual(ktaSeatNumbers(106, 'X'), [
+    ...Array.from({ length: 14 }, (_, i) => 151 + i),
+    ...Array.from({ length: 13 }, (_, i) => 167 + i),
+  ]);
   assert.equal(ktaSeatExists(113, 'X', 444), true);
   assert.equal(ktaSeatExists(113, 'W', 444), false);
 });
 
-test('chamfers the west blocks and keeps the upper-stand back-row strips', () => {
-  // Block 108: far-side row A tops out early, row M keeps the full height.
+test('keeps the two-seat aisles printed between every straight-block seat band', () => {
+  const aisleGaps = [
+    [102, 45, 46], [103, 75, 76], [104, 105, 106], [105, 135, 136], [106, 165, 166],
+    [109, 309, 310], [110, 339, 340], [111, 369, 370], [112, 399, 400], [113, 429, 430],
+  ];
+  for (const [section, first, last] of aisleGaps) {
+    for (const row of ktaRowLabels(section)) {
+      assert.equal(ktaSeatExists(section, row, first), false, `${section}-${row}-${first}`);
+      assert.equal(ktaSeatExists(section, row, last), false, `${section}-${row}-${last}`);
+    }
+  }
+});
+
+test('chamfers Blocks 107 and 108 through row F and keeps 108\'s lower band', () => {
+  assert.deepEqual(ktaSeatNumbers(107, 'A'), Array.from({ length: 19 }, (_, i) => 203 + i));
+  assert.deepEqual(ktaSeatNumbers(107, 'F'), Array.from({ length: 27 }, (_, i) => 195 + i));
+  assert.deepEqual(ktaSeatNumbers(107, 'M'), Array.from({ length: 27 }, (_, i) => 195 + i));
+  assert.equal(ktaSeatExists(107, 'M', 222), false);
+
+  assert.equal(ktaSeatExists(108, 'A', 224), true);
+  assert.equal(ktaSeatExists(108, 'A', 250), true);
+  assert.equal(ktaSeatExists(108, 'A', 251), false);
+  assert.equal(ktaSeatExists(108, 'A', 252), false);
+  assert.equal(ktaSeatExists(108, 'A', 253), true);
+  assert.equal(ktaSeatExists(108, 'A', 271), true);
   assert.equal(ktaSeatExists(108, 'M', 279), true);
   assert.equal(ktaSeatExists(108, 'A', 279), false);
-  assert.equal(ktaSeatExists(108, 'A', 271), true);
-  // Block 107: far-side row A loses its lowest seats to the cut corner.
-  assert.equal(ktaSeatExists(107, 'M', 195), true);
-  assert.equal(ktaSeatExists(107, 'A', 195), false);
-  assert.equal(ktaSeatExists(107, 'A', 203), true);
-  // Block 208: chamfered top (row HH stops at 278) plus the FF-GG-HH strip.
-  assert.equal(ktaSeatExists(208, 'AA', 293), true);
-  assert.equal(ktaSeatExists(208, 'HH', 293), false);
-  assert.equal(ktaSeatExists(208, 'HH', 278), true);
-  assert.equal(ktaSeatExists(208, 'HH', 224), true);
-  assert.equal(ktaSeatExists(208, 'EE', 224), false);
-  // Block 207: full main body plus the BB-through-HH strip below it.
-  assert.equal(ktaSeatExists(207, 'BB', 180), true);
+});
+
+test('keeps the disjoint upper-west bands and their printed row boundaries', () => {
+  // Block 207: 180-192 begins at BB; 193-194 is always an aisle.
   assert.equal(ktaSeatExists(207, 'AA', 180), false);
+  assert.equal(ktaSeatExists(207, 'BB', 180), true);
+  assert.equal(ktaSeatExists(207, 'HH', 192), true);
   assert.equal(ktaSeatExists(207, 'BB', 193), false);
+  assert.equal(ktaSeatExists(207, 'AA', 195), true);
+  assert.equal(ktaSeatExists(207, 'HH', 221), true);
+
+  // Block 208: 224-249 is FF-HH, 252-278 is AA-HH, and the stepped
+  // 281-293 cap is BB-GG. Seats 250-251 and 279-280 remain aisles.
+  assert.equal(ktaSeatExists(208, 'EE', 224), false);
+  assert.equal(ktaSeatExists(208, 'FF', 224), true);
+  assert.equal(ktaSeatExists(208, 'HH', 249), true);
+  assert.equal(ktaSeatExists(208, 'HH', 250), false);
+  assert.equal(ktaSeatExists(208, 'HH', 278), true);
+  assert.equal(ktaSeatExists(208, 'BB', 279), false);
+  assert.equal(ktaSeatExists(208, 'AA', 281), false);
+  assert.equal(ktaSeatExists(208, 'BB', 293), true);
+  assert.equal(ktaSeatExists(208, 'GG', 284), true);
+  assert.equal(ktaSeatExists(208, 'GG', 285), false);
+  assert.equal(ktaSeatExists(208, 'HH', 281), false);
 });
 
 test('uses floor row and central-aisle seat hints from the concert plan', () => {
@@ -92,11 +130,14 @@ test('uses floor row and central-aisle seat hints from the concert plan', () => 
   assert.equal(ktaSeatExists('A', 'A', 13), false);
 });
 
-test('seat total is deterministic and includes both bowl and floor', () => {
-  const expected = [...KTA_BOWL_SECTIONS, ...KTA_FLOOR_BLOCKS].reduce((total, section) =>
+test('matches the seat total reconstructed from the two reference drawings', () => {
+  const bowl = KTA_BOWL_SECTIONS.reduce((total, section) =>
     total + section.rows.reduce((sum, row) => sum + ktaSeatNumbers(section.id, row).length, 0), 0);
-  assert.equal(ktaSeatTotal(), expected);
-  assert.ok(ktaSeatTotal() > 7000);
+  const floor = KTA_FLOOR_BLOCKS.reduce((total, section) =>
+    total + section.rows.reduce((sum, row) => sum + ktaSeatNumbers(section.id, row).length, 0), 0);
+  assert.equal(bowl, 6659);
+  assert.equal(floor, 1680);
+  assert.equal(ktaSeatTotal(), 8339);
 });
 
 test('does not expose misc reference images as public links', () => {
