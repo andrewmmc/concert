@@ -137,7 +137,9 @@ export function ktaBowlPlacement(section, rowIndex, lateral) {
   return {
     x: -30 - upperSetback - rowIndex * rowDepth,
     y: y + upperRise,
-    z: section.center + lateral,
+    // The west-wall numbering rises from the 106 end toward the 109 end,
+    // opposite to the north/south blocks' lateral axis.
+    z: section.center - lateral,
     yaw: Math.PI / 2,
   };
 }

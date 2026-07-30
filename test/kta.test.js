@@ -42,6 +42,22 @@ test('orders the west sections from 106 through 109 and aligns their upper tiers
   assert.ok(section(208).center < 0, '208 aligns above 108');
 });
 
+test('runs west-section seat numbers from the 106 side toward the 109 side', () => {
+  const section = (id) => KTA_BOWL_SECTIONS.find((candidate) => candidate.id === id);
+  const endpoints = [
+    [107, 195, 221],
+    [108, 224, 279],
+    [207, 180, 221],
+    [208, 224, 293],
+  ];
+  for (const [id, lowSeat, highSeat] of endpoints) {
+    const midpoint = (lowSeat + highSeat) / 2;
+    const low = ktaBowlPlacement(section(id), 0, (lowSeat - midpoint) * 0.38);
+    const high = ktaBowlPlacement(section(id), 0, (highSeat - midpoint) * 0.38);
+    assert.ok(low.z > high.z, `${id} low seats are on the 106 side`);
+  }
+});
+
 test('raises and sets back the upper-west sections clear of 107 and 108', () => {
   const section = (id) => KTA_BOWL_SECTIONS.find((candidate) => candidate.id === id);
   for (const [lowerId, upperId] of [[107, 207], [108, 208]]) {
