@@ -22,10 +22,10 @@ export const KTA_BOWL_SECTIONS = [
   { id: 106, side: 'north', center: -24, rows: rowsBetween('K', 'X'), bands: [[151, 164], [167, 179]], color: '#ed65ed' },
   // Blocks 107 and 108 chamfer only through row F. Block 108 also has the
   // separate 224-250 band shown below its 253-279 main body.
-  { id: 107, side: 'west', center: -10, rows: rowsBetween('A', 'M'), bands: [
+  { id: 107, side: 'west', center: 10, rows: rowsBetween('A', 'M'), bands: [
     { min: { from: 'A', to: 'F', start: 203, end: 195 }, max: 221 },
   ], color: '#ed65ed' },
-  { id: 108, side: 'west', center: 10, rows: rowsBetween('A', 'M'), bands: [
+  { id: 108, side: 'west', center: -10, rows: rowsBetween('A', 'M'), bands: [
     [224, 250],
     { min: 253, max: { from: 'A', to: 'F', start: 271, end: 279 } },
   ], color: '#ed65ed' },
@@ -36,11 +36,11 @@ export const KTA_BOWL_SECTIONS = [
   { id: 113, side: 'south', center: 24, rows: rowsBetween('A', 'X'), bands: [[415, 428], [431, 444]], color: '#24c4cf' },
   // The upper-west blocks contain disjoint vertical bands. Block 208's upper
   // 281-293 cap runs only from BB-GG and steps down to seat 284 at row GG.
-  { id: 207, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
+  { id: 207, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
     { rows: ['BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], min: 180, max: 192 },
     [195, 221],
   ], color: '#ed65ed' },
-  { id: 208, side: 'west-upper', center: 13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
+  { id: 208, side: 'west-upper', center: -13, rows: ['AA', 'BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH'], bands: [
     { rows: ['FF', 'GG', 'HH'], min: 224, max: 249 },
     [252, 278],
     { rows: ['BB', 'CC', 'DD', 'EE', 'FF', 'GG'], min: 281, maxByRow: { BB: 293, CC: 293, DD: 293, EE: 290, FF: 287, GG: 284 } },
@@ -123,7 +123,7 @@ export function ktaSeatTotal() {
     total + section.rows.reduce((sum, row) => sum + ktaSeatNumbers(section.id, row).length, 0), 0);
 }
 
-function bowlPlacement(section, rowIndex, lateral) {
+export function ktaBowlPlacement(section, rowIndex, lateral) {
   const rowDepth = section.side === 'west-upper' ? 0.9 : 0.72;
   const y = 0.65 + rowIndex * (section.side === 'west-upper' ? 0.55 : 0.38);
   if (section.side === 'north') {
@@ -132,10 +132,11 @@ function bowlPlacement(section, rowIndex, lateral) {
   if (section.side === 'south') {
     return { x: section.center + lateral, y, z: -17.5 - rowIndex * rowDepth, yaw: 0 };
   }
-  const upperOffset = section.side === 'west-upper' ? 7 : 0;
+  const upperSetback = section.side === 'west-upper' ? 9 : 0;
+  const upperRise = section.side === 'west-upper' ? 6 : 0;
   return {
-    x: -30 - upperOffset - rowIndex * rowDepth,
-    y: y + upperOffset * 0.45,
+    x: -30 - upperSetback - rowIndex * rowDepth,
+    y: y + upperRise,
     z: section.center + lateral,
     yaw: Math.PI / 2,
   };
@@ -162,7 +163,7 @@ function addBowlPlacements(placements) {
     section.rows.forEach((row, rowIndex) => {
       const numbers = ktaSeatNumbers(section.id, row);
       numbers.forEach((seat) => {
-        const point = bowlPlacement(section, rowIndex, (seat - seatMid) * 0.38);
+        const point = ktaBowlPlacement(section, rowIndex, (seat - seatMid) * 0.38);
         placements.push({
           ...point,
           sec: section.id,
@@ -263,7 +264,7 @@ function addLabels(scene) {
   const specs = [
     ...KTA_BOWL_SECTIONS.map((section) => {
       const rowIndex = section.rows.length + 1;
-      const p = bowlPlacement(section, rowIndex, 0);
+      const p = ktaBowlPlacement(section, rowIndex, 0);
       return [String(section.id), section.id >= 200 ? 'UPPER' : 'BOWL', section.color, p.x, Math.max(8, p.y + 2), p.z];
     }),
     ...KTA_FLOOR_BLOCKS.map((block) => [`BLOCK ${block.id}`, 'FLOOR', '#9b6cff', block.x, 3.2, block.z]),

@@ -6,6 +6,7 @@ import {
   KTA_FLOOR_BLOCKS,
   KTA_OMITTED_ROWS,
   kta,
+  ktaBowlPlacement,
   ktaRowLabels,
   ktaSeatExists,
   ktaSeatNumbers,
@@ -31,6 +32,26 @@ test('places the 102 and 109 section runs on opposite arena sides', () => {
   const side = (id) => KTA_BOWL_SECTIONS.find((section) => section.id === id).side;
   for (const id of [102, 103, 104, 105, 106]) assert.equal(side(id), 'north');
   for (const id of [109, 110, 111, 112, 113]) assert.equal(side(id), 'south');
+});
+
+test('orders the west sections from 106 through 109 and aligns their upper tiers', () => {
+  const section = (id) => KTA_BOWL_SECTIONS.find((candidate) => candidate.id === id);
+  assert.ok(section(107).center > section(108).center, '107 is on the 106 side of 108');
+  assert.ok(section(207).center > section(208).center, '207 is on the 106 side of 208');
+  assert.ok(section(207).center > 0, '207 aligns above 107');
+  assert.ok(section(208).center < 0, '208 aligns above 108');
+});
+
+test('raises and sets back the upper-west sections clear of 107 and 108', () => {
+  const section = (id) => KTA_BOWL_SECTIONS.find((candidate) => candidate.id === id);
+  for (const [lowerId, upperId] of [[107, 207], [108, 208]]) {
+    const lower = section(lowerId);
+    const upper = section(upperId);
+    const lowerBack = ktaBowlPlacement(lower, lower.rows.length - 1, 0);
+    const upperFront = ktaBowlPlacement(upper, 0, 0);
+    assert.ok(upperFront.y > lowerBack.y, `${upperId} is higher than ${lowerId}`);
+    assert.ok(upperFront.x < lowerBack.x, `${upperId} is set back behind ${lowerId}`);
+  }
 });
 
 test('runs floor Blocks A-J from the 102 side to the 113 side', () => {
