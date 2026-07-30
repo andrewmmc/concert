@@ -1,10 +1,11 @@
 // Registry of available venues. Add new venue modules here.
+import { awe } from './awe.js';
 import { hkc } from './hkc.js';
 import { kta } from './kta.js';
 import { kts } from './kts.js';
 import { qes } from './qes.js';
 
-export const venues = [hkc, qes, kta, kts];
+export const venues = [hkc, qes, kta, kts, awe];
 export const defaultVenue = hkc;
 
 export function getVenue(id) {
