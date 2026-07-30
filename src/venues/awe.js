@@ -1,65 +1,51 @@
-// AsiaWorld-Arena (亞洲國際博覽館 Arena Hall 1) — end-stage concert plan
-// reconstructed from the two reference drawings in misc/awe_hall1
-// (AWA-ES-16 official floor plan and the EDAN LUI concert seating map).
-//
-// The elongated-octagon bowl surrounds a central event floor with the stage on
-// the east side. Riser-seating stands are numbered 1-16 clockwise around the
-// bowl; the chamfered west corner carries Blocks 8-10. The event floor is split
-// into Blocks A-D, with Block A nearest the stage.
+// AsiaWorld-Arena (亞洲國際博覽館 Arena Hall 1) — EDAN LUI 2023 end-stage plan
+// reconstructed from the labelled concert map in misc/awe_hall1. The generic
+// AWA-ES-16 drawing is used only to confirm the bowl and aisle geometry.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-// Row letters skip I and O (never used on the printed plan) so the modelled
-// labels line up with the reference drawing.
-function genRows(count) {
-  const rows = [];
-  let code = 65;
-  while (rows.length < count) {
-    const letter = String.fromCharCode(code);
-    if (letter !== 'I' && letter !== 'O') rows.push(letter);
-    code += 1;
-  }
-  return rows;
-}
+export const AWE_STAND_ROWS = [
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+  'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+];
+export const AWE_FLOOR_SEATS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 
-// Tier colours taken from the concert map's price bands.
 const TIER = {
-  standard: { name: 'Standard 標準', color: '#ef9a9a' },
-  side: { name: 'Side Stand 側看台', color: '#9a9ae8' },
-  corner: { name: 'Corner Stand 角落看台', color: '#efc45a' },
-  floor: { name: 'Floor 內場', color: '#f4a0a0' },
+  price1080: { name: '$1080 Standard', color: '#ff999a' },
+  price880: { name: '$880 Standard', color: '#9a99ff' },
+  price580: { name: '$580 Standard', color: '#fed966' },
+  wheelchair: { name: '$1080 Wheelchair', color: '#7fff00' },
 };
 
-// Perimeter riser stands. `side` places the block on the bowl wall, `slot` is
-// its position along that wall (0 = nearest the stage), `rows`/`seats` are the
-// modelled grid dimensions read from the reference plan.
+// `maxSeat` is the highest printed seat number, not a rectangular seat count.
+// Blocks 2 and 16 have stage-end cut-outs; their missing numbers are retained
+// so tickets map to the labels printed on the plan.
 export const AWE_STAND_BLOCKS = [
-  // North wall (blocks 2-7), block 2 nearest the stage.
-  { id: 2, side: 'north', slot: 0, rows: 18, seats: 21, tier: 'standard' },
-  { id: 3, side: 'north', slot: 1, rows: 18, seats: 21, tier: 'standard' },
-  { id: 4, side: 'north', slot: 2, rows: 18, seats: 26, tier: 'standard' },
-  { id: 5, side: 'north', slot: 3, rows: 18, seats: 25, tier: 'standard' },
-  { id: 6, side: 'north', slot: 4, rows: 18, seats: 23, tier: 'side' },
-  { id: 7, side: 'north', slot: 5, rows: 16, seats: 30, tier: 'side' },
-  // Chamfered west wall (blocks 8-10), block 8 nearest the north wall.
-  { id: 8, side: 'west', slot: 0, rows: 14, seats: 24, tier: 'corner' },
-  { id: 9, side: 'west', slot: 1, rows: 14, seats: 24, tier: 'corner' },
-  { id: 10, side: 'west', slot: 2, rows: 16, seats: 24, tier: 'corner' },
-  // South wall (blocks 11-16), block 16 nearest the stage.
-  { id: 11, side: 'south', slot: 5, rows: 16, seats: 30, tier: 'side' },
-  { id: 12, side: 'south', slot: 4, rows: 18, seats: 23, tier: 'side' },
-  { id: 13, side: 'south', slot: 3, rows: 18, seats: 25, tier: 'standard' },
-  { id: 14, side: 'south', slot: 2, rows: 18, seats: 26, tier: 'standard' },
-  { id: 15, side: 'south', slot: 1, rows: 18, seats: 21, tier: 'standard' },
-  { id: 16, side: 'south', slot: 0, rows: 18, seats: 12, tier: 'standard' },
+  { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
+  { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
+  { id: 4, side: 'north', center: [3, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 26, tier: 'price1080' },
+  { id: 5, side: 'north', center: [-3.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 25, tier: 'price1080' },
+  { id: 6, side: 'north', center: [-10, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 23, tier: 'price880' },
+  { id: 7, side: 'north', center: [-17, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 8.5, maxSeat: 36, splitTier: true },
+  { id: 8, side: 'northwest', center: [-24, 10.5], outward: [-0.71, 0.71], lateral: [-0.71, -0.71], yaw: Math.PI * 0.75, width: 12, maxSeat: 53, splitTier: true },
+  { id: 9, side: 'west', center: [-29, 0], outward: [-1, 0], lateral: [0, -1], yaw: Math.PI / 2, width: 10.5, maxSeat: 35, splitTier: true },
+  { id: 10, side: 'southwest', center: [-24, -10.5], outward: [-0.71, -0.71], lateral: [0.71, -0.71], yaw: Math.PI / 4, width: 12, maxSeat: 52, splitTier: true },
+  { id: 11, side: 'south', center: [-17, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 9.5, maxSeat: 41, splitTier: true },
+  { id: 12, side: 'south', center: [-10, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 23, tier: 'price880' },
+  { id: 13, side: 'south', center: [-3.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 25, tier: 'price1080' },
+  { id: 14, side: 'south', center: [3, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 26, tier: 'price1080' },
+  { id: 15, side: 'south', center: [9.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21, tier: 'price1080' },
+  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 12, tier: 'price1080' },
 ];
 
-// Event-floor blocks, Block A nearest the stage stepping away to Block D.
+const FLOOR_ROWS = Array.from({ length: 54 }, (_, i) => i + 1);
+
+// The event map numbers floor rows north-to-south and letters seats east-to-
+// west. Block A's T-shaped substage occupies rows 18-37.
 export const AWE_FLOOR_BLOCKS = [
-  { id: 'A', slot: 0, rows: 12, seats: 26, tier: 'floor' },
-  { id: 'B', slot: 1, rows: 12, seats: 26, tier: 'floor' },
-  { id: 'C', slot: 2, rows: 12, seats: 26, tier: 'floor' },
-  { id: 'D', slot: 3, rows: 12, seats: 20, tier: 'floor' },
+  { id: 'A', eastX: 18, rows: FLOOR_ROWS.filter((row) => row <= 17 || row >= 38), seats: [...AWE_FLOOR_SEATS, 'AA'] },
+  { id: 'B', eastX: 2, rows: FLOOR_ROWS, seats: AWE_FLOOR_SEATS.slice(0, 22) },
+  { id: 'C', eastX: -11, rows: FLOOR_ROWS, seats: AWE_FLOOR_SEATS.slice(0, 11) },
 ];
 
 const STAND_BY_ID = new Map(AWE_STAND_BLOCKS.map((b) => [String(b.id), b]));
@@ -70,36 +56,72 @@ const NORTH_Z = 10;
 const SOUTH_Z = -10;
 const WEST_X = -24;
 const STAGE_X = 26;
-const SLOT_PITCH = 6.4;
-const SLOT_CENTER_X = -2;
-const WEST_SLOT_PITCH = 7;
-const FLOOR_FRONT_X = 15;
-const FLOOR_DEPTH = 7;
-const FLOOR_GAP = 2;
 const FLOOR_HALF_Z = 8.5;
-const ROW_PITCH = 0.75;
-const ROW_RISE = 0.42;
-const SEAT_SLOT_W = 5.4;
+const STAND_ROW_PITCH = 0.58;
+const STAND_ROW_RISE = 0.31;
+const TIER_AISLE = 1.15;
+const FLOOR_SEAT_PITCH = 0.48;
 
 export function aweRowLabels(id) {
   const block = STAND_BY_ID.get(String(id)) || FLOOR_BY_ID.get(String(id).toUpperCase());
-  return block ? genRows(block.rows) : [];
+  if (!block) return [];
+  return STAND_BY_ID.has(String(id)) ? AWE_STAND_ROWS.slice() : block.rows.slice();
+}
+
+function rangeInclusive(first, last) {
+  return Array.from({ length: last - first + 1 }, (_, i) => first + i);
+}
+
+function standSeatNumbers(block, row) {
+  const rowIndex = AWE_STAND_ROWS.indexOf(row);
+  if (rowIndex < 0) return [];
+  if (block.id === 2) {
+    return rowIndex >= AWE_STAND_ROWS.indexOf('T')
+      ? rangeInclusive(1, 21)
+      : rangeInclusive(11, 21);
+  }
+  if (block.id === 16) {
+    return rowIndex >= AWE_STAND_ROWS.indexOf('T')
+      ? rangeInclusive(1, 12)
+      : [...rangeInclusive(1, 5), 11, 12];
+  }
+  if (block.id === 4) {
+    if (['J', 'K', 'L', 'M'].includes(row)) return rangeInclusive(14, 26);
+    if (['N', 'P', 'Q', 'R', 'S'].includes(row)) return rangeInclusive(1, 13);
+  }
+  if (block.id === 14) {
+    if (['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(row)) return rangeInclusive(1, 13);
+    if (['N', 'P', 'Q', 'R', 'S'].includes(row)) return rangeInclusive(14, 26);
+  }
+  return rangeInclusive(1, block.maxSeat);
+}
+
+function standTier(block, rowIndex, seat) {
+  if (block.id === 6) return TIER[seat <= 12 ? 'price1080' : 'price880'];
+  if (block.id === 12) return TIER[seat <= 11 ? 'price880' : 'price1080'];
+  if (block.splitTier) return TIER[rowIndex >= 12 ? 'price580' : 'price880'];
+  return TIER[block.tier];
 }
 
 export function aweSeatNumbers(id, row) {
-  const block = STAND_BY_ID.get(String(id)) || FLOOR_BY_ID.get(String(id).toUpperCase());
-  if (!block) return [];
-  if (!aweRowLabels(id).includes(String(row).toUpperCase())) return [];
-  return Array.from({ length: block.seats }, (_, i) => i + 1);
+  const stand = STAND_BY_ID.get(String(id));
+  const floor = FLOOR_BY_ID.get(String(id).toUpperCase());
+  if (stand) return standSeatNumbers(stand, String(row).toUpperCase());
+  if (!floor || !floor.rows.includes(Number(row))) return [];
+  return floor.seats.slice();
 }
 
 export function aweSeatExists(id, row, seat) {
-  return aweSeatNumbers(id, row).includes(Number(seat));
+  const numbers = aweSeatNumbers(id, row);
+  return STAND_BY_ID.has(String(id))
+    ? numbers.includes(Number(seat))
+    : numbers.includes(String(seat).toUpperCase());
 }
 
 export function aweSeatTotal() {
   return [...AWE_STAND_BLOCKS, ...AWE_FLOOR_BLOCKS]
-    .reduce((total, block) => total + block.rows * block.seats, 0);
+    .reduce((total, block) => total +
+      aweRowLabels(block.id).reduce((sum, row) => sum + aweSeatNumbers(block.id, row).length, 0), 0);
 }
 
 // Pure placement so the geometry can be unit-tested without WebGL. Returns one
@@ -108,32 +130,19 @@ export function awePlacements() {
   const placements = [];
 
   for (const block of AWE_STAND_BLOCKS) {
-    const rows = genRows(block.rows);
-    const seatPitch = SEAT_SLOT_W / Math.max(1, block.seats - 1);
-    const tier = TIER[block.tier];
-    rows.forEach((row, rowIndex) => {
-      const y = 0.6 + rowIndex * ROW_RISE;
-      const depth = rowIndex * ROW_PITCH;
-      for (let seat = 1; seat <= block.seats; seat += 1) {
-        const lateral = (seat - (block.seats + 1) / 2) * seatPitch;
-        let x;
-        let z;
-        let yaw;
-        if (block.side === 'north') {
-          x = SLOT_CENTER_X + (2.5 - block.slot) * SLOT_PITCH - lateral;
-          z = NORTH_Z + depth;
-          yaw = Math.PI;
-        } else if (block.side === 'south') {
-          x = SLOT_CENTER_X + (2.5 - block.slot) * SLOT_PITCH + lateral;
-          z = SOUTH_Z - depth;
-          yaw = 0;
-        } else {
-          x = WEST_X - depth;
-          z = (1 - block.slot) * WEST_SLOT_PITCH - lateral;
-          yaw = Math.PI / 2;
-        }
+    AWE_STAND_ROWS.forEach((row, rowIndex) => {
+      const upperTier = rowIndex >= 12;
+      const tierOffset = upperTier ? TIER_AISLE : 0;
+      const depth = rowIndex * STAND_ROW_PITCH + tierOffset;
+      const y = 0.6 + rowIndex * STAND_ROW_RISE + (upperTier ? 0.65 : 0);
+      const seats = standSeatNumbers(block, row);
+      for (const seat of seats) {
+        const tier = standTier(block, rowIndex, seat);
+        const lateral = ((seat - 1) / Math.max(1, block.maxSeat - 1) - 0.5) * block.width;
+        const x = block.center[0] + block.outward[0] * depth + block.lateral[0] * lateral;
+        const z = block.center[1] + block.outward[1] * depth + block.lateral[1] * lateral;
         placements.push({
-          x, y, z, yaw,
+          x, y, z, yaw: block.yaw,
           sec: block.id,
           row,
           seat,
@@ -147,29 +156,26 @@ export function awePlacements() {
   }
 
   for (const block of AWE_FLOOR_BLOCKS) {
-    const rows = genRows(block.rows);
-    const rowPitch = FLOOR_DEPTH / Math.max(1, block.rows - 1);
-    const seatPitch = (FLOOR_HALF_Z * 2) / Math.max(1, block.seats - 1);
-    const frontX = FLOOR_FRONT_X - block.slot * (FLOOR_DEPTH + FLOOR_GAP);
-    const tier = TIER[block.tier];
-    rows.forEach((row, rowIndex) => {
-      const x = frontX - rowIndex * rowPitch;
-      for (let seat = 1; seat <= block.seats; seat += 1) {
-        const z = -FLOOR_HALF_Z + (seat - 1) * seatPitch;
+    const tier = TIER.price1080;
+    block.rows.forEach((row) => {
+      const z = FLOOR_HALF_Z - (row - 1) * (FLOOR_HALF_Z * 2 / 53);
+      block.seats.forEach((seat) => {
+        const seatIndex = seat === 'AA' ? -1 : AWE_FLOOR_SEATS.indexOf(seat);
+        const x = block.eastX - seatIndex * FLOOR_SEAT_PITCH;
         placements.push({
           x,
           y: 0.05,
           z,
-          yaw: Math.PI / 2,
+          yaw: -Math.PI / 2,
           sec: block.id,
           row,
           seat,
           tier: tier.name,
           color: tier.color,
-          alt: rowIndex % 2,
+          alt: row % 2,
           widthScale: 0.78,
         });
-      }
+      });
     });
   }
 
@@ -210,8 +216,8 @@ function addStage(scene) {
   stage.position.set(STAGE_X, 0.47, 0);
   stage.userData.label = 'End Stage 舞台';
   scene.add(stage);
-  const substage = new THREE.Mesh(new THREE.BoxGeometry(7, 0.4, 3.2), material);
-  substage.position.set(STAGE_X - 6.5, 0.2, 0);
+  const substage = new THREE.Mesh(new THREE.BoxGeometry(18, 0.4, 6.2), material);
+  substage.position.set(17, 0.2, 0);
   scene.add(substage);
   return stage;
 }
@@ -220,24 +226,15 @@ function addLabels(scene) {
   const group = new THREE.Group();
   const specs = [];
   for (const block of AWE_STAND_BLOCKS) {
-    const rows = block.rows;
-    let x;
-    let z;
-    if (block.side === 'north') {
-      x = SLOT_CENTER_X + (2.5 - block.slot) * SLOT_PITCH;
-      z = NORTH_Z + rows * ROW_PITCH + 1.5;
-    } else if (block.side === 'south') {
-      x = SLOT_CENTER_X + (2.5 - block.slot) * SLOT_PITCH;
-      z = SOUTH_Z - rows * ROW_PITCH - 1.5;
-    } else {
-      x = WEST_X - rows * ROW_PITCH - 1.5;
-      z = (1 - block.slot) * WEST_SLOT_PITCH;
-    }
-    specs.push([`BLOCK ${block.id}`, 'STAND', TIER[block.tier].color, x, 3.4 + rows * ROW_RISE, z]);
+    const depth = (AWE_STAND_ROWS.length - 1) * STAND_ROW_PITCH + TIER_AISLE + 1.5;
+    const x = block.center[0] + block.outward[0] * depth;
+    const z = block.center[1] + block.outward[1] * depth;
+    const tier = TIER[block.splitTier ? 'price580' : block.tier];
+    specs.push([`BLOCK ${block.id}`, 'STAND', tier.color, x, 9.2, z]);
   }
   for (const block of AWE_FLOOR_BLOCKS) {
-    const x = FLOOR_FRONT_X - block.slot * (FLOOR_DEPTH + FLOOR_GAP) - FLOOR_DEPTH / 2;
-    specs.push([`BLOCK ${block.id}`, 'FLOOR', TIER.floor.color, x, 3.2, 0]);
+    const westX = block.eastX - (block.seats.length - 1) * FLOOR_SEAT_PITCH;
+    specs.push([`BLOCK ${block.id}`, 'FLOOR', TIER.price1080.color, (block.eastX + westX) / 2, 3.2, 0]);
   }
   for (const [text, sub, color, x, y, z] of specs) {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -253,20 +250,37 @@ function addLabels(scene) {
   return group;
 }
 
+function addWheelchairPlatforms(scene) {
+  return AWE_STAND_BLOCKS
+    .filter((block) => block.id === 4 || block.id === 5)
+    .map((block, index) => {
+      const platform = new THREE.Mesh(
+        new THREE.BoxGeometry(3.2, 0.16, 1.3),
+        new THREE.MeshStandardMaterial({ color: TIER.wheelchair.color, roughness: 0.84 }),
+      );
+      platform.position.set(block.center[0], 8.6, 25.1);
+      platform.userData.wp = index + 1;
+      platform.userData.main = `Block ${block.id} Wheelchair Bay`;
+      platform.userData.sub = `${TIER.wheelchair.name} — rear of upper tier`;
+      scene.add(platform);
+      return platform;
+    });
+}
+
 export const awe = {
   id: 'awe',
   name: 'AsiaWorld-Arena',
   zh: '亞洲國際博覽館',
-  subtitle: 'Hall 1 end-stage concert seating plan',
-  dims: `Stands 2-16 and floor Blocks A-D · ${aweSeatTotal().toLocaleString()} modelled seats`,
+  subtitle: 'Hall 1 EDAN LUI 2023 end-stage seating plan',
+  dims: `Stands 2-16 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [
-    { color: TIER.floor.color, name: 'Floor 內場' },
-    { color: TIER.standard.color, name: 'Standard 標準看台' },
-    { color: TIER.side.color, name: 'Side Stand 側看台' },
-    { color: TIER.corner.color, name: 'Corner Stand 角落看台' },
+    { color: TIER.price1080.color, name: '$1080 Standard' },
+    { color: TIER.price880.color, name: '$880 Standard' },
+    { color: TIER.price580.color, name: '$580 Standard' },
+    { color: TIER.wheelchair.color, name: '$1080 Wheelchair' },
   ],
 
   build({ scene }) {
@@ -297,13 +311,27 @@ export const awe = {
     const west = new THREE.Mesh(new THREE.BoxGeometry(14, 0.18, 26), terraceMaterial);
     west.position.set(WEST_X - 5, 0.05, 0);
     scene.add(west);
+    for (const z of [-14, 14]) {
+      const corner = new THREE.Mesh(new THREE.BoxGeometry(19, 0.18, 12), terraceMaterial);
+      corner.rotation.y = z > 0 ? Math.PI / 4 : -Math.PI / 4;
+      corner.position.set(-25, 0.05, z);
+      scene.add(corner);
+    }
 
     for (const block of AWE_FLOOR_BLOCKS) {
-      const x = FLOOR_FRONT_X - block.slot * (FLOOR_DEPTH + FLOOR_GAP) - FLOOR_DEPTH / 2;
-      addOutline(scene, x, 0, FLOOR_DEPTH, FLOOR_HALF_Z * 2 + 1);
+      const westX = block.eastX - (block.seats.length - 1) * FLOOR_SEAT_PITCH;
+      const x = (block.eastX + westX) / 2;
+      const width = block.eastX - westX + 1;
+      if (block.id === 'A') {
+        addOutline(scene, x, 6, width, 5.4);
+        addOutline(scene, x, -6, width, 5.4);
+      } else {
+        addOutline(scene, x, 0, width, FLOOR_HALF_Z * 2 + 1);
+      }
     }
 
     const placements = awePlacements();
+    const wpMeshes = addWheelchairPlatforms(scene);
 
     const pan = new THREE.BoxGeometry(0.45, 0.10, 0.32);
     pan.translate(0, 0.21, 0.03);
@@ -330,7 +358,7 @@ export const awe = {
       matrix.compose(position, quaternion, scale);
       seats.setMatrixAt(index, matrix);
       const color = new THREE.Color(placement.color);
-      color.multiplyScalar((placement.tier === TIER.floor.name ? 0.92 : 0.8) + placement.alt * 0.035);
+      color.multiplyScalar((placement.y < 0.2 ? 0.92 : 0.8) + placement.alt * 0.035);
       seats.setColorAt(index, color);
       baseColors.set([color.r, color.g, color.b], index * 3);
       seatIndex.set(`${placement.sec}-${placement.row}-${placement.seat}`, index);
@@ -360,7 +388,7 @@ export const awe = {
       seats,
       baseColors,
       seatIndex,
-      wpMeshes: [],
+      wpMeshes,
       stage,
       roofGroup,
       labelGroup,
