@@ -12,10 +12,10 @@ export const AWE_FLOOR_ROWS = ['AA', ...AWE_STAND_ROWS];
 export const AWE_FLOOR_SEATS = Array.from({ length: 54 }, (_, i) => i + 1);
 
 const TIER = {
-  price1080: { name: '$1080 Standard', color: '#ff999a' },
-  price880: { name: '$880 Standard', color: '#9a99ff' },
-  price580: { name: '$580 Standard', color: '#fed966' },
-  wheelchair: { name: '$1080 Wheelchair', color: '#7fff00' },
+  price1080: { name: 'Pink Seating', color: '#ff999a' },
+  price880: { name: 'Purple Seating', color: '#9a99ff' },
+  price580: { name: 'Yellow Seating', color: '#fed966' },
+  wheelchair: { name: 'Wheelchair', color: '#7fff00' },
 };
 
 // `maxSeat` is the highest printed seat number, not a rectangular seat count.
@@ -298,10 +298,10 @@ export const awe = {
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [
-    { color: TIER.price1080.color, name: '$1080 Standard' },
-    { color: TIER.price880.color, name: '$880 Standard' },
-    { color: TIER.price580.color, name: '$580 Standard' },
-    { color: TIER.wheelchair.color, name: '$1080 Wheelchair' },
+    { color: TIER.price1080.color, name: TIER.price1080.name },
+    { color: TIER.price880.color, name: TIER.price880.name },
+    { color: TIER.price580.color, name: TIER.price580.name },
+    { color: TIER.wheelchair.color, name: TIER.wheelchair.name },
   ],
 
   build({ scene }) {

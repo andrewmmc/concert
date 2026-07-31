@@ -128,21 +128,22 @@ test('stand seats rise through two tiers while floor stays flat', () => {
   assert.ok(placements.filter((p) => p.sec === 'A').every((p) => p.y < 0.2));
 });
 
-test('price bands follow the split stand colours on the concert map', () => {
+test('seat zones follow the split stand colours without event prices', () => {
   const placements = awePlacements();
   const at = (sec, row, seat) =>
     placements.find((placement) => placement.sec === sec &&
       placement.row === row && placement.seat === seat);
-  assert.equal(at(6, 'A', 12).tier, '$1080 Standard');
-  assert.equal(at(6, 'A', 13).tier, '$880 Standard');
-  assert.equal(at(12, 'A', 11).tier, '$880 Standard');
-  assert.equal(at(12, 'A', 12).tier, '$1080 Standard');
-  assert.equal(at(9, 'M', 1).tier, '$880 Standard');
-  assert.equal(at(9, 'N', 1).tier, '$580 Standard');
-  assert.equal(at(7, 'N', 12).tier, '$880 Standard');
-  assert.equal(at(7, 'N', 16).tier, '$580 Standard');
-  assert.equal(at(11, 'N', 26).tier, '$580 Standard');
-  assert.equal(at(11, 'N', 30).tier, '$880 Standard');
+  assert.equal(at(6, 'A', 12).tier, 'Pink Seating');
+  assert.equal(at(6, 'A', 13).tier, 'Purple Seating');
+  assert.equal(at(12, 'A', 11).tier, 'Purple Seating');
+  assert.equal(at(12, 'A', 12).tier, 'Pink Seating');
+  assert.equal(at(9, 'M', 1).tier, 'Purple Seating');
+  assert.equal(at(9, 'N', 1).tier, 'Yellow Seating');
+  assert.equal(at(7, 'N', 12).tier, 'Purple Seating');
+  assert.equal(at(7, 'N', 16).tier, 'Yellow Seating');
+  assert.equal(at(11, 'N', 26).tier, 'Yellow Seating');
+  assert.equal(at(11, 'N', 30).tier, 'Purple Seating');
+  assert.ok(awe.sides.every((side) => !side.name.includes('$')));
 });
 
 test('floor placement follows lettered rows and numbered seat direction', () => {
