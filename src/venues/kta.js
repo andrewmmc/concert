@@ -2,7 +2,7 @@
 // two reference drawings in misc/kta. The bowl uses globally numbered seats;
 // the event floor uses Blocks A-J and local seat numbers.
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { addGround, addOutline, createSeatInstances, labelTexture } from '../scene.js';
 
 export const KTA_OMITTED_ROWS = ['I', 'O', 'U', 'W'];
 
@@ -221,34 +221,6 @@ function addFloorPlacements(placements) {
   }
 }
 
-function addOutline(scene, x, z, w, d, color = 0x58309b) {
-  const points = [
-    new THREE.Vector3(x - w / 2, 0.04, z - d / 2),
-    new THREE.Vector3(x + w / 2, 0.04, z - d / 2),
-    new THREE.Vector3(x + w / 2, 0.04, z + d / 2),
-    new THREE.Vector3(x - w / 2, 0.04, z + d / 2),
-  ];
-  scene.add(new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({ color }),
-  ));
-}
-
-function labelTexture(text, sub, color) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 256;
-  const context = canvas.getContext('2d');
-  context.textAlign = 'center';
-  context.fillStyle = color;
-  context.font = '900 86px system-ui';
-  context.fillText(text, 256, 112);
-  context.fillStyle = '#d7deee';
-  context.font = '600 32px system-ui';
-  context.fillText(sub, 256, 174);
-  return new THREE.CanvasTexture(canvas);
-}
-
 function addStage(scene) {
   const material = new THREE.MeshStandardMaterial({ color: 0xc9005c, roughness: 0.72 });
   const stage = new THREE.Mesh(new THREE.BoxGeometry(31, 0.9, 6), material);
@@ -302,13 +274,7 @@ export const kta = {
   ],
 
   build({ scene }) {
-    const ground = new THREE.Mesh(
-      new THREE.CircleGeometry(150, 64),
-      new THREE.MeshStandardMaterial({ color: 0x070b11, roughness: 1 }),
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.04;
-    scene.add(ground);
+    addGround(scene, 150, 0x070b11, -0.04);
 
     const arenaFloor = new THREE.Mesh(
       new THREE.PlaneGeometry(62, 32),
@@ -335,38 +301,13 @@ export const kta = {
     addBowlPlacements(placements);
     addFloorPlacements(placements);
 
-    const pan = new THREE.BoxGeometry(0.45, 0.10, 0.32);
-    pan.translate(0, 0.21, 0.03);
-    const back = new THREE.BoxGeometry(0.45, 0.37, 0.08);
-    back.translate(0, 0.39, -0.14);
-    const seatGeometry = mergeGeometries([pan, back]);
-    const seats = new THREE.InstancedMesh(
-      seatGeometry,
-      new THREE.MeshStandardMaterial({ roughness: 0.76, metalness: 0.04 }),
-      placements.length,
-    );
-    const baseColors = new Float32Array(placements.length * 3);
-    const seatIndex = new Map();
-    const matrix = new THREE.Matrix4();
-    const quaternion = new THREE.Quaternion();
-    const euler = new THREE.Euler();
-    const position = new THREE.Vector3();
-    const scale = new THREE.Vector3();
-    placements.forEach((placement, index) => {
-      euler.set(0, placement.yaw, 0);
-      quaternion.setFromEuler(euler);
-      position.set(placement.x, placement.y, placement.z);
-      scale.set(placement.widthScale, 1, 1);
-      matrix.compose(position, quaternion, scale);
-      seats.setMatrixAt(index, matrix);
-      const color = new THREE.Color(placement.color);
-      color.multiplyScalar((placement.tier === 'Arena Floor' ? 0.92 : 0.78) + placement.alt * 0.035);
-      seats.setColorAt(index, color);
-      baseColors.set([color.r, color.g, color.b], index * 3);
-      seatIndex.set(`${placement.sec}-${placement.row}-${placement.seat}`, index);
+    const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
+      boxes: [
+        { size: [0.45, 0.10, 0.32], pos: [0, 0.21, 0.03] },
+        { size: [0.45, 0.37, 0.08], pos: [0, 0.39, -0.14] },
+      ],
+      shade: (p) => (p.tier === 'Arena Floor' ? 0.92 : 0.78),
     });
-    seats.instanceMatrix.needsUpdate = true;
-    if (seats.instanceColor) seats.instanceColor.needsUpdate = true;
     scene.add(seats);
 
     const stage = addStage(scene);

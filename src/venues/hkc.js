@@ -11,8 +11,7 @@
 //     its aisle and seats 81-89 in the block after it; shortened ranges remain
 //     contiguous within their half-block (see blockAfterAisleForSeat)
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { makeRingR, ringStripGeo } from '../scene.js';
+import { addGround, addOutline, createSeatInstances, makeRingR, ringStripGeo } from '../scene.js';
 
 const DEG = Math.PI / 180;
 
@@ -314,18 +313,13 @@ export const hkc = {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40),
       new THREE.MeshStandardMaterial({ color: 0x11161f, roughness: 0.9 }));
     floor.rotation.x = -Math.PI / 2; floor.position.y = 0; scene.add(floor);
-    scene.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(-20, 0.04, -20), new THREE.Vector3(20, 0.04, -20),
-      new THREE.Vector3(20, 0.04, 20), new THREE.Vector3(-20, 0.04, 20)]),
-      new THREE.LineBasicMaterial({ color: 0x3a4a66 })));
+    addOutline(scene, 0, 0, 40, 40, 0x3a4a66);
 
     const topRow = rowGeo(38);
     scene.add(new THREE.Mesh(strip([{ S: topRow.S + TIER.upperOuter.dr, y: topRow.y + TIER.upperOuter.dy },
       { S: topRow.S + TIER.upperOuter.dr + 2.6, y: 0 }]),
       new THREE.MeshStandardMaterial({ color: 0x151b26, roughness: 1, side: THREE.DoubleSide })));
-    const ground = new THREE.Mesh(new THREE.CircleGeometry(220, 64),
-      new THREE.MeshStandardMaterial({ color: 0x090d14, roughness: 1 }));
-    ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+    addGround(scene, 220, 0x090d14, -0.02);
 
     /* stage — 四面台: centred box; 三面台: box against the Green Gate end
        (+Z).  正面 (front) faces +Z in the 四面台 layout and -Z in the
@@ -440,7 +434,7 @@ export const hkc = {
             placements.push({
               x, y: rg.y, z, yaw: Math.atan2(-x, -z),
               sec, row: row + 1, seat: slot, tier: rg.name, side: seatSide,
-              widthScale: spacing * 0.82 / seatWidth,
+              widthScale: Math.min(rg.name === 'Upper Tier' ? 1.12 : 1, spacing * 0.82 / seatWidth),
             });
           };
           const lowSlots = [], highSlots = [];
@@ -509,31 +503,18 @@ export const hkc = {
       }
     }
 
-    const pan = new THREE.BoxGeometry(seatWidth, 0.10, 0.38); pan.translate(0, 0.24, 0.03);
-    const back = new THREE.BoxGeometry(seatWidth, 0.44, 0.09); back.translate(0, 0.44, -0.17);
-    const seatGeo = mergeGeometries([pan, back]);
-    const seatMat = new THREE.MeshStandardMaterial({ roughness: 0.75, metalness: 0.05 });
-    const seats = new THREE.InstancedMesh(seatGeo, seatMat, placements.length);
-    const baseColors = new Float32Array(placements.length * 3);
-    const seatIndex = new Map();
-    {
-      const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler();
-      const V = new THREE.Vector3(), scale = new THREE.Vector3();
-      placements.forEach((p, i) => {
-        E.set(0, p.yaw, 0); Q.setFromEuler(E); V.set(p.x, p.y, p.z);
-        const preferredWidthScale = p.tier === 'Upper Tier' ? 1.12 : 1;
-        scale.set(Math.min(preferredWidthScale, p.widthScale), 1, 1);
-        M.compose(V, Q, scale); seats.setMatrixAt(i, M);
-        const c = new THREE.Color(p.color || SIDES[p.side].color);
-        const shade = p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82;
-        c.multiplyScalar(shade + (p.alt ?? p.row % 2) * 0.05);
-        seats.setColorAt(i, c);
-        baseColors.set([c.r, c.g, c.b], i * 3);
-        seatIndex.set(`${p.sec}-${p.row}-${p.seat}`, i);
-      });
-    }
-    seats.instanceMatrix.needsUpdate = true;
-    if (seats.instanceColor) seats.instanceColor.needsUpdate = true;
+    // Stand seats inherit their gate-side colour; floor blocks carry their own.
+    for (const p of placements) p.color ??= SIDES[p.side].color;
+    const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
+      boxes: [
+        { size: [seatWidth, 0.10, 0.38], pos: [0, 0.24, 0.03] },
+        { size: [seatWidth, 0.44, 0.09], pos: [0, 0.44, -0.17] },
+      ],
+      shade: (p) => (p.tier === 'Upper Tier' ? 0.62 : p.tier === 'Promenade Level' ? 0.72 : 0.82),
+      altShade: 0.05,
+      roughness: 0.75,
+      metalness: 0.05,
+    });
     scene.add(seats);
 
     /* inverted-pyramid roof */

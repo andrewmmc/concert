@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { makeRingR, ringStripGeo } from '../src/scene.js';
+import { createSeatInstances, makeRingR, ringStripGeo } from '../src/scene.js';
 
 const closeTo = (actual, expected, tolerance = 1e-6) => {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} ≉ ${expected}`);
@@ -63,4 +63,38 @@ test('ringStripGeo respects a partial angular span', () => {
   assert.equal(geometry.index.count, 12);
 
   geometry.dispose();
+});
+
+test('createSeatInstances builds the seat index and shaded base colours', () => {
+  const placements = [
+    { x: 0, y: 1, z: 0, yaw: 0, sec: 1, row: 'A', seat: 1, color: '#ff0000', widthScale: 1, alt: 0 },
+    { x: 1, y: 1, z: 0, yaw: 0, sec: 1, row: 'A', seat: 2, color: '#00ff00', widthScale: 1, alt: 1 },
+  ];
+  const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
+    boxes: [{ size: [0.5, 0.1, 0.3], pos: [0, 0.2, 0.03] }],
+    shade: (p) => (p.seat === 1 ? 0.8 : 0.5),
+    altShade: 0.05,
+  });
+
+  assert.equal(seats.count, 2);
+  assert.equal(seatIndex.get('1-A-1'), 0);
+  assert.equal(seatIndex.get('1-A-2'), 1);
+  assert.equal(seatIndex.get('1-A-3'), undefined);
+  // base color = placement color × (shade + alt × altShade)
+  const [r1, g1, b1] = baseColors.slice(0, 3);
+  closeTo(r1, 0.8); closeTo(g1, 0); closeTo(b1, 0);
+  const [, g2] = baseColors.slice(3, 6);
+  closeTo(g2, 0.55);
+
+  seats.geometry.dispose();
+});
+
+test('createSeatInstances falls back to numeric-row alternation', () => {
+  const { baseColors } = createSeatInstances(
+    [{ x: 0, y: 0, z: 0, yaw: 0, sec: 2, row: 5, seat: 3, color: '#ffffff' }],
+    { boxes: [{ size: [0.5, 0.1, 0.3] }], shade: () => 1, altShade: 0.1 },
+  );
+  // row 5 is odd → alt 1 → white × (1 + 0.1)
+  const [r, g, b] = baseColors.slice(0, 3);
+  closeTo(r, 1.1); closeTo(g, 1.1); closeTo(b, 1.1);
 });

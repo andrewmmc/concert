@@ -3,7 +3,10 @@
 // stand sections 1-8 around the arena and event-floor sections 9-10 for the
 // concert/ring layouts.
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { addGround, addOutline, createSeatInstances, labelTexture } from '../scene.js';
+
+// QES label texture styling (fonts and baselines).
+const QES_LABEL = { font: '800 70px system-ui', subFont: '600 36px system-ui', subColor: '#c8d4e8', textY: 104, subY: 170 };
 
 export const QES_STAND_SECTIONS = [
   { id: 1, label: 'Section 1', total: 395, rows: 22, side: 'east', center: -9, color: '#52b7ff' },
@@ -125,27 +128,6 @@ function sectionPosition(section, rowIndex, seatIndex, seatsInRow) {
   return { x: -20.5 - rowIndex * rowPitch, y: standY, z: section.center - lateral, yaw: Math.PI / 2 };
 }
 
-function addBlockOutline(scene, x, z, w, d, color = 0x284466, y = 0.045) {
-  const points = [
-    new THREE.Vector3(x - w / 2, y, z - d / 2),
-    new THREE.Vector3(x + w / 2, y, z - d / 2),
-    new THREE.Vector3(x + w / 2, y, z + d / 2),
-    new THREE.Vector3(x - w / 2, y, z + d / 2),
-  ];
-  scene.add(new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({ color }),
-  ));
-}
-
-function labelTexture(text, sub, color) {
-  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
-  const x = c.getContext('2d'); x.textAlign = 'center';
-  x.fillStyle = color; x.font = '800 70px system-ui'; x.fillText(text, 256, 104);
-  x.fillStyle = '#c8d4e8'; x.font = '600 36px system-ui'; x.fillText(sub, 256, 170);
-  return new THREE.CanvasTexture(c);
-}
-
 function addFloorSectionPlacements(placements, section) {
   const counts = rowSeatCounts(section.total, section.rows);
   // axis 'x': rows step along x away from the (west) stage and seats run
@@ -236,7 +218,7 @@ function makeStage(scene, layout) {
 
   const top = new THREE.Mesh(
     new THREE.PlaneGeometry(Math.max(1, spec.w - 0.9), Math.max(1, spec.d - 0.9)),
-    new THREE.MeshBasicMaterial({ map: labelTexture(spec.arrow, spec.label, '#00d299') }),
+    new THREE.MeshBasicMaterial({ map: labelTexture(spec.arrow, spec.label, '#00d299', QES_LABEL) }),
   );
   top.rotation.x = -Math.PI / 2;
   top.rotation.z = -spec.rotation;
@@ -262,14 +244,12 @@ export const qes = {
     const layout = qesLayout(opts.layout);
     const placements = [];
 
-    const ground = new THREE.Mesh(new THREE.CircleGeometry(180, 64),
-      new THREE.MeshStandardMaterial({ color: 0x070c10, roughness: 1 }));
-    ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; scene.add(ground);
+    addGround(scene, 180, 0x070c10, -0.02);
 
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(37, 25),
       new THREE.MeshStandardMaterial({ color: 0x101820, roughness: 0.9 }));
     floor.rotation.x = -Math.PI / 2; floor.position.y = 0; scene.add(floor);
-    addBlockOutline(scene, 0, 0, 37, 25, 0x24644f);
+    addOutline(scene, 0, 0, 37, 25, 0x24644f, 0.045);
 
     const terraceMat = new THREE.MeshStandardMaterial({ color: 0x182534, roughness: 0.95 });
     for (const section of QES_STAND_SECTIONS) {
@@ -285,33 +265,20 @@ export const qes = {
 
     addStandPlacements(placements, new Set(layout.closedStands || []));
     for (const floorSection of layout.floorSections) {
-      addBlockOutline(scene, floorSection.x, floorSection.z, floorSection.w, floorSection.d, 0x806132, 0.075);
+      addOutline(scene, floorSection.x, floorSection.z, floorSection.w, floorSection.d, 0x806132, 0.075);
       addFloorSectionPlacements(placements, floorSection);
     }
 
     const stage = makeStage(scene, layout);
 
-    const pan = new THREE.BoxGeometry(0.44, 0.10, 0.34); pan.translate(0, 0.22, 0.03);
-    const back = new THREE.BoxGeometry(0.44, 0.38, 0.08); back.translate(0, 0.40, -0.15);
-    const seatGeo = mergeGeometries([pan, back]);
-    const seatMat = new THREE.MeshStandardMaterial({ roughness: 0.76, metalness: 0.04 });
-    const seats = new THREE.InstancedMesh(seatGeo, seatMat, placements.length);
-    const baseColors = new Float32Array(placements.length * 3);
-    const seatIndex = new Map();
-    const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler();
-    const V = new THREE.Vector3(), scale = new THREE.Vector3();
-    placements.forEach((p, i) => {
-      E.set(0, p.yaw, 0); Q.setFromEuler(E); V.set(p.x, p.y, p.z);
-      scale.set(p.widthScale || 1, 1, 1);
-      M.compose(V, Q, scale); seats.setMatrixAt(i, M);
-      const c = new THREE.Color(p.color);
-      c.multiplyScalar((p.tier === 'Arena Floor' ? 0.86 : 0.70) + (p.alt ?? 0) * 0.06);
-      seats.setColorAt(i, c);
-      baseColors.set([c.r, c.g, c.b], i * 3);
-      seatIndex.set(`${p.sec}-${p.row}-${p.seat}`, i);
+    const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
+      boxes: [
+        { size: [0.44, 0.10, 0.34], pos: [0, 0.22, 0.03] },
+        { size: [0.44, 0.38, 0.08], pos: [0, 0.40, -0.15] },
+      ],
+      shade: (p) => (p.tier === 'Arena Floor' ? 0.86 : 0.70),
+      altShade: 0.06,
     });
-    seats.instanceMatrix.needsUpdate = true;
-    if (seats.instanceColor) seats.instanceColor.needsUpdate = true;
     scene.add(seats);
 
     const roofGroup = new THREE.Group();
@@ -336,7 +303,7 @@ export const qes = {
       const yaw = sectionYaw(section.side);
       const pos = sectionPosition(section, section.rows + 2, 0, 1);
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: labelTexture(String(section.id), section.label, section.color),
+        map: labelTexture(String(section.id), section.label, section.color, QES_LABEL),
         transparent: true,
         depthTest: false,
       }));

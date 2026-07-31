@@ -1,7 +1,10 @@
 // Shared 3D scene engine — builds an interactive seating bowl from a venue
-// data module. Venue modules live in ./venues/*.js and export `build(THREE, helpers)`.
+// data module. Venue modules live in ./venues/*.js and export `build(ctx, opts)`,
+// adding their geometry to `ctx.scene` (a THREE.Group) and returning the model
+// references the app needs for picking, search and the display toggles.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export const HOVER = new THREE.Color('#ffe14d');
 export const PIN   = new THREE.Color('#22d3ee');
@@ -94,4 +97,80 @@ export function createScene(canvas) {
   addEventListener('resize', onResize);
 
   return { THREE, renderer, scene, camera, controls, animate, flyTo, isFlying: () => !!fly };
+}
+
+// Instanced seat mesh from placement data. Each placement supplies
+// { x, y, z, yaw, sec, row, seat, color, widthScale?, alt? }; returns the mesh,
+// its per-instance base colours, and the `sec-row-seat` → instance map used by
+// the seat search. `boxes` lists the merged seat-shape boxes, `shade` the
+// venue's per-placement colour multiplier, `altShade` the row-alternation step.
+export function createSeatInstances(placements, { boxes, shade = () => 1, altShade = 0.035, roughness = 0.76, metalness = 0.04 } = {}) {
+  const geoms = boxes.map((b) => {
+    const g = new THREE.BoxGeometry(b.size[0], b.size[1], b.size[2]);
+    if (b.pos) g.translate(b.pos[0], b.pos[1], b.pos[2]);
+    return g;
+  });
+  const seats = new THREE.InstancedMesh(
+    mergeGeometries(geoms),
+    new THREE.MeshStandardMaterial({ roughness, metalness }),
+    placements.length,
+  );
+  const baseColors = new Float32Array(placements.length * 3);
+  const seatIndex = new Map();
+  const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler();
+  const V = new THREE.Vector3(), scale = new THREE.Vector3();
+  placements.forEach((p, i) => {
+    E.set(0, p.yaw, 0); Q.setFromEuler(E); V.set(p.x, p.y, p.z);
+    scale.set(p.widthScale ?? 1, 1, 1);
+    M.compose(V, Q, scale); seats.setMatrixAt(i, M);
+    const c = new THREE.Color(p.color);
+    const alt = p.alt ?? (typeof p.row === 'number' ? p.row % 2 : 0);
+    c.multiplyScalar(shade(p) + alt * altShade);
+    seats.setColorAt(i, c);
+    baseColors.set([c.r, c.g, c.b], i * 3);
+    seatIndex.set(`${p.sec}-${p.row}-${p.seat}`, i);
+  });
+  seats.instanceMatrix.needsUpdate = true;
+  if (seats.instanceColor) seats.instanceColor.needsUpdate = true;
+  return { seats, baseColors, seatIndex };
+}
+
+// Flat dark ground disc under the model.
+export function addGround(scene, radius, color = 0x070b11, y = -0.04) {
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 64),
+    new THREE.MeshStandardMaterial({ color, roughness: 1 }),
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = y;
+  scene.add(ground);
+}
+
+// Rectangle outline on the floor, e.g. arena floor or seating-block bounds.
+export function addOutline(scene, x, z, w, d, color = 0x58309b, y = 0.04) {
+  const points = [
+    new THREE.Vector3(x - w / 2, y, z - d / 2),
+    new THREE.Vector3(x + w / 2, y, z - d / 2),
+    new THREE.Vector3(x + w / 2, y, z + d / 2),
+    new THREE.Vector3(x - w / 2, y, z + d / 2),
+  ];
+  scene.add(new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.LineBasicMaterial({ color }),
+  ));
+}
+
+// Canvas texture for in-scene labels; opts tune the fonts and baselines.
+export function labelTexture(text, sub, color, { font = '900 86px system-ui', subFont = '600 32px system-ui', subColor = '#d7deee', textY = 112, subY = 174 } = {}) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 256;
+  const context = canvas.getContext('2d');
+  context.textAlign = 'center';
+  context.fillStyle = color;
+  context.font = font;
+  context.fillText(text, 256, textY);
+  context.fillStyle = subColor;
+  context.font = subFont;
+  context.fillText(sub, 256, subY);
+  return new THREE.CanvasTexture(canvas);
 }

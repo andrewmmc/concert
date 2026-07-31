@@ -4,8 +4,11 @@
 // blocks), upper-level sections 501-540, wheelchair seating, hospitality
 // areas, upper-level gates A-H/J/K, and ground-level gate X.
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { addGround, createSeatInstances, labelTexture } from '../scene.js';
 import { KTS_ROW_COUNTS, KTS_ROW_ENDS } from './kts-seat-data.js';
+
+// Upper-gate labels use the large variant of the shared label texture.
+const GATE_LABEL = { font: '900 112px system-ui', subFont: '600 34px system-ui', subColor: '#d3dcec', textY: 126 };
 
 const DEG = Math.PI / 180;
 export const KTS_ROW_LABELS = [
@@ -214,20 +217,6 @@ function rowGeometry(section, rowIndex) {
   return { a: 47.5 + progress * 14.7, b: 35 + progress * 12.2, y: 12.0 + progress * 12.4 };
 }
 
-function makeLabelTexture(text, sub, color, large = false) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  ctx.textAlign = 'center';
-  ctx.fillStyle = color;
-  ctx.font = `${large ? 900 : 800} ${large ? 112 : 76}px system-ui`;
-  ctx.fillText(text, 256, large ? 126 : 106);
-  ctx.fillStyle = '#d3dcec';
-  ctx.font = '600 34px system-ui';
-  ctx.fillText(sub, 256, 184);
-  return new THREE.CanvasTexture(canvas);
-}
-
 function addField(scene) {
   const field = new THREE.Mesh(
     new THREE.PlaneGeometry(51, 34),
@@ -299,13 +288,7 @@ export const kts = {
   build(ctx) {
     const { scene } = ctx;
 
-    const ground = new THREE.Mesh(
-      new THREE.CircleGeometry(190, 64),
-      new THREE.MeshStandardMaterial({ color: 0x070c10, roughness: 1 }),
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.04;
-    scene.add(ground);
+    addGround(scene, 190, 0x070c10, -0.04);
 
     const terraceMaterial = new THREE.MeshStandardMaterial({ color: 0x1a2230, roughness: 0.96 });
     scene.add(new THREE.Mesh(stadiumStripGeometry([
@@ -369,34 +352,13 @@ export const kts = {
       }
     }
 
-    const pan = new THREE.BoxGeometry(0.48, 0.10, 0.34); pan.translate(0, 0.22, 0.03);
-    const back = new THREE.BoxGeometry(0.48, 0.40, 0.08); back.translate(0, 0.41, -0.15);
-    const seatGeometry = mergeGeometries([pan, back]);
-    const seatMaterial = new THREE.MeshStandardMaterial({ roughness: 0.76, metalness: 0.04 });
-    const seats = new THREE.InstancedMesh(seatGeometry, seatMaterial, placements.length);
-    const baseColors = new Float32Array(placements.length * 3);
-    const seatIndex = new Map();
-    const matrix = new THREE.Matrix4();
-    const quaternion = new THREE.Quaternion();
-    const euler = new THREE.Euler();
-    const position = new THREE.Vector3();
-    const scale = new THREE.Vector3();
-    placements.forEach((placement, i) => {
-      euler.set(0, placement.yaw, 0);
-      quaternion.setFromEuler(euler);
-      position.set(placement.x, placement.y, placement.z);
-      scale.set(placement.widthScale, 1, 1);
-      matrix.compose(position, quaternion, scale);
-      seats.setMatrixAt(i, matrix);
-      const color = new THREE.Color(placement.color);
-      const shade = placement.tier === 'Upper Level' ? 0.72 : placement.tier === 'Inner Bowl' ? 0.9 : 0.82;
-      color.multiplyScalar(shade + placement.alt * 0.035);
-      seats.setColorAt(i, color);
-      baseColors.set([color.r, color.g, color.b], i * 3);
-      seatIndex.set(`${placement.sec}-${placement.row}-${placement.seat}`, i);
+    const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
+      boxes: [
+        { size: [0.48, 0.10, 0.34], pos: [0, 0.22, 0.03] },
+        { size: [0.48, 0.40, 0.08], pos: [0, 0.41, -0.15] },
+      ],
+      shade: (p) => (p.tier === 'Upper Level' ? 0.72 : p.tier === 'Inner Bowl' ? 0.9 : 0.82),
     });
-    seats.instanceMatrix.needsUpdate = true;
-    if (seats.instanceColor) seats.instanceColor.needsUpdate = true;
     scene.add(seats);
 
     const roofGroup = new THREE.Group();
@@ -432,7 +394,7 @@ export const kts = {
       const theta = degrees * DEG;
       const point = stadiumPoint(theta, 69, 54, 29.5);
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: makeLabelTexture(gate, 'UPPER GATE', '#f0334f', true),
+        map: labelTexture(gate, 'UPPER GATE', '#f0334f', GATE_LABEL),
         transparent: true,
         depthTest: false,
       }));
@@ -442,7 +404,7 @@ export const kts = {
     }
     const xPoint = stadiumPoint(126 * DEG, 69, 54, 32.0);
     const xGate = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: makeLabelTexture('X', 'GROUND GATE', '#3f57bc', true),
+      map: labelTexture('X', 'GROUND GATE', '#3f57bc', GATE_LABEL),
       transparent: true,
       depthTest: false,
     }));
