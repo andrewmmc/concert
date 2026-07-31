@@ -85,7 +85,9 @@ Venues are data modules under `src/venues/`:
 
 1. Create `src/venues/<name>.js` exporting an object with
    `{ id, name, zh, subtitle, dims, planUrl, layouts, sides, build(ctx, opts) }`
-   (see `src/venues/hkc.js` for the shape).
+   (see `src/venues/hkc.js` for the shape). Optional `defaultCamera`
+   (`{ target: [x, y, z], position: [x, y, z] }`) frames the initial view;
+   missing entries fall back to the default framing.
 2. Register it in `src/venues/index.js` (`venues` array).
 3. It's automatically available at `#/<id>/<layout>` and in the venue picker.
 

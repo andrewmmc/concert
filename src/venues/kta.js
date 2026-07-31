@@ -264,6 +264,7 @@ export const kta = {
   subtitle: 'End-stage concert seating plan',
   dims: `Blocks 102-113, 207-208 and arena-floor Blocks A-J · ${ktaSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
+  defaultCamera: { target: [-5, 4, 0] },
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [

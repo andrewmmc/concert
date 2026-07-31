@@ -36,3 +36,12 @@ test('returns null for venues without layouts', () => {
   assert.equal(resolveLayout({}, 'anything'), null);
   assert.equal(resolveLayout({ layouts: [] }, 'anything'), null);
 });
+
+test('venue default cameras are well-formed when present', () => {
+  const framed = venues.filter((venue) => venue.defaultCamera);
+  assert.ok(framed.length > 0);
+  for (const venue of framed) {
+    assert.equal(venue.defaultCamera.target.length, 3);
+    if (venue.defaultCamera.position) assert.equal(venue.defaultCamera.position.length, 3);
+  }
+});

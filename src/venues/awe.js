@@ -253,6 +253,7 @@ export const awe = {
   subtitle: 'Hall 1 EDAN LUI 2023 end-stage seating plan',
   dims: `Stands 2-16 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
+  defaultCamera: { target: [-8, 4, 0] },
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [
