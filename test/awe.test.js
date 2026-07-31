@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   AWE_FLOOR_BLOCKS,
+  AWE_FLOOR_ROWS,
   AWE_FLOOR_SEATS,
   AWE_STAND_BLOCKS,
   AWE_STAND_ROWS,
@@ -38,41 +39,50 @@ test('stand rows cover both tiers from A-Z and omit I and O', () => {
   assert.ok(!AWE_STAND_ROWS.includes('O'));
 });
 
-test('stand seat numbers preserve the printed stage-end cut-outs', () => {
-  assert.deepEqual(aweSeatNumbers(2, 'A'), Array.from({ length: 11 }, (_, i) => i + 11));
-  assert.deepEqual(aweSeatNumbers(2, 'Z'), Array.from({ length: 21 }, (_, i) => i + 1));
-  assert.deepEqual(aweSeatNumbers(16, 'A'), [1, 2, 3, 4, 5, 11, 12]);
+test('stand seat numbers preserve printed gaps and partial row groups', () => {
+  assert.deepEqual(aweSeatNumbers(2, 'A'), Array.from({ length: 21 }, (_, i) => i + 1));
+  assert.deepEqual(aweSeatNumbers(16, 'A'), Array.from({ length: 12 }, (_, i) => i + 1));
+  assert.deepEqual(aweSeatNumbers(16, 'N'), [1, 2, 3, 4, 5]);
   assert.deepEqual(aweSeatNumbers(16, 'Z'), Array.from({ length: 12 }, (_, i) => i + 1));
-  assert.deepEqual(aweSeatNumbers(4, 'M'), Array.from({ length: 13 }, (_, i) => i + 14));
-  assert.deepEqual(aweSeatNumbers(4, 'N'), Array.from({ length: 13 }, (_, i) => i + 1));
+  assert.deepEqual(aweSeatNumbers(4, 'A'), Array.from({ length: 13 }, (_, i) => i + 14));
+  assert.deepEqual(aweSeatNumbers(4, 'H'), Array.from({ length: 13 }, (_, i) => i + 14));
+  assert.deepEqual(aweSeatNumbers(4, 'J'), Array.from({ length: 26 }, (_, i) => i + 1));
   assert.deepEqual(aweSeatNumbers(14, 'A'), Array.from({ length: 13 }, (_, i) => i + 1));
-  assert.deepEqual(aweSeatNumbers(14, 'N'), Array.from({ length: 13 }, (_, i) => i + 14));
+  assert.deepEqual(aweSeatNumbers(14, 'N'), Array.from({ length: 26 }, (_, i) => i + 1));
+  assert.deepEqual(aweSeatNumbers(7, 'A'), [1, 2, 9, 10, 11, 12]);
+  assert.ok(!aweSeatNumbers(7, 'N').includes(13));
+  assert.ok(!aweSeatNumbers(8, 'M').includes(25));
   assert.equal(aweSeatNumbers(8, 'M').at(-1), 53);
+  assert.deepEqual(aweRowLabels(9), AWE_STAND_ROWS.slice(8));
+  assert.ok(!aweSeatNumbers(10, 'A').includes(26));
+  assert.ok(aweSeatNumbers(10, 'H').includes(26));
+  assert.deepEqual(aweSeatNumbers(11, 'A').slice(0, 3), [7, 8, 9]);
+  assert.ok(!aweSeatNumbers(11, 'A').includes(27));
   assert.deepEqual(aweSeatNumbers(4, 'nope'), []);
   assert.deepEqual(aweSeatNumbers(999, 'A'), []);
 });
 
-test('floor uses numbered rows and lettered seats from the concert map', () => {
-  assert.deepEqual(aweRowLabels('A'), [
-    ...Array.from({ length: 17 }, (_, i) => i + 1),
-    ...Array.from({ length: 17 }, (_, i) => i + 38),
+test('floor uses lettered rows and numbered seats from the concert map', () => {
+  assert.deepEqual(aweRowLabels('A'), AWE_FLOOR_ROWS);
+  assert.deepEqual(aweRowLabels('B'), AWE_STAND_ROWS.slice(0, 20));
+  assert.deepEqual(aweRowLabels('C'), AWE_STAND_ROWS.slice(0, 10));
+  assert.deepEqual(aweSeatNumbers('A', 'AA'), [
+    ...AWE_FLOOR_SEATS.slice(0, 17),
+    ...AWE_FLOOR_SEATS.slice(37),
   ]);
-  assert.equal(aweRowLabels('B').length, 54);
-  assert.deepEqual(aweSeatNumbers('A', 1), [...AWE_FLOOR_SEATS, 'AA']);
-  assert.deepEqual(aweSeatNumbers('B', 1), AWE_FLOOR_SEATS.slice(0, 22));
-  assert.deepEqual(aweSeatNumbers('C', 1), AWE_FLOOR_SEATS.slice(0, 11));
-  assert.deepEqual(aweSeatNumbers('A', 18), []);
+  assert.deepEqual(aweSeatNumbers('B', 'V'), AWE_FLOOR_SEATS);
+  assert.deepEqual(aweSeatNumbers('C', 'K'), AWE_FLOOR_SEATS);
+  assert.deepEqual(aweSeatNumbers('C', 'L'), []);
 });
 
 test('seat existence checks respect printed gaps and bounds', () => {
-  assert.ok(aweSeatExists(2, 'A', 11));
-  assert.ok(!aweSeatExists(2, 'A', 10));
-  assert.ok(aweSeatExists(16, 'A', 12));
-  assert.ok(!aweSeatExists(16, 'A', 6));
-  assert.ok(aweSeatExists('A', 1, 'AA'));
-  assert.ok(!aweSeatExists('A', 18, 'A'));
-  assert.ok(aweSeatExists('C', 54, 'K'));
-  assert.ok(!aweSeatExists('C', 54, 'L'));
+  assert.ok(aweSeatExists(2, 'A', 1));
+  assert.ok(aweSeatExists(16, 'A', 6));
+  assert.ok(!aweSeatExists(16, 'N', 6));
+  assert.ok(aweSeatExists('A', 'AA', 1));
+  assert.ok(!aweSeatExists('A', 'AA', 18));
+  assert.ok(aweSeatExists('C', 'K', 54));
+  assert.ok(!aweSeatExists('C', 'L', 54));
 });
 
 test('seat total sums every valid printed row and seat', () => {
@@ -80,7 +90,7 @@ test('seat total sums every valid printed row and seat', () => {
     .reduce((sum, block) => sum + aweRowLabels(block.id)
       .reduce((rowSum, row) => rowSum + aweSeatNumbers(block.id, row).length, 0), 0);
   assert.equal(aweSeatTotal(), expected);
-  assert.equal(aweSeatTotal(), 12732);
+  assert.equal(aweSeatTotal(), 11712);
   assert.equal(awePlacements().length, expected);
 });
 
@@ -129,13 +139,17 @@ test('price bands follow the split stand colours on the concert map', () => {
   assert.equal(at(12, 'A', 12).tier, '$1080 Standard');
   assert.equal(at(9, 'M', 1).tier, '$880 Standard');
   assert.equal(at(9, 'N', 1).tier, '$580 Standard');
+  assert.equal(at(7, 'N', 12).tier, '$880 Standard');
+  assert.equal(at(7, 'N', 16).tier, '$580 Standard');
+  assert.equal(at(11, 'N', 26).tier, '$580 Standard');
+  assert.equal(at(11, 'N', 30).tier, '$880 Standard');
 });
 
-test('floor placement follows row numbers and lettered seat direction', () => {
+test('floor placement follows lettered rows and numbered seat direction', () => {
   const blockA = awePlacements().filter((p) => p.sec === 'A');
   const at = (row, seat) => blockA.find((p) => p.row === row && p.seat === seat);
-  assert.ok(at(1, 'A').z > at(54, 'A').z);
-  assert.ok(at(1, 'AA').x > at(1, 'A').x);
-  assert.ok(at(1, 'A').x > at(1, 'Z').x);
-  assert.equal(at(18, 'A'), undefined);
+  assert.ok(at('AA', 1).z > at('AA', 54).z);
+  assert.ok(at('AA', 1).x > at('A', 1).x);
+  assert.ok(at('A', 1).x > at('Z', 1).x);
+  assert.equal(at('AA', 18), undefined);
 });

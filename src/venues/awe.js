@@ -8,7 +8,8 @@ export const AWE_STAND_ROWS = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
   'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
-export const AWE_FLOOR_SEATS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+export const AWE_FLOOR_ROWS = ['AA', ...AWE_STAND_ROWS];
+export const AWE_FLOOR_SEATS = Array.from({ length: 54 }, (_, i) => i + 1);
 
 const TIER = {
   price1080: { name: '$1080 Standard', color: '#ff999a' },
@@ -18,8 +19,8 @@ const TIER = {
 };
 
 // `maxSeat` is the highest printed seat number, not a rectangular seat count.
-// Blocks 2 and 16 have stage-end cut-outs; their missing numbers are retained
-// so tickets map to the labels printed on the plan.
+// Some blocks contain numbering gaps or lose their front rows around handrails,
+// wheelchair bays and the rear control panel; standSeatNumbers preserves them.
 export const AWE_STAND_BLOCKS = [
   { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
   { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
@@ -38,14 +39,13 @@ export const AWE_STAND_BLOCKS = [
   { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 12, tier: 'price1080' },
 ];
 
-const FLOOR_ROWS = Array.from({ length: 54 }, (_, i) => i + 1);
-
-// The event map numbers floor rows north-to-south and letters seats east-to-
-// west. Block A's T-shaped substage occupies rows 18-37.
+// The event map letters floor rows from the stage towards the panel and numbers
+// seats north-to-south. Block A starts at Row AA and is split by the T-shaped
+// substage, which replaces Seats 18-37. Blocks B and C retain Seats 1-54.
 export const AWE_FLOOR_BLOCKS = [
-  { id: 'A', eastX: 18, rows: FLOOR_ROWS.filter((row) => row <= 17 || row >= 38), seats: [...AWE_FLOOR_SEATS, 'AA'] },
-  { id: 'B', eastX: 2, rows: FLOOR_ROWS, seats: AWE_FLOOR_SEATS.slice(0, 22) },
-  { id: 'C', eastX: -11, rows: FLOOR_ROWS, seats: AWE_FLOOR_SEATS.slice(0, 11) },
+  { id: 'A', eastX: 18, rows: AWE_FLOOR_ROWS, seats: [...AWE_FLOOR_SEATS.slice(0, 17), ...AWE_FLOOR_SEATS.slice(37)] },
+  { id: 'B', eastX: 2, rows: AWE_STAND_ROWS.slice(0, 20), seats: AWE_FLOOR_SEATS },
+  { id: 'C', eastX: -11, rows: AWE_STAND_ROWS.slice(0, 10), seats: AWE_FLOOR_SEATS },
 ];
 
 const STAND_BY_ID = new Map(AWE_STAND_BLOCKS.map((b) => [String(b.id), b]));
@@ -61,11 +61,14 @@ const STAND_ROW_PITCH = 0.58;
 const STAND_ROW_RISE = 0.31;
 const TIER_AISLE = 1.15;
 const FLOOR_SEAT_PITCH = 0.48;
+const FLOOR_ROW_PITCH = 0.58;
 
 export function aweRowLabels(id) {
   const block = STAND_BY_ID.get(String(id)) || FLOOR_BY_ID.get(String(id).toUpperCase());
   if (!block) return [];
-  return STAND_BY_ID.has(String(id)) ? AWE_STAND_ROWS.slice() : block.rows.slice();
+  return STAND_BY_ID.has(String(id))
+    ? AWE_STAND_ROWS.filter((row) => standSeatNumbers(block, row).length)
+    : block.rows.slice();
 }
 
 function rangeInclusive(first, last) {
@@ -75,23 +78,40 @@ function rangeInclusive(first, last) {
 function standSeatNumbers(block, row) {
   const rowIndex = AWE_STAND_ROWS.indexOf(row);
   if (rowIndex < 0) return [];
-  if (block.id === 2) {
-    return rowIndex >= AWE_STAND_ROWS.indexOf('T')
-      ? rangeInclusive(1, 21)
-      : rangeInclusive(11, 21);
-  }
+  const rowAtoG = rowIndex <= AWE_STAND_ROWS.indexOf('G');
+  const rowAtoH = rowIndex <= AWE_STAND_ROWS.indexOf('H');
+  const rowNtoS = rowIndex >= AWE_STAND_ROWS.indexOf('N') &&
+    rowIndex <= AWE_STAND_ROWS.indexOf('S');
   if (block.id === 16) {
-    return rowIndex >= AWE_STAND_ROWS.indexOf('T')
-      ? rangeInclusive(1, 12)
-      : [...rangeInclusive(1, 5), 11, 12];
+    return rowNtoS ? rangeInclusive(1, 5) : rangeInclusive(1, 12);
   }
   if (block.id === 4) {
-    if (['J', 'K', 'L', 'M'].includes(row)) return rangeInclusive(14, 26);
-    if (['N', 'P', 'Q', 'R', 'S'].includes(row)) return rangeInclusive(1, 13);
+    return rowAtoH ? rangeInclusive(14, 26) : rangeInclusive(1, 26);
   }
   if (block.id === 14) {
-    if (['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(row)) return rangeInclusive(1, 13);
-    if (['N', 'P', 'Q', 'R', 'S'].includes(row)) return rangeInclusive(14, 26);
+    return rowAtoH ? rangeInclusive(1, 13) : rangeInclusive(1, 26);
+  }
+  if (block.id === 7) {
+    const lowerSeats = rowIndex <= AWE_STAND_ROWS.indexOf('C')
+      ? [1, 2, ...rangeInclusive(9, 12)]
+      : rangeInclusive(1, 12);
+    return rowIndex < AWE_STAND_ROWS.indexOf('N')
+      ? lowerSeats
+      : [...rangeInclusive(1, 12), ...rangeInclusive(16, 36)];
+  }
+  if (block.id === 8) {
+    const seats = [...rangeInclusive(1, 24), ...rangeInclusive(27, 53)];
+    return rowAtoG ? seats.filter((seat) => seat <= 12 || seat >= 27) : seats;
+  }
+  if (block.id === 9) {
+    return rowIndex < AWE_STAND_ROWS.indexOf('J') ? [] : rangeInclusive(1, 35);
+  }
+  if (block.id === 10) {
+    const seats = rangeInclusive(1, 52);
+    return rowAtoG ? seats.filter((seat) => seat <= 25 || seat >= 41) : seats;
+  }
+  if (block.id === 11) {
+    return [...rangeInclusive(7, 26), ...rangeInclusive(30, 41)];
   }
   return rangeInclusive(1, block.maxSeat);
 }
@@ -99,6 +119,10 @@ function standSeatNumbers(block, row) {
 function standTier(block, rowIndex, seat) {
   if (block.id === 6) return TIER[seat <= 12 ? 'price1080' : 'price880'];
   if (block.id === 12) return TIER[seat <= 11 ? 'price880' : 'price1080'];
+  if (block.id === 7) return TIER[seat <= 12 ? 'price880' : 'price580'];
+  if (block.id === 11) {
+    return TIER[rowIndex >= AWE_STAND_ROWS.indexOf('N') && seat <= 26 ? 'price580' : 'price880'];
+  }
   if (block.splitTier) return TIER[rowIndex >= 12 ? 'price580' : 'price880'];
   return TIER[block.tier];
 }
@@ -107,15 +131,13 @@ export function aweSeatNumbers(id, row) {
   const stand = STAND_BY_ID.get(String(id));
   const floor = FLOOR_BY_ID.get(String(id).toUpperCase());
   if (stand) return standSeatNumbers(stand, String(row).toUpperCase());
-  if (!floor || !floor.rows.includes(Number(row))) return [];
+  if (!floor || !floor.rows.includes(String(row).toUpperCase())) return [];
   return floor.seats.slice();
 }
 
 export function aweSeatExists(id, row, seat) {
   const numbers = aweSeatNumbers(id, row);
-  return STAND_BY_ID.has(String(id))
-    ? numbers.includes(Number(seat))
-    : numbers.includes(String(seat).toUpperCase());
+  return numbers.includes(Number(seat));
 }
 
 export function aweSeatTotal() {
@@ -157,11 +179,10 @@ export function awePlacements() {
 
   for (const block of AWE_FLOOR_BLOCKS) {
     const tier = TIER.price1080;
-    block.rows.forEach((row) => {
-      const z = FLOOR_HALF_Z - (row - 1) * (FLOOR_HALF_Z * 2 / 53);
+    block.rows.forEach((row, rowIndex) => {
+      const x = block.eastX - rowIndex * FLOOR_ROW_PITCH;
       block.seats.forEach((seat) => {
-        const seatIndex = seat === 'AA' ? -1 : AWE_FLOOR_SEATS.indexOf(seat);
-        const x = block.eastX - seatIndex * FLOOR_SEAT_PITCH;
+        const z = FLOOR_HALF_Z - (seat - 1) * (FLOOR_HALF_Z * 2 / 53);
         placements.push({
           x,
           y: 0.05,
@@ -172,7 +193,7 @@ export function awePlacements() {
           seat,
           tier: tier.name,
           color: tier.color,
-          alt: row % 2,
+          alt: rowIndex % 2,
           widthScale: 0.78,
         });
       });
@@ -233,7 +254,7 @@ function addLabels(scene) {
     specs.push([`BLOCK ${block.id}`, 'STAND', tier.color, x, 9.2, z]);
   }
   for (const block of AWE_FLOOR_BLOCKS) {
-    const westX = block.eastX - (block.seats.length - 1) * FLOOR_SEAT_PITCH;
+    const westX = block.eastX - (block.rows.length - 1) * FLOOR_ROW_PITCH;
     specs.push([`BLOCK ${block.id}`, 'FLOOR', TIER.price1080.color, (block.eastX + westX) / 2, 3.2, 0]);
   }
   for (const [text, sub, color, x, y, z] of specs) {
@@ -319,9 +340,9 @@ export const awe = {
     }
 
     for (const block of AWE_FLOOR_BLOCKS) {
-      const westX = block.eastX - (block.seats.length - 1) * FLOOR_SEAT_PITCH;
+      const westX = block.eastX - (block.rows.length - 1) * FLOOR_ROW_PITCH;
       const x = (block.eastX + westX) / 2;
-      const width = block.eastX - westX + 1;
+      const width = block.eastX - westX + FLOOR_ROW_PITCH;
       if (block.id === 'A') {
         addOutline(scene, x, 6, width, 5.4);
         addOutline(scene, x, -6, width, 5.4);
