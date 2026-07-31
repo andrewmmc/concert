@@ -14,6 +14,9 @@ import * as THREE from 'three';
 import { addGround, addOutline, createSeatInstances, makeRingR, ringStripGeo } from '../scene.js';
 
 const DEG = Math.PI / 180;
+// Each of the four gate colours spans a quarter of the bowl as ten 9°
+// sections.
+const SEC_DEG = 9;
 
 // The PDF numbers entrance aisles (gates), not self-contained rectangular
 // sections.  Each physical block between two aisles is shared by two gates:
@@ -271,7 +274,7 @@ export const hkc = {
     const P_SUPER = 3.2;
     const ringR = makeRingR(P_SUPER);
     const SIDES = this.sides;
-    const SECS_PER_SIDE = 10, SEC_DEG = 9;
+    const SECS_PER_SIDE = 10;
 
     const TIER = {
       lower: { r0: 22.5, y0: 1.00, dr: 0.80, dy: 0.42 },
@@ -368,10 +371,8 @@ export const hkc = {
     {
       const wpMat = new THREE.MeshStandardMaterial({ color: 0x6b7684, roughness: 0.85, side: THREE.DoubleSide });
       for (const wp of WHEELCHAIR_PLATFORMS) {
-          const { gate: side, offset: j } = gateAndOffset(wp.aisle);
-          const S = SIDES[side];
           // Platforms occupy the block between this aisle and the next one.
-          const tMid = (S.center / DEG - 45 + (j + 1) * SEC_DEG) * DEG;
+          const tMid = platformCenterAngle(wp.aisle);
           const halfW = SEC_DEG * DEG * 0.44;
           const segs = 16, pos = [], idx = [];
           for (let k = 0; k <= segs; k++) {
@@ -561,3 +562,11 @@ export const hkc = {
     return { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe };
   },
 };
+
+// Centre angle of a wheelchair platform slab: the middle of the 9° block
+// between the anchor aisle and the next one — the wedge whose rows 14-15
+// seats the platform replaces.
+export function platformCenterAngle(aisle) {
+  const { gate, offset } = gateAndOffset(aisle);
+  return (hkc.sides[gate].center / DEG - 45 + (offset + 1.5) * SEC_DEG) * DEG;
+}

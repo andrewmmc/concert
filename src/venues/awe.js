@@ -174,7 +174,8 @@ export function awePlacements() {
           x,
           y: 0.05,
           z,
-          yaw: -Math.PI / 2,
+          // Face +x, toward the stage at STAGE_X.
+          yaw: Math.PI / 2,
           sec: block.id,
           row,
           seat,

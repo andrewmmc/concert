@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   ROW_LIMITS_BY_GATE,
   WHEELCHAIR_PLATFORMS,
+  platformCenterAngle,
   seatExistsOnPlan,
   standSeatPositionInBlock,
 } from '../src/venues/hkc.js';
@@ -160,4 +161,13 @@ test('produces the expected total number of modelled seats', () => {
 
   assert.deepEqual(byTier, [7030, 1720, 7662]);
   assert.equal(byTier.reduce((total, seats) => total + seats, 0), 16412);
+});
+
+test('centres each wheelchair platform on the block after its aisle', () => {
+  // WP6 anchors at aisle 41: the block between aisles 41 and 42 spans
+  // 243-252° on the Red side, so the slab's middle sits at 247.5°.
+  const DEG = Math.PI / 180;
+  assert.equal(platformCenterAngle(41), 247.5 * DEG);
+  assert.equal(platformCenterAngle(61), 67.5 * DEG);
+  assert.equal(platformCenterAngle(72), 166.5 * DEG);
 });

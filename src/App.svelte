@@ -53,10 +53,11 @@
 
     let placements = [], seats, baseColors, seatIndex, wpMeshes = [], stage, roofGroup, labelGroup, describe;
 
-    // Dispose the geometry, materials and textures of a previous model before
-    // rebuilding the scene for a new venue/layout.
+    // Dispose the geometry, materials, textures and instance buffers of a
+    // previous model before rebuilding the scene for a new venue/layout.
     function disposeGroup(group) {
       group.traverse((obj) => {
+        if (obj.isInstancedMesh) obj.dispose();
         if (obj.geometry) obj.geometry.dispose();
         if (obj.material) {
           const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
@@ -311,7 +312,7 @@
   <div class="search-label">Find a seat</div>
   <div class="search-content">
     <div class="fields">
-      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Sec"  maxlength="3" aria-label="Section">
+      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Sec"  maxlength="3" aria-label="Section">
       <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Row"  maxlength="3" aria-label="Row">
       <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="4" aria-label="Seat">
     </div>

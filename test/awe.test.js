@@ -144,3 +144,10 @@ test('floor placement follows lettered rows and numbered seat direction', () => 
   assert.ok(at('A', 1).x > at('Z', 1).x);
   assert.equal(at('AA', 18), undefined);
 });
+
+test('floor seats face the stage at the east end', () => {
+  const floorIds = AWE_FLOOR_BLOCKS.map((block) => block.id);
+  const floor = awePlacements().filter((p) => floorIds.includes(p.sec));
+  assert.ok(floor.length > 0);
+  assert.ok(floor.every((p) => p.yaw === Math.PI / 2));
+});
