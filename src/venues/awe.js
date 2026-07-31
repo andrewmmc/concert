@@ -12,9 +12,7 @@ export const AWE_FLOOR_ROWS = ['AA', ...AWE_STAND_ROWS];
 export const AWE_FLOOR_SEATS = Array.from({ length: 54 }, (_, i) => i + 1);
 
 const TIER = {
-  price1080: { name: 'Pink Seating', color: '#ff999a' },
-  price880: { name: 'Purple Seating', color: '#9a99ff' },
-  price580: { name: 'Yellow Seating', color: '#fed966' },
+  seating: { name: 'Seating', color: '#ff999a' },
   wheelchair: { name: 'Wheelchair', color: '#7fff00' },
 };
 
@@ -22,21 +20,21 @@ const TIER = {
 // Some blocks contain numbering gaps or lose their front rows around handrails,
 // wheelchair bays and the rear control panel; standSeatNumbers preserves them.
 export const AWE_STAND_BLOCKS = [
-  { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
-  { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21, tier: 'price1080' },
-  { id: 4, side: 'north', center: [3, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 26, tier: 'price1080' },
-  { id: 5, side: 'north', center: [-3.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 25, tier: 'price1080' },
-  { id: 6, side: 'north', center: [-10, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 23, tier: 'price880' },
-  { id: 7, side: 'north', center: [-17, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 8.5, maxSeat: 36, splitTier: true },
-  { id: 8, side: 'northwest', center: [-24, 10.5], outward: [-0.71, 0.71], lateral: [-0.71, -0.71], yaw: Math.PI * 0.75, width: 12, maxSeat: 53, splitTier: true },
-  { id: 9, side: 'west', center: [-29, 0], outward: [-1, 0], lateral: [0, -1], yaw: Math.PI / 2, width: 10.5, maxSeat: 35, splitTier: true },
-  { id: 10, side: 'southwest', center: [-24, -10.5], outward: [-0.71, -0.71], lateral: [0.71, -0.71], yaw: Math.PI / 4, width: 12, maxSeat: 52, splitTier: true },
-  { id: 11, side: 'south', center: [-17, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 9.5, maxSeat: 41, splitTier: true },
-  { id: 12, side: 'south', center: [-10, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 23, tier: 'price880' },
-  { id: 13, side: 'south', center: [-3.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 25, tier: 'price1080' },
-  { id: 14, side: 'south', center: [3, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 26, tier: 'price1080' },
-  { id: 15, side: 'south', center: [9.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21, tier: 'price1080' },
-  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 12, tier: 'price1080' },
+  { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
+  { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
+  { id: 4, side: 'north', center: [3, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 26 },
+  { id: 5, side: 'north', center: [-3.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 25 },
+  { id: 6, side: 'north', center: [-10, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 23 },
+  { id: 7, side: 'north', center: [-17, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 8.5, maxSeat: 36 },
+  { id: 8, side: 'northwest', center: [-24, 10.5], outward: [-0.71, 0.71], lateral: [-0.71, -0.71], yaw: Math.PI * 0.75, width: 12, maxSeat: 53 },
+  { id: 9, side: 'west', center: [-29, 0], outward: [-1, 0], lateral: [0, -1], yaw: Math.PI / 2, width: 10.5, maxSeat: 35 },
+  { id: 10, side: 'southwest', center: [-24, -10.5], outward: [-0.71, -0.71], lateral: [0.71, -0.71], yaw: Math.PI / 4, width: 12, maxSeat: 52 },
+  { id: 11, side: 'south', center: [-17, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 9.5, maxSeat: 41 },
+  { id: 12, side: 'south', center: [-10, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 23 },
+  { id: 13, side: 'south', center: [-3.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 25 },
+  { id: 14, side: 'south', center: [3, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 26 },
+  { id: 15, side: 'south', center: [9.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21 },
+  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 12 },
 ];
 
 // The event map letters floor rows from the stage towards the panel and numbers
@@ -116,17 +114,6 @@ function standSeatNumbers(block, row) {
   return rangeInclusive(1, block.maxSeat);
 }
 
-function standTier(block, rowIndex, seat) {
-  if (block.id === 6) return TIER[seat <= 12 ? 'price1080' : 'price880'];
-  if (block.id === 12) return TIER[seat <= 11 ? 'price880' : 'price1080'];
-  if (block.id === 7) return TIER[seat <= 12 ? 'price880' : 'price580'];
-  if (block.id === 11) {
-    return TIER[rowIndex >= AWE_STAND_ROWS.indexOf('N') && seat <= 26 ? 'price580' : 'price880'];
-  }
-  if (block.splitTier) return TIER[rowIndex >= 12 ? 'price580' : 'price880'];
-  return TIER[block.tier];
-}
-
 export function aweSeatNumbers(id, row) {
   const stand = STAND_BY_ID.get(String(id));
   const floor = FLOOR_BY_ID.get(String(id).toUpperCase());
@@ -159,7 +146,7 @@ export function awePlacements() {
       const y = 0.6 + rowIndex * STAND_ROW_RISE + (upperTier ? 0.65 : 0);
       const seats = standSeatNumbers(block, row);
       for (const seat of seats) {
-        const tier = standTier(block, rowIndex, seat);
+        const tier = TIER.seating;
         const lateral = ((seat - 1) / Math.max(1, block.maxSeat - 1) - 0.5) * block.width;
         const x = block.center[0] + block.outward[0] * depth + block.lateral[0] * lateral;
         const z = block.center[1] + block.outward[1] * depth + block.lateral[1] * lateral;
@@ -178,7 +165,7 @@ export function awePlacements() {
   }
 
   for (const block of AWE_FLOOR_BLOCKS) {
-    const tier = TIER.price1080;
+    const tier = TIER.seating;
     block.rows.forEach((row, rowIndex) => {
       const x = block.eastX - rowIndex * FLOOR_ROW_PITCH;
       block.seats.forEach((seat) => {
@@ -250,12 +237,11 @@ function addLabels(scene) {
     const depth = (AWE_STAND_ROWS.length - 1) * STAND_ROW_PITCH + TIER_AISLE + 1.5;
     const x = block.center[0] + block.outward[0] * depth;
     const z = block.center[1] + block.outward[1] * depth;
-    const tier = TIER[block.splitTier ? 'price580' : block.tier];
-    specs.push([`BLOCK ${block.id}`, 'STAND', tier.color, x, 9.2, z]);
+    specs.push([`BLOCK ${block.id}`, 'STAND', TIER.seating.color, x, 9.2, z]);
   }
   for (const block of AWE_FLOOR_BLOCKS) {
     const westX = block.eastX - (block.rows.length - 1) * FLOOR_ROW_PITCH;
-    specs.push([`BLOCK ${block.id}`, 'FLOOR', TIER.price1080.color, (block.eastX + westX) / 2, 3.2, 0]);
+    specs.push([`BLOCK ${block.id}`, 'FLOOR', TIER.seating.color, (block.eastX + westX) / 2, 3.2, 0]);
   }
   for (const [text, sub, color, x, y, z] of specs) {
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -298,9 +284,7 @@ export const awe = {
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [
-    { color: TIER.price1080.color, name: TIER.price1080.name },
-    { color: TIER.price880.color, name: TIER.price880.name },
-    { color: TIER.price580.color, name: TIER.price580.name },
+    { color: TIER.seating.color, name: TIER.seating.name },
     { color: TIER.wheelchair.color, name: TIER.wheelchair.name },
   ],
 
