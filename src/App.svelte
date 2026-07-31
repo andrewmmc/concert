@@ -21,6 +21,7 @@
   let seatSub = $state('Click a seat to select it');
   let pinned = $state(false);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
+  let tooltipEl;
 
   let engine;
   let modelGroup, buildSceneFn;
@@ -37,7 +38,8 @@
       if (changed && buildSceneFn) {
         clearPinFn?.();
         buildSceneFn();
-        resetCamera();
+        // Venues without their own framing fly back to the default view.
+        if (!venue.defaultCamera) resetCamera();
       }
     });
     return off;
@@ -73,6 +75,12 @@
       roofGroup.visible = showRoof;
       labelGroup.visible = showLabels;
       searchMsg = '';
+      // Frame the venue with its own camera when one is configured.
+      const dc = venue.defaultCamera;
+      if (dc) {
+        camera.position.set(...(dc.position ?? [76, 58, 76]));
+        controls.target.set(...(dc.target ?? [0, 4, 0]));
+      }
     }
     buildScene();
     buildSceneFn = buildScene;
@@ -136,6 +144,8 @@
     canvas.addEventListener('pointerdown', () => canvas.classList.add('dragging'));
     addEventListener('pointerup', () => canvas.classList.remove('dragging'));
     canvas.addEventListener('click', onClick);
+    function onWindowKey(e) { if (e.key === 'Escape') clearPinFn?.(); }
+    addEventListener('keydown', onWindowKey);
 
     pickFn = () => {
       raycaster.setFromCamera(mouseNDC, camera);
@@ -179,6 +189,13 @@
     $effect(() => { controls.autoRotate = autoRotate; });
     $effect(() => { roofGroup.visible = showRoof; });
     $effect(() => { labelGroup.visible = showLabels; });
+    // Flip the tooltip away from the viewport edges once it is measured.
+    $effect(() => {
+      if (!tooltip.show || !tooltipEl) return;
+      const rect = tooltipEl.getBoundingClientRect();
+      tooltipEl.classList.toggle('flip-x', tooltip.x + rect.width + 28 > innerWidth);
+      tooltipEl.classList.toggle('flip-y', tooltip.y + rect.height + 28 > innerHeight);
+    });
 
     // search
     goSeatFn = () => {
@@ -201,6 +218,7 @@
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerleave', onLeave);
       canvas.removeEventListener('click', onClick);
+      removeEventListener('keydown', onWindowKey);
     };
   });
 
@@ -211,9 +229,10 @@
   }
   function resetCamera() {
     if (!engine || !flyFn) return;
+    const dc = venue.defaultCamera;
     flyFn(
-      new engine.THREE.Vector3(0, 4, 0),
-      new engine.THREE.Vector3(76, 58, 76)
+      new engine.THREE.Vector3(...(dc?.target ?? [0, 4, 0])),
+      new engine.THREE.Vector3(...(dc?.position ?? [76, 58, 76]))
     );
   }
   function onKey(e) { if (e.key === 'Enter') goSeat(); }
@@ -221,7 +240,7 @@
   function selectLayout(e) { goTo(venue.id, e.currentTarget.value); }
 </script>
 
-<canvas bind:this={canvas} id="scene"></canvas>
+<canvas bind:this={canvas} id="scene" role="img" aria-label="3D view of the venue seating plan. Hover or click a seat to select it, or search for a seat by section, row and seat number."></canvas>
 
 <div id="header" class="card">
   <div class="site">{siteName}</div>
@@ -255,7 +274,7 @@
 
   <div id="legend">
     {#each venue.sides as s}
-      <span class="chip"><i style="background:{s.color}"></i>{s.name.replace(' (', ' ').replace('s)', 's').replace('Gate (', 'Gate ')}</span>
+      <span class="chip"><i style="background:{s.color}"></i>{s.name}</span>
     {/each}
   </div>
 </div>
@@ -298,13 +317,15 @@
     </div>
     <button class="go" onclick={goSeat}>Go to seat</button>
   </div>
-  <div id="searchmsg">{searchMsg}</div>
+  <div id="searchmsg" aria-live="polite">{searchMsg}</div>
 </div>
 
 <div id="info" class="card">
-  <div class="cap">Seat</div>
-  <div class="seat">{seatMain}</div>
-  <div class="sub">{seatSub}</div>
+  <div aria-live="polite">
+    <div class="cap">Seat</div>
+    <div class="seat">{seatMain}</div>
+    <div class="sub">{seatSub}</div>
+  </div>
   {#if pinned}
     <button class="clear" onclick={unselect}>✕ Unselect seat</button>
   {/if}
@@ -316,7 +337,7 @@
 </button>
 
 {#if tooltip.show}
-  <div id="tooltip" style="left:{tooltip.x}px;top:{tooltip.y}px">
+  <div id="tooltip" bind:this={tooltipEl} aria-hidden="true" style="left:{tooltip.x}px;top:{tooltip.y}px">
     <b>{tooltip.main}</b>{#if tooltip.sub}<br><span class="dim">{tooltip.sub}</span>{/if}
   </div>
 {/if}
@@ -396,6 +417,9 @@
   #tooltip { position: fixed; pointer-events: none; z-index: 20; background: rgba(8,12,20,.94);
     border: 1px solid rgba(255,211,77,.5); border-radius: 9px; padding: 8px 11px; font-size: 12px; line-height: 1.5;
     box-shadow: 0 6px 22px rgba(0,0,0,.5); transform: translate(14px,14px); white-space: nowrap; }
+  #tooltip.flip-x { transform: translate(calc(-100% - 14px), 14px); }
+  #tooltip.flip-y { transform: translate(14px, calc(-100% - 14px)); }
+  #tooltip.flip-x.flip-y { transform: translate(calc(-100% - 14px), calc(-100% - 14px)); }
   #tooltip b { color: #ffd34d; font-size: 13px; }
   #tooltip .dim { color: #7d8ca3; }
 

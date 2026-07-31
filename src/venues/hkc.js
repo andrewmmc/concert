@@ -257,10 +257,10 @@ export const hkc = {
   ],
 
   sides: [
-    { base: 40, center: 270 * DEG, color: '#ff5f5f', name: 'Red Gate (40s)' },
-    { base: 50, center: 360 * DEG, color: '#4aa3ff', name: 'Blue Gate (50s)' },
-    { base: 60, center:  90 * DEG, color: '#46d39a', name: 'Green Gate (60s)' },
-    { base: 70, center: 180 * DEG, color: '#ffc44d', name: 'Yellow Gate (70s)' },
+    { base: 40, center: 270 * DEG, color: '#ff5f5f', name: 'Red Gate 40s' },
+    { base: 50, center: 360 * DEG, color: '#4aa3ff', name: 'Blue Gate 50s' },
+    { base: 60, center:  90 * DEG, color: '#46d39a', name: 'Green Gate 60s' },
+    { base: 70, center: 180 * DEG, color: '#ffc44d', name: 'Yellow Gate 70s' },
   ],
 
   build(ctx, opts = {}) {
