@@ -22,20 +22,23 @@
   let pinned = $state(false);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
 
-  let engine, model;
+  let engine;
+  let modelGroup, buildSceneFn;
   let hoveredId = -1, pinnedId = -1;
   let restoreFn, pickFn, flyFn, goSeatFn, clearPinFn;
 
   onMount(() => {
     route = parseHash();
     const off = onRoute((r) => {
-      // The scene is built once for the initial venue/layout; a route that
-      // resolves to a different one needs a full rebuild, so reload.
-      if (r.venue.id !== route.venue.id || r.layout?.id !== route.layout?.id) {
-        location.reload();
-        return;
-      }
+      // The scene is built per venue/layout; a route that resolves to a
+      // different one gets an in-place rebuild instead of a page reload.
+      const changed = r.venue.id !== route.venue.id || r.layout?.id !== route.layout?.id;
       route = r;
+      if (changed && buildSceneFn) {
+        clearPinFn?.();
+        buildSceneFn();
+        resetCamera();
+      }
     });
     return off;
   });
@@ -43,8 +46,36 @@
   onMount(() => {
     engine = createScene(canvas);
     const { scene, camera, controls, flyTo } = engine;
-    model = venue.build({ scene }, { layout: layout?.id });
-    const { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe } = model;
+    modelGroup = new engine.THREE.Group();
+    scene.add(modelGroup);
+
+    let placements = [], seats, baseColors, seatIndex, wpMeshes = [], stage, roofGroup, labelGroup, describe;
+
+    // Dispose the geometry, materials and textures of a previous model before
+    // rebuilding the scene for a new venue/layout.
+    function disposeGroup(group) {
+      group.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          for (const m of mats) { if (m.map) m.map.dispose(); m.dispose(); }
+        }
+      });
+      group.clear();
+    }
+
+    // (Re)build the model for the current route into modelGroup and refresh
+    // the references used by picking, search and the display toggles.
+    function buildScene() {
+      disposeGroup(modelGroup);
+      const model = venue.build({ scene: modelGroup }, { layout: layout?.id });
+      ({ placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe } = model);
+      roofGroup.visible = showRoof;
+      labelGroup.visible = showLabels;
+      searchMsg = '';
+    }
+    buildScene();
+    buildSceneFn = buildScene;
 
     const raycaster = new engine.THREE.Raycaster();
     const mouseNDC = new engine.THREE.Vector2();
