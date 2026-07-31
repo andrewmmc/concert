@@ -22,9 +22,9 @@
   let pinned = $state(false);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
 
-  let engine, model, controlsRef, cameraRef;
+  let engine, model;
   let hoveredId = -1, pinnedId = -1;
-  let paintFn, restoreFn, pickFn, flyFn;
+  let restoreFn, pickFn, flyFn, goSeatFn, clearPinFn;
 
   onMount(() => {
     route = parseHash();
@@ -43,7 +43,6 @@
   onMount(() => {
     engine = createScene(canvas);
     const { scene, camera, controls, flyTo } = engine;
-    controlsRef = controls; cameraRef = camera;
     model = venue.build({ scene }, { layout: layout?.id });
     const { placements, seats, baseColors, seatIndex, wpMeshes, stage, roofGroup, labelGroup, describe } = model;
 
@@ -53,7 +52,6 @@
 
     const setColor = (i, color) => { if (i < 0) return; seats.setColorAt(i, color); seats.instanceColor.needsUpdate = true; };
     const base = (i) => new engine.THREE.Color(baseColors[i * 3], baseColors[i * 3 + 1], baseColors[i * 3 + 2]);
-    paintFn = setColor;
     restoreFn = (i) => { if (i < 0 || i === pinnedId) return; setColor(i, base(i)); };
 
     function showInfo(p) { const d = describe(p); seatMain = d.main; seatSub = d.sub; }
@@ -152,13 +150,14 @@
     $effect(() => { labelGroup.visible = showLabels; });
 
     // search
-    window.__goSeat = () => {
-      const i = seatIndex.get(`${inSec.trim()}-${inRow.trim()}-${inSeat.trim()}`);
+    goSeatFn = () => {
+      const key = `${inSec.trim().toUpperCase()}-${inRow.trim().toUpperCase()}-${inSeat.trim().toUpperCase()}`;
+      const i = seatIndex.get(key);
       if (i === undefined) { searchMsg = 'Seat not found — check Sec / Row / Seat.'; return; }
       searchMsg = '';
       selectSeat(i);
     };
-    window.__clearPin = clearPin;
+    clearPinFn = clearPin;
 
     // render loop with picking
     (function loop() {
@@ -174,9 +173,9 @@
     };
   });
 
-  function goSeat() { window.__goSeat && window.__goSeat(); }
+  function goSeat() { goSeatFn && goSeatFn(); }
   function unselect() {
-    window.__clearPin && window.__clearPin();
+    clearPinFn && clearPinFn();
     resetCamera();
   }
   function resetCamera() {
@@ -191,7 +190,7 @@
   function selectLayout(e) { goTo(venue.id, e.currentTarget.value); }
 </script>
 
-<canvas bind:this={canvas} id="scene" class:dragging={false}></canvas>
+<canvas bind:this={canvas} id="scene"></canvas>
 
 <div id="header" class="card">
   <div class="site">{siteName}</div>
