@@ -62,7 +62,7 @@ const t = (key) => translate(ENGLISH, key);
       <div><p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p><h2 data-i18n="venueDirectoryTitle">{t('venueDirectoryTitle')}</h2></div>
       <p data-i18n="venueDirectoryBody">{t('venueDirectoryBody')}</p>
     </div>
-    <VenueGrid venues={venues} featuredFirst compact />
+    <VenueGrid venues={venues} compact />
     <a class="wide-link" href="/venues/"><span data-i18n="compareVenues">{t('compareVenues')}</span><span>→</span></a>
   </section>
 </BaseLayout>

@@ -1,7 +1,7 @@
 ---
 import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../lib/i18n.js';
 
-const { venues, featuredFirst = false, compact = false } = Astro.props;
+const { venues, compact = false } = Astro.props;
 const t = (key) => translate(ENGLISH, key);
 ---
 
@@ -10,7 +10,7 @@ const t = (key) => translate(ENGLISH, key);
     const english = getVenueText(ENGLISH, venue);
     const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
     return (
-      <article class:list={['venue-card', { featured: featuredFirst && index === 0 }]}>
+      <article class="venue-card">
         <div class="venue-number">{String(index + 1).padStart(2, '0')}</div>
         <div class="venue-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
         <div class="venue-card-copy">

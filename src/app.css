@@ -423,7 +423,7 @@
 
   .venue-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
   .venue-card { min-height: 280px; padding: 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; position: relative; overflow: hidden; transition: background .25s, color .25s; }
-  .venue-card:hover, .venue-card.featured { background: var(--ink); color: #fff; }
+  .venue-card:hover { background: var(--ink); color: #fff; }
   .venue-number { font-family: var(--display); font-size: 18px; color: var(--signal); }
   .venue-graphic { position: absolute; right: 26px; top: 25px; width: 115px; height: 115px; border: 1px solid currentColor; border-radius: 50%; opacity: .18; display: grid; place-items: center; }
   .venue-graphic span { position: absolute; display: block; border: 1px solid currentColor; border-radius: 50%; }
@@ -434,7 +434,7 @@
   .venue-card-copy > p { color: var(--signal); font-size: 12px; font-weight: 900; letter-spacing: .16em; }
   .venue-card-copy h3 { margin-top: 7px; font-family: var(--display); font-size: 24px; font-weight: 800; line-height: 1.12; }
   .venue-card-copy > span { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
-  .venue-card:hover .venue-card-copy > span, .venue-card.featured .venue-card-copy > span { color: #aaaDA6; }
+  .venue-card:hover .venue-card-copy > span { color: #aaaDA6; }
   .venue-card > a { margin-top: 22px; border: 0; border-top: 1px solid currentColor; background: transparent; color: inherit; padding: 11px 0 0; display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; cursor: pointer; text-decoration: none; }
   .venue-card > a span:last-child { color: var(--signal); font-size: 15px; }
 
