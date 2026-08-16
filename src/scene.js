@@ -122,23 +122,34 @@ export function createScene(canvas) {
 
   const clock = new THREE.Clock();
   let fly = null;
+  let animationFrame = 0;
+  let running = false;
 
   function flyTo(target, camPos) {
     fly = { t: 0, fromT: controls.target.clone(), toT: target, fromC: camera.position.clone(), toC: camPos };
   }
 
   function animate() {
-    requestAnimationFrame(animate);
-    const dt = clock.getDelta();
-    if (fly) {
-      fly.t = Math.min(1, fly.t + dt / 1.1);
-      const k = fly.t < 0.5 ? 2 * fly.t * fly.t : 1 - Math.pow(-2 * fly.t + 2, 2) / 2;
-      controls.target.lerpVectors(fly.fromT, fly.toT, k);
-      camera.position.lerpVectors(fly.fromC, fly.toC, k);
-      if (fly.t >= 1) fly = null;
+    if (running) return;
+    running = true;
+    clock.start();
+
+    function frame() {
+      if (!running) return;
+      animationFrame = requestAnimationFrame(frame);
+      const dt = clock.getDelta();
+      if (fly) {
+        fly.t = Math.min(1, fly.t + dt / 1.1);
+        const k = fly.t < 0.5 ? 2 * fly.t * fly.t : 1 - Math.pow(-2 * fly.t + 2, 2) / 2;
+        controls.target.lerpVectors(fly.fromT, fly.toT, k);
+        camera.position.lerpVectors(fly.fromC, fly.toC, k);
+        if (fly.t >= 1) fly = null;
+      }
+      controls.update();
+      renderer.render(scene, camera);
     }
-    controls.update();
-    renderer.render(scene, camera);
+
+    frame();
   }
 
   function onResize() {
@@ -165,6 +176,8 @@ export function createScene(canvas) {
     flyTo,
     isFlying: () => !!fly,
     destroy() {
+      running = false;
+      cancelAnimationFrame(animationFrame);
       resizeObserver?.disconnect();
       removeEventListener('resize', onResize);
       controls.dispose();

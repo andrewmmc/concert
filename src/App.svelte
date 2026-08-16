@@ -83,7 +83,9 @@
   });
 
   function initializeScene() {
-    engine = createScene(canvas);
+    const sceneCanvas = canvas;
+    const activeEngine = createScene(sceneCanvas);
+    engine = activeEngine;
     const { scene, camera, controls, flyTo } = engine;
     modelGroup = new engine.THREE.Group();
     scene.add(modelGroup);
@@ -189,7 +191,7 @@
     }
 
     function onMove(e) {
-      const rect = canvas.getBoundingClientRect();
+      const rect = sceneCanvas.getBoundingClientRect();
       mouseNDC.set(
         ((e.clientX - rect.left) / rect.width) * 2 - 1,
         -((e.clientY - rect.top) / rect.height) * 2 + 1,
@@ -200,7 +202,7 @@
     function onLeave() {
       tooltip = { ...tooltip, show: false };
       restoreFn(hoveredId); hoveredId = -1;
-      canvas.classList.remove('hovering');
+      sceneCanvas.classList.remove('hovering');
     }
     function onClick() {
       if (hoveredId >= 0) {
@@ -210,11 +212,13 @@
       }
     }
 
-    canvas.addEventListener('pointermove', onMove);
-    canvas.addEventListener('pointerleave', onLeave);
-    canvas.addEventListener('pointerdown', () => canvas.classList.add('dragging'));
-    addEventListener('pointerup', () => canvas.classList.remove('dragging'));
-    canvas.addEventListener('click', onClick);
+    function onPointerDown() { sceneCanvas.classList.add('dragging'); }
+    function onPointerUp() { sceneCanvas.classList.remove('dragging'); }
+    sceneCanvas.addEventListener('pointermove', onMove);
+    sceneCanvas.addEventListener('pointerleave', onLeave);
+    sceneCanvas.addEventListener('pointerdown', onPointerDown);
+    addEventListener('pointerup', onPointerUp);
+    sceneCanvas.addEventListener('click', onClick);
     function onWindowKey(e) { if (e.key === 'Escape') clearPinFn?.(); }
     addEventListener('keydown', onWindowKey);
 
@@ -224,7 +228,7 @@
       if (!hit) {
         if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
         tooltip = { ...tooltip, show: false };
-        canvas.classList.remove('hovering');
+        sceneCanvas.classList.remove('hovering');
         if (pinnedId >= 0) showInfo(placements[pinnedId]);
         return;
       }
@@ -237,7 +241,7 @@
           main: describeStage(locale, venue, layout, stage.userData.label),
           sub: t('performanceArea'),
         };
-        canvas.classList.add('hovering'); return;
+        sceneCanvas.classList.add('hovering'); return;
       }
       if (hit.object.userData.wp) {
         if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
@@ -253,7 +257,7 @@
           main: wheelchair.main || `${t('wheelchairPlatform')} WP${hit.object.userData.wp}`,
           sub: wheelchair.sub || t('wheelchairDetails'),
         };
-        canvas.classList.add('hovering'); return;
+        sceneCanvas.classList.add('hovering'); return;
       }
       const id = hit.instanceId;
       if (id !== hoveredId) {
@@ -261,7 +265,7 @@
         setColor(hoveredId, HOVER);
         const p = placements[hoveredId], d = localizedSeat(p);
         tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: d.main, sub: d.sub };
-        canvas.classList.add('hovering');
+        sceneCanvas.classList.add('hovering');
       }
     };
 
@@ -295,25 +299,43 @@
     clearPinFn = clearPin;
 
     // render loop with picking
-    (function loop() {
-      requestAnimationFrame(loop);
-      if (mouseDirty && !engine.isFlying()) { pickFn(); mouseDirty = false; }
-    })();
-    engine.animate();
+    let pickingFrame = 0;
+    let picking = true;
+    function loop() {
+      if (!picking) return;
+      pickingFrame = requestAnimationFrame(loop);
+      if (mouseDirty && !activeEngine.isFlying()) { pickFn(); mouseDirty = false; }
+    }
+    loop();
+    activeEngine.animate();
 
     return () => {
-      canvas.removeEventListener('pointermove', onMove);
-      canvas.removeEventListener('pointerleave', onLeave);
-      canvas.removeEventListener('click', onClick);
+      picking = false;
+      cancelAnimationFrame(pickingFrame);
+      sceneCanvas.removeEventListener('pointermove', onMove);
+      sceneCanvas.removeEventListener('pointerleave', onLeave);
+      sceneCanvas.removeEventListener('pointerdown', onPointerDown);
+      sceneCanvas.removeEventListener('click', onClick);
+      removeEventListener('pointerup', onPointerUp);
       removeEventListener('keydown', onWindowKey);
-      engine.destroy();
+      activeEngine.destroy();
+      if (engine === activeEngine) {
+        engine = undefined;
+        buildSceneFn = undefined;
+        restoreFn = undefined;
+        pickFn = undefined;
+        flyFn = undefined;
+        goSeatFn = undefined;
+        viewSeatFn = undefined;
+        clearPinFn = undefined;
+        refreshLocalizedInfoFn = undefined;
+      }
     };
   }
 
   $effect(() => {
-    if (route.page === 'viewer' && canvas && !engine) {
-      untrack(initializeScene);
-    }
+    if (route.page !== 'viewer' || !canvas) return;
+    return untrack(initializeScene);
   });
 
   function goSeat() { goSeatFn && goSeatFn(); }
@@ -544,7 +566,8 @@
       </section>
     {/if}
 
-    <section class="viewer-section viewer-page" hidden={route.page !== 'viewer'}>
+    {#if route.page === 'viewer'}
+    <section class="viewer-section viewer-page">
       <div class="viewer-topbar">
         <button class="viewer-back" onclick={() => goToVenue(venue.id)}>← {t('viewerBackToVenue')}</button>
         <span>{t('viewerModeLabel')} / {venue.id.toUpperCase()}</span>
@@ -660,6 +683,7 @@
         </aside>
       </div>
     </section>
+    {/if}
   </main>
 
   {#if route.page !== 'viewer'}
@@ -1190,7 +1214,6 @@
   .viewer-callout button { width: 100%; margin-top: 28px; padding: 13px; border: 1px solid var(--acid); background: var(--acid); color: var(--ink); font-weight: 900; cursor: pointer; }
 
   .viewer-main { height: 100vh; min-height: 0; overflow: hidden; background: #05070c; }
-  .viewer-page[hidden] { display: none !important; }
   .viewer-page {
     height: 100vh;
     min-height: 0;
