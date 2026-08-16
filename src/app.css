@@ -251,6 +251,10 @@
     background: var(--line);
   }
   .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
     border: 0;
     border-bottom: 1px solid var(--ink);
     background: transparent;
@@ -258,9 +262,11 @@
     padding: 0 0 6px;
     margin-bottom: 30px;
     font-weight: 800;
+    line-height: 1.2;
     cursor: pointer;
+    text-decoration: none;
   }
-  .back-link span { color: var(--signal); margin-right: 8px; }
+  .back-link span:first-child { color: var(--signal); }
   .arena-hero h1 {
     margin-top: 22px;
     max-width: 900px;
