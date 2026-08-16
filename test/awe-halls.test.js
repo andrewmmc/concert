@@ -21,6 +21,7 @@ test('AWE VIVA is registered with TH8400 and TH5600 routes', () => {
   assert.equal(resolveLayout(aweHalls, 'th5600').id, 'th5600');
   assert.equal(resolveLayout(aweHalls, 'unknown').id, 'th8400');
   assert.equal(resolveLayout(aweHalls, 'th8400').label, 'Halls 6, 8 & 10');
+  assert.equal(resolveLayout(aweHalls, 'th5600').label, 'Halls 8 & 10');
 });
 
 test('models every hall and block printed on AWE-VIVA-H8-TH8400', () => {

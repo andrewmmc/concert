@@ -272,7 +272,7 @@ export const aweHalls = {
     },
     {
       id: 'th5600',
-      label: 'TH5600 · Halls 8 & 10',
+      label: 'Halls 8 & 10',
       zh: '正面舞台',
       dims: `Hall 8 floor Blocks A-B and Hall 10 riser Blocks C-D · ${aweHallsSeatTotal('th5600').toLocaleString()} drawn seats`,
     },
