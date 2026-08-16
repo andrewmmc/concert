@@ -22,6 +22,16 @@ function localizedDataValue(element, locale) {
   return locale === TRADITIONAL_CHINESE ? element.dataset.zhHk : element.dataset.en;
 }
 
+function initialDocumentLocale() {
+  const locale = document.documentElement.dataset.initialLocale;
+  return locale === ENGLISH || locale === TRADITIONAL_CHINESE ? locale : undefined;
+}
+
+function revealLocalizedDocument() {
+  document.documentElement.classList.remove('locale-pending');
+  delete document.documentElement.dataset.initialLocale;
+}
+
 function updateLocalizedContent(locale) {
   document.querySelectorAll('[data-i18n]').forEach((element) => {
     element.textContent = translate(locale, element.dataset.i18n);
@@ -58,15 +68,22 @@ export function setLocale(locale) {
 }
 
 export function initializeLocale() {
-  if (initialized) return;
+  if (initialized) {
+    revealLocalizedDocument();
+    return;
+  }
   initialized = true;
-  activeLocale = initialLocale({
+  activeLocale = initialDocumentLocale() || initialLocale({
     storage: storage(),
     languages: navigator.languages || [navigator.language],
   });
   document.querySelectorAll('[data-locale]').forEach((button) => {
     button.addEventListener('click', () => setLocale(button.dataset.locale));
   });
-  updateLocalizedContent(activeLocale);
+  try {
+    updateLocalizedContent(activeLocale);
+  } finally {
+    revealLocalizedDocument();
+  }
   dispatchEvent(new CustomEvent('concert:locale', { detail: activeLocale }));
 }

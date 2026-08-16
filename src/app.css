@@ -28,6 +28,7 @@
     font-family: var(--sans);
   }
   body { overflow-x: hidden; }
+  html.locale-pending .portal { visibility: hidden; }
   html.viewer-open, body.viewer-open { height: 100%; min-height: 0; overflow: hidden; background: var(--paper); }
   html.viewer-open .portal { height: 100%; min-height: 0; overflow: hidden; }
   button, input, select { font: inherit; }

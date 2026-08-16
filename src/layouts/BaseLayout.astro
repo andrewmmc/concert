@@ -1,6 +1,7 @@
 ---
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import localeBootstrap from '../scripts/locale-bootstrap.js?raw';
 import '../app.css';
 
 const {
@@ -19,6 +20,7 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script is:inline set:html={localeBootstrap}></script>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#fffdf8" />
     <meta name="color-scheme" content="light" />
