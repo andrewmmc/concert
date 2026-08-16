@@ -264,7 +264,7 @@
     {/if}
   </div>
 
-  <p>Interactive 3D seating model — <b>{layout ? `${layout.label} ${layout.zh}` : venue.subtitle}</b>.<br>{venue.dims}.<br>
+  <p>Interactive 3D seating model — <b>{layout ? `${layout.label} ${layout.zh}` : venue.subtitle}</b>.<br>{layout?.dims || venue.dims}.<br>
      Hover any seat for its <b>section · row · seat number</b>.</p>
 
   {#if layout?.planUrl || venue.planUrl}

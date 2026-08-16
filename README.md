@@ -25,7 +25,8 @@ for a specific seat, and fly the camera straight to it.
 | **Kai Tak Arena** 啟德體藝館 | End Stage 正面舞台 | `#/kta/end-stage` |
 | **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `#/kts/stadium` |
 | **AsiaWorld Expo (Hall 1 Arena)** 亞洲國際博覽館 | EDAN LUI 2023 End Stage | `#/awe/end-stage` |
-| **AsiaWorld Expo (Halls 6, 8 & 10)** 亞洲國際博覽館 | TH8400 End Stage | `#/awe-halls/end-stage` |
+| **AsiaWorld Expo (Halls 6, 8 & 10)** 亞洲國際博覽館 | TH8400 End Stage | `#/awe-halls/th8400` |
+| | TH5600 End Stage (Halls 8 & 10) | `#/awe-halls/th5600` |
 
 The Kai Tak Stadium model follows the row domains and gate totals printed on
 the project source drawing. Level 2 row depth varies by stand: the inset north
@@ -104,5 +105,5 @@ Venues are data modules under `src/venues/`:
 - Kai Tak Arena seating plans — project source drawings in `misc/kta/`.
 - AsiaWorld Expo (Hall 1 Arena) EDAN LUI 2023 end-stage plan — project source drawing in
   `misc/awe_hall1/`.
-- AsiaWorld Expo Halls 6, 8 & 10 TH8400 end-stage plan — project source drawing in
+- AsiaWorld Expo VIVA TH8400 and TH5600 end-stage plans — project source drawings in
   `misc/awe_halls/`.
