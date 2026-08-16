@@ -6,11 +6,16 @@ export function parseHash() {
   const [venueId, layoutId] = h.split('/').filter(Boolean);
   const venue = getVenue(venueId);
   const layout = resolveLayout(venue, layoutId);
-  return { venue, layout };
+  const page = venueId && venue.id === venueId ? 'venue' : 'home';
+  return { venue, layout, page };
 }
 
 export function goTo(venueId, layoutId) {
   location.hash = `#/${venueId}/${layoutId}`;
+}
+
+export function goHome() {
+  location.hash = '';
 }
 
 export function onRoute(cb) {

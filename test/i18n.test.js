@@ -36,6 +36,8 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(ENGLISH, 'siteName'), 'Hong Kong Concert Guide');
   assert.equal(translate(TRADITIONAL_CHINESE, 'siteName'), '香港演唱會指南');
   assert.equal(translate(TRADITIONAL_CHINESE, 'navConcerts'), '演出日程');
+  assert.equal(translate(ENGLISH, 'arenaTransportTitle'), 'Transport');
+  assert.equal(translate(TRADITIONAL_CHINESE, 'exploreOtherArenas'), '探索其他場館');
   assert.equal(copy.name, '香港體育館');
   assert.equal(copy.layoutName, '三面台');
   assert.equal(copy.sides[0], '紅閘 40 段');

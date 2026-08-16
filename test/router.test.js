@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { goTo, onRoute, parseHash } from '../src/lib/router.js';
+import { goHome, goTo, onRoute, parseHash } from '../src/lib/router.js';
 
 function installBrowserGlobals(hash = '') {
   const previous = new Map();
@@ -33,6 +33,7 @@ test('parses canonical and slashless hash routes', () => {
   try {
     assert.equal(parseHash().venue.id, 'hkc');
     assert.equal(parseHash().layout.id, 'end-stage');
+    assert.equal(parseHash().page, 'venue');
 
     location.hash = '#hkc/center-stage';
     assert.equal(parseHash().layout.id, 'center-stage');
@@ -46,10 +47,22 @@ test('falls back to venue and layout defaults for empty or unknown routes', () =
   try {
     assert.equal(parseHash().venue.id, 'hkc');
     assert.equal(parseHash().layout.id, 'center-stage');
+    assert.equal(parseHash().page, 'home');
 
     location.hash = '#/unknown/unknown';
     assert.equal(parseHash().venue.id, 'hkc');
     assert.equal(parseHash().layout.id, 'center-stage');
+    assert.equal(parseHash().page, 'home');
+  } finally {
+    browser.restore();
+  }
+});
+
+test('returns to the portal home page', () => {
+  const browser = installBrowserGlobals('#/hkc/center-stage');
+  try {
+    goHome();
+    assert.equal(location.hash, '');
   } finally {
     browser.restore();
   }
