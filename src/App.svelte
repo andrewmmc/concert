@@ -1,8 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { createScene, getSeatSurroundingsView, getSeatView, HOVER, PIN } from './scene.js';
   import { venues } from './venues/index.js';
-  import { parseHash, goHome as navigateHome, goTo, onRoute } from './lib/router.js';
+  import { goTo, goToPage, goToVenue, onRoute, parseHash } from './lib/router.js';
   import {
     ENGLISH,
     TRADITIONAL_CHINESE,
@@ -59,7 +59,9 @@
 
   $effect(() => {
     updateDocumentLocale(locale);
-    if (route.page === 'venue') document.title = `${text.name} — ${t('siteName')}`;
+    if (route.page === 'venue' || route.page === 'viewer') {
+      document.title = `${text.name} — ${t('siteName')}`;
+    }
   });
 
   onMount(() => {
@@ -79,7 +81,7 @@
     return off;
   });
 
-  onMount(() => {
+  function initializeScene() {
     engine = createScene(canvas);
     const { scene, camera, controls, flyTo } = engine;
     modelGroup = new engine.THREE.Group();
@@ -305,6 +307,12 @@
       removeEventListener('keydown', onWindowKey);
       engine.destroy();
     };
+  }
+
+  $effect(() => {
+    if (route.page === 'viewer' && canvas && !engine) {
+      untrack(initializeScene);
+    }
   });
 
   function goSeat() { goSeatFn && goSeatFn(); }
@@ -324,18 +332,22 @@
     );
   }
   function onKey(e) { if (e.key === 'Enter') goSeat(); }
-  function scrollToSection(id) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function openPage(page) {
+    goToPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  function goHome(sectionId = 'top') {
-    navigateHome();
-    requestAnimationFrame(() => requestAnimationFrame(() => scrollToSection(sectionId)));
+  function goHome() {
+    openPage('home');
   }
   function selectVenue(e) {
     const nextVenue = venues.find((item) => item.id === e.currentTarget.value);
     if (nextVenue) goTo(nextVenue.id, nextVenue.defaultLayout);
   }
   function selectVenueFromCard(nextVenue) {
+    goToVenue(nextVenue.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function openViewer(nextVenue = venue) {
     goTo(nextVenue.id, nextVenue.defaultLayout);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -353,6 +365,7 @@
 </script>
 
 <div class="portal" id="top">
+  {#if route.page !== 'viewer'}
   <header class="topbar">
     <button class="brand" onclick={() => goHome()} aria-label={t('siteName')}>
       <span class="brand-mark" aria-hidden="true">
@@ -362,10 +375,10 @@
     </button>
 
     <nav aria-label={t('navLabel')}>
-      <button onclick={() => scrollToSection('explore')}>{t('navExplore')}</button>
-      <button onclick={() => goHome('venues')}>{t('navVenues')}</button>
-      <button onclick={() => goHome('concerts')}>{t('navConcerts')}</button>
-      <button onclick={() => goHome('community')}>{t('navCommunity')}</button>
+      <button class:active={route.page === 'home'} onclick={() => openPage('home')}>{t('navHome')}</button>
+      <button class:active={route.page === 'guide'} onclick={() => openPage('guide')}>{t('navGuide')}</button>
+      <button class:active={route.page === 'concerts'} onclick={() => openPage('concerts')}>{t('navConcerts')}</button>
+      <button class:active={route.page === 'venues' || route.page === 'venue'} onclick={() => openPage('venues')}>{t('navVenues')}</button>
     </nav>
 
     <div class="top-actions">
@@ -383,79 +396,160 @@
           aria-pressed={locale === ENGLISH}
         >EN</button>
       </div>
-      <button class="top-cta" onclick={() => scrollToSection('explore')}>{t('explore3d')}</button>
+      <button class="top-cta" onclick={() => openPage('concerts')}>{t('navConcerts')}</button>
     </div>
   </header>
+  {/if}
 
-  <main>
+  <main class:viewer-main={route.page === 'viewer'}>
     {#if route.page === 'home'}
-    <section class="hero">
-      <div class="hero-copy reveal">
-        <p class="eyebrow">{t('portalEyebrow')}</p>
-        <h1>{t('heroTitle')} <em>{t('heroTitleAccent')}</em></h1>
-        <p class="hero-body">{t('heroBody')}</p>
-        <div class="hero-actions">
-          <button class="button-primary" onclick={() => scrollToSection('explore')}>
-            {t('explore3d')} <span aria-hidden="true">↘</span>
-          </button>
-          <button class="button-link" onclick={() => scrollToSection('venues')}>
-            {t('browseVenues')} <span aria-hidden="true">→</span>
-          </button>
+      <section class="hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">{t('portalEyebrow')}</p>
+          <h1>{t('heroTitle')} <em>{t('heroTitleAccent')}</em></h1>
+          <p class="hero-body">{t('heroBody')}</p>
+          <div class="hero-actions">
+            <button class="button-primary" onclick={() => openPage('guide')}>
+              {t('beforeYouGo')} <span aria-hidden="true">↘</span>
+            </button>
+            <button class="button-link" onclick={() => openPage('concerts')}>
+              {t('seeAllConcerts')} <span aria-hidden="true">→</span>
+            </button>
+          </div>
+          <div class="hero-stats">
+            <div><strong>{venues.length}</strong><span>{t('modelsAvailable')}</span></div>
+            <div><strong>繁 / EN</strong><span>{t('bilingualGuide')}</span></div>
+            <div><strong>852</strong><span>{t('builtForHongKong')}</span></div>
+          </div>
         </div>
-        <div class="hero-stats">
-          <div><strong>{venues.length}</strong><span>{t('modelsAvailable')}</span></div>
-          <div><strong>繁 / EN</strong><span>{t('bilingualGuide')}</span></div>
-          <div><strong>852</strong><span>{t('builtForHongKong')}</span></div>
+        <div class="hero-visual reveal delay-one" aria-hidden="true">
+          <div class="city-card">
+            <div class="city-card-head"><span>{t('tonightInHongKong')}</span><span>20:15 HKT</span></div>
+            <div class="route-map">
+              <div class="route-line"></div>
+              <span class="station station-one"><i></i>HUNG HOM</span>
+              <span class="station station-two"><i></i>KAI TAK</span>
+              <span class="station station-three"><i></i>ASIAWORLD</span>
+              <div class="pulse-ring"></div>
+            </div>
+            <div class="city-card-foot"><span>{t('cityNote')}</span><b>22°19'N<br>114°10'E</b></div>
+          </div>
+          <div class="ticket-strip">LIVE / PLAN / GO / 852 / LIVE / PLAN / GO</div>
+          <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="hero-visual reveal delay-one" aria-hidden="true">
-        <div class="city-card">
-          <div class="city-card-head">
-            <span>{t('tonightInHongKong')}</span>
-            <span>20:15 HKT</span>
-          </div>
-          <div class="route-map">
-            <div class="route-line"></div>
-            <span class="station station-one"><i></i>HUNG HOM</span>
-            <span class="station station-two"><i></i>KAI TAK</span>
-            <span class="station station-three"><i></i>ASIAWORLD</span>
-            <div class="pulse-ring"></div>
-          </div>
-          <div class="city-card-foot">
-            <span>{t('cityNote')}</span>
-            <b>22°19'N<br>114°10'E</b>
+      <section class="portal-paths">
+        <div class="section-heading">
+          <div><p class="eyebrow">{t('homePathEyebrow')}</p><h2>{t('homePathTitle')}</h2></div>
+          <p>{t('homePathBody')}</p>
+        </div>
+        <div class="path-grid">
+          <article><span>01</span><h3>{t('beforeYouGo')}</h3><p>{t('beforeYouGoBody')}</p><button onclick={() => openPage('guide')}>{t('openPage')} ↗</button></article>
+          <article><span>02</span><h3>{t('seeAllConcerts')}</h3><p>{t('seeAllConcertsBody')}</p><button onclick={() => openPage('concerts')}>{t('openPage')} ↗</button></article>
+          <article><span>03</span><h3>{t('compareVenues')}</h3><p>{t('compareVenuesBody')}</p><button onclick={() => openPage('venues')}>{t('openPage')} ↗</button></article>
+        </div>
+      </section>
+
+      <section class="home-venue-preview">
+        <div class="section-heading">
+          <div><p class="eyebrow">{t('venueDirectoryEyebrow')}</p><h2>{t('venueDirectoryTitle')}</h2></div>
+          <p>{t('venueDirectoryBody')}</p>
+        </div>
+        <div class="venue-grid compact-grid">
+          {#each venues.slice(0, 3) as v, i}
+            <article class="venue-card" class:featured={i === 0}>
+              <div class="venue-number">0{i + 1}</div><div class="venue-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="venue-card-copy"><p>{v.id.toUpperCase()}</p><h3>{getVenueText(locale, v).name}</h3><span>{getVenueText(locale, v).subtitle}</span></div>
+              <button onclick={() => selectVenueFromCard(v)}>{t('venueDetails')} <span aria-hidden="true">↗</span></button>
+            </article>
+          {/each}
+        </div>
+        <button class="wide-link" onclick={() => openPage('venues')}>{t('compareVenues')} <span>→</span></button>
+      </section>
+
+    {:else if route.page === 'guide'}
+      <section class="page-hero guide-hero">
+        <p class="eyebrow">{t('guidePageEyebrow')}</p><h1>{t('guidePageTitle')}</h1><p>{t('guidePageBody')}</p>
+      </section>
+      <section class="guide-grid">
+        <article><span>01</span><h2>{t('guideTicketTitle')}</h2><p>{t('guideTicketBody')}</p></article>
+        <article><span>02</span><h2>{t('guideArrivalTitle')}</h2><p>{t('guideArrivalBody')}</p></article>
+        <article><span>03</span><h2>{t('guideInsideTitle')}</h2><p>{t('guideInsideBody')}</p></article>
+        <article><span>04</span><h2>{t('guideAfterTitle')}</h2><p>{t('guideAfterBody')}</p></article>
+        <article><span>05</span><h2>{t('guideAccessibilityTitle')}</h2><p>{t('guideAccessibilityBody')}</p></article>
+      </section>
+
+    {:else if route.page === 'concerts'}
+      <section class="page-hero concerts-hero">
+        <p class="eyebrow">{t('concertPageEyebrow')}</p><h1>{t('concertPageTitle')}</h1><p>{t('concertPageBody')}</p>
+      </section>
+      <section class="concert-section standalone-concerts">
+        <div class="concert-board">
+          <div class="calendar-stamp"><span>AUG — DEC</span><strong>2026</strong><small>{t('calendarPreview')}</small></div>
+          <div class="concert-list">
+            <article><time>TBA</time><div><h3>{t('concertOne')}</h3><p>{t('concertOneMeta')}</p></div><span>01</span></article>
+            <article><time>TBA</time><div><h3>{t('concertTwo')}</h3><p>{t('concertTwoMeta')}</p></div><span>02</span></article>
+            <article><time>TBA</time><div><h3>{t('concertThree')}</h3><p>{t('concertThreeMeta')}</p></div><span>03</span></article>
           </div>
         </div>
-        <div class="ticket-strip">LIVE / SEAT / CITY / 852 / LIVE / SEAT / CITY</div>
-        <div class="hero-orbit orbit-one"></div>
-        <div class="hero-orbit orbit-two"></div>
-      </div>
-    </section>
-    {:else}
+      </section>
+
+    {:else if route.page === 'venues'}
+      <section class="page-hero venues-hero">
+        <p class="eyebrow">{t('venueDirectoryEyebrow')}</p><h1>{t('venueIndexTitle')}</h1><p>{t('venueIndexBody')}</p>
+      </section>
+      <section class="venue-directory-page">
+        <div class="venue-grid">
+          {#each venues as v, i}
+            <article class="venue-card" class:featured={i === 0}>
+              <div class="venue-number">0{i + 1}</div><div class="venue-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
+              <div class="venue-card-copy"><p>{v.id.toUpperCase()}</p><h3>{getVenueText(locale, v).name}</h3><span>{getVenueText(locale, v).subtitle}</span></div>
+              <button onclick={() => selectVenueFromCard(v)}>{t('venueDetails')} <span aria-hidden="true">↗</span></button>
+            </article>
+          {/each}
+        </div>
+      </section>
+
+    {:else if route.page === 'venue'}
       <section class="arena-hero">
         <div class="arena-hero-copy reveal">
-          <button class="back-link" onclick={() => goHome('venues')}>
-            <span aria-hidden="true">←</span> {t('backToPortal')}
-          </button>
+          <button class="back-link" onclick={() => openPage('venues')}><span aria-hidden="true">←</span> {t('navVenues')}</button>
           <p class="eyebrow">{t('arenaPageEyebrow')} / {venue.id.toUpperCase()}</p>
-          <h1>{text.name}</h1>
-          <p class="arena-subtitle">{text.subtitle}</p>
-          <p class="arena-intro">{t('arenaPageBody')}</p>
-          <div class="arena-layout-line">
-            <span>{t('currentLayout')}</span>
-            <strong>{layout ? text.layoutName : text.subtitle}</strong>
-          </div>
+          <h1>{text.name}</h1><p class="arena-subtitle">{text.subtitle}</p><p class="arena-intro">{text.dims}</p>
+          <button class="button-primary venue-viewer-button" onclick={() => openViewer()}>{t('openDedicatedViewer')} <span aria-hidden="true">↗</span></button>
         </div>
-        <div class="arena-index reveal delay-one" aria-hidden="true">
-          <span>{venues.findIndex((item) => item.id === venue.id) + 1}</span>
-          <div class="arena-rings"><i></i><i></i><i></i><b></b></div>
-          <small>{venue.id.toUpperCase()} / 852</small>
+        <div class="arena-index reveal delay-one" aria-hidden="true"><span>{venues.findIndex((item) => item.id === venue.id) + 1}</span><div class="arena-rings"><i></i><i></i><i></i><b></b></div><small>{venue.id.toUpperCase()} / 852</small></div>
+      </section>
+      <section class="venue-detail-section">
+        <div class="detail-grid">
+          <article><span>01</span><h2>{t('openingHours')}</h2><strong>{t('openingHoursValue')}</strong><p>{t('openingHoursBody')}</p></article>
+          <article><span>02</span><h2>{t('arenaTransportTitle')}</h2><p>{t('arenaTransportBody')}</p></article>
+          <article><span>03</span><h2>{t('venueFacilities')}</h2><p>{t('venueFacilitiesBody')}</p></article>
+          <article><span>04</span><h2>{t('venueUpcoming')}</h2><p>{t('venueUpcomingBody')}</p><b>{t('dateTba')}</b></article>
+          <article><span>05</span><h2>{t('venueComments')}</h2><p>{t('venueCommentsBody')}</p><blockquote>“{t('localCommentsBody')}”</blockquote></article>
+          <article class="viewer-callout"><span>3D</span><h2>{t('viewerTitle')}</h2><p>{t('viewerBody')}</p><button onclick={() => openViewer()}>{t('openDedicatedViewer')} →</button></article>
+        </div>
+      </section>
+      <section class="other-arenas">
+        <div class="section-heading"><div><p class="eyebrow">{t('venueDirectoryEyebrow')}</p><h2>{t('exploreOtherArenas')}</h2></div></div>
+        <div class="venue-grid compact-grid">
+          {#each venues.filter((item) => item.id !== venue.id).slice(0, 3) as v, i}
+            <article class="venue-card"><div class="venue-number">0{i + 1}</div><div class="venue-card-copy"><p>{v.id.toUpperCase()}</p><h3>{getVenueText(locale, v).name}</h3><span>{getVenueText(locale, v).subtitle}</span></div><button onclick={() => selectVenueFromCard(v)}>{t('venueDetails')} ↗</button></article>
+          {/each}
         </div>
       </section>
     {/if}
 
-    <section class="viewer-section" id="explore">
+    <section class="viewer-section viewer-page" hidden={route.page !== 'viewer'}>
+      <div class="viewer-topbar">
+        <button class="viewer-back" onclick={() => goToVenue(venue.id)}>← {t('viewerBackToVenue')}</button>
+        <span>{t('viewerModeLabel')} / {venue.id.toUpperCase()}</span>
+        <div class="viewer-language" role="group" aria-label={t('language')}>
+          <button class:active={locale === TRADITIONAL_CHINESE} onclick={() => changeLocale(TRADITIONAL_CHINESE)}>繁</button>
+          <button class:active={locale === ENGLISH} onclick={() => changeLocale(ENGLISH)}>EN</button>
+        </div>
+      </div>
       <div class="section-heading">
         <div>
           <p class="eyebrow">{t('viewerEyebrow')}</p>
@@ -570,169 +664,9 @@
         </aside>
       </div>
     </section>
-
-    {#if route.page === 'home'}
-    <section class="venue-section" id="venues">
-      <div class="section-heading venue-heading">
-        <div>
-          <p class="eyebrow">{t('venueDirectoryEyebrow')}</p>
-          <h2>{t('venueDirectoryTitle')}</h2>
-        </div>
-        <p>{t('venueDirectoryBody')}</p>
-      </div>
-
-      <div class="venue-grid">
-        {#each venues as v, i}
-          <article class="venue-card" class:featured={i === 0}>
-            <div class="venue-number">0{i + 1}</div>
-            <div class="venue-graphic" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="venue-card-copy">
-              <p>{v.id.toUpperCase()}</p>
-              <h3>{getVenueText(locale, v).name}</h3>
-              <span>{getVenueText(locale, v).subtitle}</span>
-            </div>
-            <button onclick={() => selectVenueFromCard(v)} aria-label={`${t('open3dModel')}: ${getVenueText(locale, v).name}`}>
-              {t('open3dModel')} <span aria-hidden="true">↗</span>
-            </button>
-          </article>
-        {/each}
-      </div>
-    </section>
-
-    <section class="transport-section">
-      <div class="transport-intro">
-        <p class="eyebrow">{t('transportEyebrow')}</p>
-        <h2>{t('transportTitle')}</h2>
-        <p>{t('transportBody')}</p>
-      </div>
-      <div class="transport-grid">
-        <article>
-          <span class="feature-icon">M</span>
-          <div><h3>{t('mtrRoutes')}</h3><p>{t('mtrRoutesBody')}</p></div>
-          <b>{t('comingFeature')}</b>
-        </article>
-        <article>
-          <span class="feature-icon">N</span>
-          <div><h3>{t('afterShow')}</h3><p>{t('afterShowBody')}</p></div>
-          <b>{t('comingFeature')}</b>
-        </article>
-        <article>
-          <span class="feature-icon">A</span>
-          <div><h3>{t('accessibilityGuide')}</h3><p>{t('accessibilityGuideBody')}</p></div>
-          <b>{t('comingFeature')}</b>
-        </article>
-      </div>
-    </section>
-
-    <section class="concert-section" id="concerts">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">{t('whatsOnEyebrow')}</p>
-          <h2>{t('whatsOnTitle')}</h2>
-        </div>
-        <p>{t('whatsOnBody')}</p>
-      </div>
-      <div class="concert-board">
-        <div class="calendar-stamp">
-          <span>AUG — DEC</span>
-          <strong>2026</strong>
-          <small>{t('calendarPreview')}</small>
-        </div>
-        <div class="concert-list">
-          <article><time>TBA</time><div><h3>{t('concertOne')}</h3><p>{t('concertOneMeta')}</p></div><span>01</span></article>
-          <article><time>TBA</time><div><h3>{t('concertTwo')}</h3><p>{t('concertTwoMeta')}</p></div><span>02</span></article>
-          <article><time>TBA</time><div><h3>{t('concertThree')}</h3><p>{t('concertThreeMeta')}</p></div><span>03</span></article>
-        </div>
-      </div>
-    </section>
-
-    <section class="community-section" id="community">
-      <div class="community-copy">
-        <p class="eyebrow">{t('communityEyebrow')}</p>
-        <h2>{t('communityTitle')}</h2>
-        <p>{t('communityBody')}</p>
-        <span>{t('communitySoon')}</span>
-      </div>
-      <div class="community-cards">
-        <article class="photo-card">
-          <div class="photo-placeholder">
-            <span>SECTION 42 · ROW 18</span>
-            <i></i>
-          </div>
-          <h3>{t('uploadPhotos')}</h3>
-          <p>{t('uploadPhotosBody')}</p>
-        </article>
-        <article class="comment-card">
-          <div class="comment-lines" aria-hidden="true"><i></i><i></i><i></i></div>
-          <blockquote>“{t('localCommentsBody')}”</blockquote>
-          <h3>{t('localComments')}</h3>
-        </article>
-      </div>
-    </section>
-    {:else}
-      <section class="arena-guide-section">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{text.name}</p>
-            <h2>{t('arenaQuickGuide')}</h2>
-          </div>
-          <p>{t('arenaQuickGuideBody')}</p>
-        </div>
-        <div class="arena-guide-grid">
-          <article>
-            <span>01</span>
-            <h3>{t('arenaTransportTitle')}</h3>
-            <p>{t('arenaTransportBody')}</p>
-            <b>{t('comingFeature')}</b>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>{t('arenaConcertsTitle')}</h3>
-            <p>{t('arenaConcertsBody')}</p>
-            <b>{t('comingFeature')}</b>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>{t('arenaCommunityTitle')}</h3>
-            <p>{t('arenaCommunityBody')}</p>
-            <b>{t('comingFeature')}</b>
-          </article>
-        </div>
-      </section>
-
-      <section class="other-arenas" id="venues">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{t('venueDirectoryEyebrow')}</p>
-            <h2>{t('exploreOtherArenas')}</h2>
-          </div>
-        </div>
-        <div class="venue-grid">
-          {#each venues as v, i}
-            {#if v.id !== venue.id}
-              <article class="venue-card">
-                <div class="venue-number">0{i + 1}</div>
-                <div class="venue-graphic" aria-hidden="true">
-                  <span></span><span></span><span></span>
-                </div>
-                <div class="venue-card-copy">
-                  <p>{v.id.toUpperCase()}</p>
-                  <h3>{getVenueText(locale, v).name}</h3>
-                  <span>{getVenueText(locale, v).subtitle}</span>
-                </div>
-                <button onclick={() => selectVenueFromCard(v)} aria-label={`${t('open3dModel')}: ${getVenueText(locale, v).name}`}>
-                  {t('open3dModel')} <span aria-hidden="true">↗</span>
-                </button>
-              </article>
-            {/if}
-          {/each}
-        </div>
-      </section>
-    {/if}
   </main>
 
+  {#if route.page !== 'viewer'}
   <footer>
     <div class="brand footer-brand">
       <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
@@ -741,6 +675,7 @@
     <p>{t('footerLine')}</p>
     <span>© 2026 / 22°19'N 114°10'E</span>
   </footer>
+  {/if}
 </div>
 
 {#if tooltip.show}
@@ -1017,9 +952,6 @@
   }
   .arena-subtitle { margin-top: 24px; color: var(--signal); font-size: 20px; font-weight: 800; }
   .arena-intro { max-width: 680px; margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
-  .arena-layout-line { display: flex; gap: 18px; align-items: center; margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--line); max-width: 680px; }
-  .arena-layout-line span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
-  .arena-layout-line strong { font-size: 14px; }
   .arena-index {
     height: 390px;
     position: relative;
@@ -1038,13 +970,13 @@
   .arena-rings i:nth-child(3) { width: 105px; height: 82px; }
   .arena-rings b { width: 46px; height: 46px; background: var(--signal); transform: rotate(45deg); }
 
-  .viewer-section, .venue-section, .concert-section {
+  .viewer-section, .concert-section {
     scroll-margin-top: 24px;
     padding: 110px max(32px, calc((100vw - 1440px) / 2));
   }
   .viewer-section { background: #ecefea; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .section-heading { display: grid; grid-template-columns: 1fr minmax(280px, 430px); gap: 70px; align-items: end; margin-bottom: 48px; }
-  .section-heading h2, .transport-intro h2, .community-copy h2 {
+  .section-heading h2 {
     margin-top: 18px;
     max-width: 820px;
     font-family: var(--display);
@@ -1053,7 +985,7 @@
     line-height: .98;
     letter-spacing: -.045em;
   }
-  .section-heading > p, .transport-intro > p:not(.eyebrow), .community-copy > p:not(.eyebrow) { color: var(--muted); font-size: 15px; line-height: 1.75; }
+  .section-heading > p { color: var(--muted); font-size: 15px; line-height: 1.75; }
   .viewer-frame {
     min-height: 690px;
     display: grid;
@@ -1169,7 +1101,6 @@
   .plan-link { display: flex; justify-content: space-between; margin-top: 14px; color: var(--ink); font-size: 14px; font-weight: 800; text-decoration: none; }
   .plan-link:hover { color: var(--signal); }
 
-  .venue-section { background: var(--paper); }
   .venue-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
   .venue-card { min-height: 330px; padding: 24px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; position: relative; overflow: hidden; transition: background .25s, color .25s; }
   .venue-card:hover, .venue-card.featured { background: var(--ink); color: #fff; }
@@ -1187,32 +1118,10 @@
   .venue-card button { margin-top: 22px; border: 0; border-top: 1px solid currentColor; background: transparent; color: inherit; padding: 11px 0 0; display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; cursor: pointer; }
   .venue-card button span { color: var(--signal); font-size: 15px; }
 
-  .arena-guide-section, .other-arenas {
-    padding: 110px max(32px, calc((100vw - 1440px) / 2));
-  }
-  .arena-guide-section { background: var(--acid); }
-  .arena-guide-section .eyebrow { color: var(--ink); }
-  .arena-guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(23,23,20,.4); border-left: 1px solid rgba(23,23,20,.4); }
-  .arena-guide-grid article { min-height: 300px; padding: 26px; border-right: 1px solid rgba(23,23,20,.4); border-bottom: 1px solid rgba(23,23,20,.4); display: flex; flex-direction: column; }
-  .arena-guide-grid article > span { font-family: var(--display); font-size: 28px; color: var(--signal-dark); }
-  .arena-guide-grid h3 { margin-top: auto; font-family: var(--display); font-size: 30px; font-weight: 500; }
-  .arena-guide-grid p { margin-top: 10px; color: #54564e; font-size: 14px; line-height: 1.6; }
-  .arena-guide-grid b { width: fit-content; margin-top: 22px; padding: 6px 9px; border: 1px solid rgba(23,23,20,.45); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
-  .other-arenas { background: var(--paper); }
+  .other-arenas { padding: 110px max(32px, calc((100vw - 1440px) / 2)); background: var(--paper); }
 
-  .transport-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 90px; padding: 100px max(32px, calc((100vw - 1440px) / 2)); background: var(--acid); }
-  .transport-intro h2 { font-size: clamp(40px, 4.4vw, 65px); }
-  .transport-intro > p:not(.eyebrow) { margin-top: 24px; color: #4c4d45; max-width: 500px; }
-  .transport-intro .eyebrow { color: var(--ink); }
-  .transport-grid { border-top: 1px solid rgba(23,23,20,.35); }
-  .transport-grid article { display: grid; grid-template-columns: 48px 1fr auto; gap: 20px; align-items: center; min-height: 130px; border-bottom: 1px solid rgba(23,23,20,.35); }
-  .feature-icon { width: 38px; height: 38px; border: 2px solid var(--ink); border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 18px; }
-  .transport-grid h3 { font-size: 17px; }
-  .transport-grid p { margin-top: 4px; color: #56574e; font-size: 12px; }
-  .transport-grid b { padding: 5px 8px; border: 1px solid rgba(23,23,20,.4); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
 
   .concert-section { background: var(--ink); color: #fff; }
-  .concert-section .section-heading > p { color: #a6a8a2; }
   .concert-board { display: grid; grid-template-columns: 300px 1fr; border: 1px solid #45463f; }
   .calendar-stamp { padding: 30px; background: var(--signal); display: flex; flex-direction: column; min-height: 360px; }
   .calendar-stamp span { font-size: 12px; font-weight: 900; letter-spacing: .15em; }
@@ -1225,26 +1134,6 @@
   .concert-list p { margin-top: 5px; color: #9c9e98; font-size: 12px; }
   .concert-list article > span { color: #64665e; font-family: var(--display); font-size: 42px; }
 
-  .community-section { scroll-margin-top: 24px; padding: 120px max(32px, calc((100vw - 1440px) / 2)); display: grid; grid-template-columns: .8fr 1.2fr; gap: 90px; background: #f4f0ea; }
-  .community-copy > p:not(.eyebrow) { margin-top: 26px; max-width: 520px; }
-  .community-copy > span { display: inline-block; margin-top: 32px; padding: 8px 11px; border: 1px solid var(--ink); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .12em; }
-  .community-cards { display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; align-items: center; }
-  .community-cards article { background: #fff; border: 1px solid var(--line); padding: 18px; box-shadow: 12px 12px 0 rgba(23,23,20,.07); }
-  .photo-card { transform: rotate(-2deg); }
-  .comment-card { transform: translateY(34px) rotate(2deg); }
-  .photo-placeholder { height: 230px; background: #cfd4cc; position: relative; overflow: hidden; }
-  .photo-placeholder::before { content: ""; position: absolute; width: 190px; height: 190px; border: 28px solid #a9b1a7; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-  .photo-placeholder::after { content: ""; position: absolute; width: 80px; height: 55px; background: var(--signal); left: 50%; top: 50%; transform: translate(-50%, -32%) perspective(80px) rotateX(45deg); }
-  .photo-placeholder span { position: absolute; z-index: 2; left: 12px; top: 12px; color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .1em; }
-  .photo-placeholder i { position: absolute; z-index: 2; inset: 0; background: linear-gradient(130deg, rgba(255,255,255,.3), transparent 45%); }
-  .community-cards h3 { margin-top: 18px; font-family: var(--display); font-size: 25px; font-weight: 500; }
-  .community-cards p { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.55; }
-  .comment-card { padding-top: 30px !important; }
-  .comment-lines { display: grid; gap: 9px; }
-  .comment-lines i { height: 7px; background: #e7e8e3; }
-  .comment-lines i:nth-child(2) { width: 82%; }
-  .comment-lines i:nth-child(3) { width: 58%; }
-  .comment-card blockquote { margin-top: 42px; font-family: var(--display); font-size: 21px; line-height: 1.35; color: var(--signal); }
 
   footer { min-height: 120px; padding: 34px max(32px, calc((100vw - 1440px) / 2)); display: flex; align-items: center; justify-content: space-between; gap: 30px; background: var(--paper); border-top: 1px solid var(--line); }
   .footer-brand { cursor: default; }
@@ -1253,6 +1142,86 @@
 
   .portal { font-size: 14px; }
   .portal button, .portal input, .portal select { font-size: 14px; }
+  .topbar nav button.active { color: var(--signal); }
+  .topbar nav button.active::after { right: 0; }
+
+  .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page, .venue-detail-section {
+    padding: 110px max(32px, calc((100vw - 1440px) / 2));
+  }
+  .portal-paths { background: var(--acid); }
+  .portal-paths .eyebrow { color: var(--ink); }
+  .path-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(23,23,20,.4); border-left: 1px solid rgba(23,23,20,.4); }
+  .path-grid article { min-height: 310px; padding: 28px; display: flex; flex-direction: column; border-right: 1px solid rgba(23,23,20,.4); border-bottom: 1px solid rgba(23,23,20,.4); }
+  .path-grid article > span { font-family: var(--display); font-size: 28px; color: var(--signal-dark); }
+  .path-grid h3 { margin-top: auto; font-family: var(--display); font-size: 32px; font-weight: 500; line-height: 1; }
+  .path-grid p { margin-top: 12px; color: #55574f; line-height: 1.65; }
+  .path-grid button { margin-top: 24px; padding: 11px 0 0; border: 0; border-top: 1px solid var(--ink); background: transparent; color: var(--ink); text-align: left; font-weight: 800; cursor: pointer; }
+  .home-venue-preview { background: var(--paper); }
+  .wide-link { width: 100%; margin-top: 22px; padding: 18px 0; display: flex; justify-content: space-between; border: 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); background: transparent; color: var(--ink); font-weight: 900; cursor: pointer; }
+  .wide-link span { color: var(--signal); }
+
+  .page-hero { min-height: 520px; padding: 100px max(32px, calc((100vw - 1440px) / 2)); display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid var(--line); }
+  .page-hero h1 { max-width: 1050px; margin-top: 24px; font-family: var(--display); font-size: clamp(64px, 8vw, 120px); line-height: .88; letter-spacing: -.055em; font-weight: 500; }
+  .page-hero > p:last-child { max-width: 680px; margin-top: 28px; color: var(--muted); font-size: 17px; line-height: 1.7; }
+  .guide-hero { background: #f4f0ea; }
+  .concerts-hero { background: var(--ink); color: #fff; border-color: #393a35; }
+  .concerts-hero > p:last-child { color: #aaaca6; }
+  .venues-hero { background: var(--acid); }
+  .venues-hero .eyebrow { color: var(--ink); }
+  .guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; background: var(--paper); }
+  .guide-grid article { min-height: 280px; padding: 34px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .guide-grid article:nth-child(odd) { border-left: 1px solid var(--line); }
+  .guide-grid article > span, .detail-grid article > span { color: var(--signal); font-family: var(--display); font-size: 24px; }
+  .guide-grid h2, .detail-grid h2 { margin-top: 55px; font-family: var(--display); font-size: 32px; font-weight: 500; }
+  .guide-grid p, .detail-grid p { margin-top: 14px; color: var(--muted); line-height: 1.7; }
+  .standalone-concerts { padding-top: 80px; padding-bottom: 110px; }
+  .venue-directory-page { padding-top: 80px; }
+
+  .venue-viewer-button { margin-top: 30px; }
+  .venue-detail-section { background: #f4f0ea; }
+  .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .detail-grid article { min-height: 310px; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--paper); }
+  .detail-grid h2 { margin-top: 48px; }
+  .detail-grid strong { display: block; margin-top: 12px; color: var(--signal); font-size: 18px; }
+  .detail-grid b { display: inline-block; margin-top: 22px; padding: 6px 9px; border: 1px solid var(--line); font-size: 12px; }
+  .detail-grid blockquote { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--signal-dark); font-family: var(--display); font-size: 20px; line-height: 1.4; }
+  .detail-grid .viewer-callout { background: var(--ink); color: #fff; }
+  .detail-grid .viewer-callout p { color: #aeb1aa; }
+  .viewer-callout button { width: 100%; margin-top: 28px; padding: 13px; border: 1px solid var(--acid); background: var(--acid); color: var(--ink); font-weight: 900; cursor: pointer; }
+
+  .viewer-main { background: #05070c; min-height: 100vh; }
+  .viewer-page {
+    min-height: 100vh;
+    padding: 18px;
+    background: #05070c;
+    color: #dbe6f5;
+    border: 0;
+  }
+  .viewer-topbar { min-height: 54px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; color: #8d9bb0; }
+  .viewer-topbar > span { font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .viewer-back { width: fit-content; border: 0; background: transparent; color: #dbe6f5; font-weight: 800; cursor: pointer; }
+  .viewer-back:hover { color: #ffd34d; }
+  .viewer-language { justify-self: end; display: flex; border: 1px solid rgba(120,150,200,.24); padding: 3px; border-radius: 8px; }
+  .viewer-language button { min-width: 38px; height: 30px; border: 0; border-radius: 5px; background: transparent; color: #8d9bb0; cursor: pointer; }
+  .viewer-language button.active { background: #ffd34d; color: #07111e; }
+  .viewer-page > .section-heading { width: min(1440px, 100%); margin: 24px auto 30px; }
+  .viewer-page .section-heading h2 { color: #fff; }
+  .viewer-page .section-heading > p { color: #8d9bb0; }
+  .viewer-page .viewer-frame { min-height: calc(100vh - 220px); background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
+  .viewer-page .canvas-stage { min-height: calc(100vh - 220px); background: #05070c; border-color: rgba(120,150,200,.22); }
+  .viewer-page .canvas-label, .viewer-page .canvas-reset { border-color: rgba(120,150,200,.24); background: rgba(13,18,28,.88); color: #dbe6f5; }
+  .viewer-page .viewer-panel { background: #0d121c; color: #dbe6f5; }
+  .viewer-page .venue-meta, .viewer-page .model-note, .viewer-page .seat-sub, .viewer-page .picker-stack label > span { color: #7d8ca3; }
+  .viewer-page .picker { background-color: #0b1120; color: #dbe6f5; border-color: rgba(120,150,200,.24); }
+  .viewer-page .chip { background: rgba(255,255,255,.03); color: #dbe6f5; border-color: rgba(120,150,200,.22); }
+  .viewer-page .panel-rule { background: rgba(120,150,200,.22); }
+  .viewer-page .fields input { background: #0b1120; color: #dbe6f5; border-color: rgba(120,150,200,.24); }
+  .viewer-page .seat-card { background: #0b1120; border-color: rgba(120,150,200,.24); }
+  .viewer-page .seat-card.has-seat { border-color: #ffd34d; box-shadow: 4px 4px 0 rgba(255,211,77,.25); }
+  .viewer-page button.view-seat { background: rgba(255,255,255,.04); color: #aebbd0; border-color: rgba(120,150,200,.28); }
+  .viewer-page .settings-toggle { color: #dbe6f5; border-color: rgba(120,150,200,.22); }
+  .viewer-page .setting-row { color: #b8c4d7; }
+  .viewer-page .plan-link { color: #ffd34d; }
 
   #tooltip {
     position: fixed;
@@ -1299,8 +1268,8 @@
     .viewer-frame { grid-template-columns: minmax(0, 1fr) 330px; }
     .canvas-stage { min-height: 650px; }
     .arena-hero { grid-template-columns: 1fr 340px; gap: 40px; }
+    .detail-grid { grid-template-columns: repeat(2, 1fr); }
     .venue-grid { grid-template-columns: repeat(2, 1fr); }
-    .transport-section, .community-section { gap: 50px; }
   }
 
   @media (max-width: 820px) {
@@ -1314,16 +1283,17 @@
     .arena-index { height: 300px; }
     .arena-rings { transform: translate(80px, 25px) rotate(-12deg); }
     .section-heading { grid-template-columns: 1fr; gap: 20px; }
-    .viewer-section, .venue-section, .concert-section, .arena-guide-section, .other-arenas { padding-top: 80px; padding-bottom: 80px; }
+    .viewer-section, .concert-section, .other-arenas { padding-top: 80px; padding-bottom: 80px; }
+    .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page, .venue-detail-section { padding-top: 80px; padding-bottom: 80px; }
+    .path-grid, .guide-grid { grid-template-columns: 1fr; }
+    .guide-grid article { border-left: 1px solid var(--line); }
+    .page-hero { min-height: 460px; padding-top: 80px; padding-bottom: 80px; }
+    .viewer-page { padding: 14px; }
     .viewer-frame { grid-template-columns: 1fr; }
     .canvas-stage { min-height: 540px; border-right: 0; border-bottom: 1px solid #cfd2ca; }
     .viewer-panel { overflow: visible; }
-    .arena-guide-grid { grid-template-columns: 1fr; }
-    .arena-guide-grid article { min-height: 240px; }
-    .transport-section, .community-section { grid-template-columns: 1fr; padding-top: 80px; padding-bottom: 80px; }
     .concert-board { grid-template-columns: 180px 1fr; }
     .calendar-stamp strong { font-size: 58px; }
-    .community-cards { max-width: 650px; }
   }
 
   @media (max-width: 560px) {
@@ -1355,8 +1325,14 @@
     .station-three { right: 10px; top: 122px; }
     .city-card-foot { font-size: 12px; }
     .ticket-strip { right: -90px; bottom: 26px; }
-    .section-heading h2, .transport-intro h2, .community-copy h2 { font-size: 41px; }
-    .viewer-section, .venue-section, .concert-section, .transport-section, .community-section, .arena-guide-section, .other-arenas { padding-left: 18px; padding-right: 18px; }
+    .section-heading h2 { font-size: 41px; }
+    .viewer-section, .concert-section, .other-arenas { padding-left: 18px; padding-right: 18px; }
+    .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page, .venue-detail-section, .page-hero { padding-left: 18px; padding-right: 18px; }
+    .page-hero h1 { font-size: clamp(52px, 15vw, 76px); }
+    .detail-grid { grid-template-columns: 1fr; }
+    .viewer-page { padding: 10px; }
+    .viewer-topbar { grid-template-columns: 1fr auto; }
+    .viewer-topbar > span { display: none; }
     .canvas-stage { min-height: 430px; }
     .canvas-hint { display: none; }
     .canvas-label { top: 12px; left: 12px; }
@@ -1364,8 +1340,6 @@
     .viewer-panel { padding: 22px 18px; }
     .venue-grid { grid-template-columns: 1fr; }
     .venue-card { min-height: 285px; }
-    .transport-grid article { grid-template-columns: 42px 1fr; padding: 16px 0; }
-    .transport-grid b { grid-column: 2; width: fit-content; }
     .concert-board { grid-template-columns: 1fr; }
     .calendar-stamp { min-height: auto; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 8px; }
     .calendar-stamp strong { writing-mode: initial; grid-row: 1 / 3; grid-column: 2; }
@@ -1373,8 +1347,6 @@
     .concert-list article { grid-template-columns: 55px 1fr auto; padding: 20px 16px; }
     .concert-list h3 { font-size: 21px; }
     .concert-list article > span { font-size: 28px; }
-    .community-cards { grid-template-columns: 1fr; }
-    .comment-card { transform: rotate(1deg); }
     footer { align-items: flex-start; flex-direction: column; }
   }
 </style>

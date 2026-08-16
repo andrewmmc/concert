@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { goHome, goTo, onRoute, parseHash } from '../src/lib/router.js';
+import { goHome, goTo, goToPage, goToVenue, onRoute, parseHash } from '../src/lib/router.js';
 
 function installBrowserGlobals(hash = '') {
   const previous = new Map();
@@ -33,10 +33,29 @@ test('parses canonical and slashless hash routes', () => {
   try {
     assert.equal(parseHash().venue.id, 'hkc');
     assert.equal(parseHash().layout.id, 'end-stage');
-    assert.equal(parseHash().page, 'venue');
+    assert.equal(parseHash().page, 'viewer');
 
     location.hash = '#hkc/center-stage';
     assert.equal(parseHash().layout.id, 'center-stage');
+  } finally {
+    browser.restore();
+  }
+});
+
+test('parses portal and venue detail pages', () => {
+  const browser = installBrowserGlobals('#/guide');
+  try {
+    assert.equal(parseHash().page, 'guide');
+
+    location.hash = '#/concerts';
+    assert.equal(parseHash().page, 'concerts');
+
+    location.hash = '#/venues';
+    assert.equal(parseHash().page, 'venues');
+
+    location.hash = '#/venue/kta';
+    assert.equal(parseHash().page, 'venue');
+    assert.equal(parseHash().venue.id, 'kta');
   } finally {
     browser.restore();
   }
@@ -73,6 +92,12 @@ test('writes canonical hashes when navigating', () => {
   try {
     goTo('hkc', 'center-stage');
     assert.equal(location.hash, '#/hkc/center-stage');
+
+    goToPage('concerts');
+    assert.equal(location.hash, '#/concerts');
+
+    goToVenue('qes');
+    assert.equal(location.hash, '#/venue/qes');
   } finally {
     browser.restore();
   }

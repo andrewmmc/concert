@@ -95,10 +95,10 @@ export function ringStripGeo(ringR, rings, segs = 200, th0 = 0, th1 = Math.PI * 
 export function createScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setClearColor(0xf1f3ef);
+  renderer.setClearColor(0x05070c);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xf1f3ef, 220, 460);
+  scene.fog = new THREE.Fog(0x05070c, 220, 460);
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 800);
   camera.position.set(76, 58, 76);
@@ -112,11 +112,11 @@ export function createScene(canvas) {
   controls.autoRotateSpeed = 0.7;
   controls.target.set(0, 4, 0);
 
-  scene.add(new THREE.HemisphereLight(0xeaf3ff, 0xb7aa91, 1.35));
+  scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x1a1410, 1.0));
   const sun = new THREE.DirectionalLight(0xffffff, 1.35);
   sun.position.set(60, 95, 35);
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xb9d2e8, 0.45);
+  const fill = new THREE.DirectionalLight(0x88aaff, 0.35);
   fill.position.set(-50, 40, -60);
   scene.add(fill);
 
