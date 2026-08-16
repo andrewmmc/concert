@@ -103,12 +103,12 @@ test('places sections on the correct side of the bowl', () => {
   const placements = awePlacements();
   const bySec = (id) => placements.filter((p) => p.sec === id);
 
-  // North stands sit at positive z, south stands at negative z.
-  assert.ok(bySec(1).every((p) => p.z > 0));
-  assert.ok(bySec(17).every((p) => p.z < 0));
+  // North stands sit at the top of the plan, south stands at the bottom.
+  assert.ok(bySec(1).every((p) => p.z < 0));
+  assert.ok(bySec(17).every((p) => p.z > 0));
   // Blocks 8 and 10 follow the north-west and south-west chamfers.
-  assert.ok(bySec(8).every((p) => p.x < -15 && p.z > 0));
-  assert.ok(bySec(10).every((p) => p.x < -15 && p.z < 0));
+  assert.ok(bySec(8).every((p) => p.x < -15 && p.z < 0));
+  assert.ok(bySec(10).every((p) => p.x < -15 && p.z > 0));
   // Block 9 occupies the west wall.
   assert.ok(bySec(9).every((p) => p.x < -20));
   // Floor blocks stay within the central event floor.
@@ -149,7 +149,8 @@ test('default view matches the PDF block order', () => {
   assert.ok(projected.get(2).x > projected.get(3).x);
   assert.ok(projected.get(17).x > projected.get(16).x);
   assert.ok(projected.get(16).x > projected.get(15).x);
-  assert.ok(projected.get(1).y < projected.get(17).y);
+  // Positive NDC y is the top of the rendered view.
+  assert.ok(projected.get(1).y > projected.get(17).y);
   assert.ok(stage.x > projected.get(1).x);
 });
 
@@ -162,7 +163,10 @@ test('stand seats rise through two tiers while floor stays flat', () => {
   const rowZ = block4.find((p) => p.row === 'Z');
   assert.ok(rowM.y > rowA.y);
   assert.ok(rowN.y > rowM.y);
-  assert.ok(rowN.z - rowM.z > rowM.z - block4.find((p) => p.row === 'L').z);
+  assert.ok(
+    Math.abs(rowN.z - rowM.z) >
+    Math.abs(rowM.z - block4.find((p) => p.row === 'L').z),
+  );
   assert.ok(rowZ.y > rowN.y);
   assert.ok(placements.filter((p) => p.sec === 'A').every((p) => p.y < 0.2));
 });
@@ -178,7 +182,7 @@ test('all seats share one merged seating colour', () => {
 test('floor placement follows lettered rows and numbered seat direction', () => {
   const blockA = awePlacements().filter((p) => p.sec === 'A');
   const at = (row, seat) => blockA.find((p) => p.row === row && p.seat === seat);
-  assert.ok(at('AA', 1).z > at('AA', 54).z);
+  assert.ok(at('AA', 1).z < at('AA', 54).z);
   assert.ok(at('AA', 1).x > at('A', 1).x);
   assert.ok(at('A', 1).x > at('Z', 1).x);
   assert.equal(at('AA', 18), undefined);

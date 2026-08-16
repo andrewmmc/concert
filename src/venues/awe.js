@@ -21,23 +21,23 @@ const TIER = {
 // The event map leaves some seats uncoloured, but the AWA-ES-16 all-seats
 // drawing confirms that those seats and both stage-end blocks remain in use.
 export const AWE_STAND_BLOCKS = [
-  { id: 1, side: 'north', center: [22.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 24 },
-  { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
-  { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
-  { id: 4, side: 'north', center: [3, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 26 },
-  { id: 5, side: 'north', center: [-3.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 25 },
-  { id: 6, side: 'north', center: [-10, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 23 },
-  { id: 7, side: 'north', center: [-17, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 8.5, maxSeat: 36 },
-  { id: 8, side: 'northwest', center: [-24, 10.5], outward: [-0.71, 0.71], lateral: [-0.71, -0.71], yaw: Math.PI * 0.75, width: 12, maxSeat: 53 },
-  { id: 9, side: 'west', center: [-29, 0], outward: [-1, 0], lateral: [0, -1], yaw: Math.PI / 2, width: 10.5, maxSeat: 35 },
-  { id: 10, side: 'southwest', center: [-24, -10.5], outward: [-0.71, -0.71], lateral: [0.71, -0.71], yaw: Math.PI / 4, width: 12, maxSeat: 52 },
-  { id: 11, side: 'south', center: [-17, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 9.5, maxSeat: 41 },
-  { id: 12, side: 'south', center: [-10, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 23 },
-  { id: 13, side: 'south', center: [-3.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 25 },
-  { id: 14, side: 'south', center: [3, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 26 },
-  { id: 15, side: 'south', center: [9.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21 },
-  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21 },
-  { id: 17, side: 'south', center: [22.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 24 },
+  { id: 1, side: 'north', center: [22.5, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 24 },
+  { id: 2, side: 'north', center: [16, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 21 },
+  { id: 3, side: 'north', center: [9.5, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 21 },
+  { id: 4, side: 'north', center: [3, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 26 },
+  { id: 5, side: 'north', center: [-3.5, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 25 },
+  { id: 6, side: 'north', center: [-10, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 6, maxSeat: 23 },
+  { id: 7, side: 'north', center: [-17, -10], outward: [0, -1], lateral: [-1, 0], yaw: 0, width: 8.5, maxSeat: 36 },
+  { id: 8, side: 'northwest', center: [-24, -10.5], outward: [-0.71, -0.71], lateral: [-0.71, 0.71], yaw: Math.PI / 4, width: 12, maxSeat: 53 },
+  { id: 9, side: 'west', center: [-29, 0], outward: [-1, 0], lateral: [0, 1], yaw: Math.PI / 2, width: 10.5, maxSeat: 35 },
+  { id: 10, side: 'southwest', center: [-24, 10.5], outward: [-0.71, 0.71], lateral: [0.71, 0.71], yaw: Math.PI * 0.75, width: 12, maxSeat: 52 },
+  { id: 11, side: 'south', center: [-17, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 9.5, maxSeat: 41 },
+  { id: 12, side: 'south', center: [-10, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 23 },
+  { id: 13, side: 'south', center: [-3.5, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 25 },
+  { id: 14, side: 'south', center: [3, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 26 },
+  { id: 15, side: 'south', center: [9.5, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
+  { id: 16, side: 'south', center: [16, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
+  { id: 17, side: 'south', center: [22.5, 10], outward: [0, 1], lateral: [1, 0], yaw: Math.PI, width: 6, maxSeat: 24 },
 ];
 
 // The event map letters floor rows from the stage towards the panel and numbers
@@ -53,8 +53,8 @@ const STAND_BY_ID = new Map(AWE_STAND_BLOCKS.map((b) => [String(b.id), b]));
 const FLOOR_BY_ID = new Map(AWE_FLOOR_BLOCKS.map((b) => [b.id, b]));
 
 // Geometry constants (metres) that lay the bowl and floor out on the page.
-const NORTH_Z = 10;
-const SOUTH_Z = -10;
+const NORTH_Z = -10;
+const SOUTH_Z = 10;
 const WEST_X = -24;
 const STAGE_X = 26;
 const FLOOR_HALF_Z = 8.5;
@@ -136,7 +136,7 @@ export function awePlacements() {
     block.rows.forEach((row, rowIndex) => {
       const x = block.eastX - rowIndex * FLOOR_ROW_PITCH;
       block.seats.forEach((seat) => {
-        const z = FLOOR_HALF_Z - (seat - 1) * (FLOOR_HALF_Z * 2 / 53);
+        const z = -FLOOR_HALF_Z + (seat - 1) * (FLOOR_HALF_Z * 2 / 53);
         placements.push({
           x,
           y: 0.05,
@@ -205,7 +205,11 @@ function addWheelchairPlatforms(scene) {
         new THREE.BoxGeometry(3.2, 0.16, 1.3),
         new THREE.MeshStandardMaterial({ color: TIER.wheelchair.color, roughness: 0.84 }),
       );
-      platform.position.set(block.center[0], 8.6, 25.1);
+      platform.position.set(
+        block.center[0],
+        8.6,
+        block.center[1] + block.outward[1] * 15.1,
+      );
       platform.userData.wp = index + 1;
       platform.userData.main = `Block ${block.id} Wheelchair Bay`;
       platform.userData.sub = `${TIER.wheelchair.name} — rear of upper tier`;
@@ -221,7 +225,7 @@ export const awe = {
   subtitle: 'Hall 1 EDAN LUI 2023 end-stage seating plan',
   dims: `Stands 1-17 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
-  defaultCamera: { position: [-8, 70, 90], target: [-8, 4, 0] },
+  defaultCamera: { position: [0, 110, 30], target: [-8, 4, 0] },
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [
