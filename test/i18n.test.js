@@ -31,8 +31,8 @@ test('returns localized interface and venue copy', () => {
   const copy = getVenueText(TRADITIONAL_CHINESE, venue, layout);
 
   assert.equal(translate(TRADITIONAL_CHINESE, 'findSeat'), '尋找座位');
-  assert.equal(translate(ENGLISH, 'viewFromSeat'), 'View from seat');
-  assert.equal(translate(TRADITIONAL_CHINESE, 'viewFromSeat'), '座位視角');
+  assert.equal(translate(ENGLISH, 'viewFromSeat'), 'Stage view');
+  assert.equal(translate(TRADITIONAL_CHINESE, 'seatSurroundings'), '座位周邊');
   assert.equal(copy.name, '香港體育館');
   assert.equal(copy.layoutName, '三面台');
   assert.equal(copy.sides[0], '紅閘 40 段');

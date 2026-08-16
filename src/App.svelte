@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { createScene, getSeatView, HOVER, PIN } from './scene.js';
+  import { createScene, getSeatSurroundingsView, getSeatView, HOVER, PIN } from './scene.js';
   import { venues } from './venues/index.js';
   import { parseHash, goTo, onRoute } from './lib/router.js';
   import {
@@ -46,7 +46,7 @@
   let seatMain = $state(translate(startingLocale, 'noSeatSelected'));
   let seatSub = $state(translate(startingLocale, 'selectSeatHint'));
   let pinned = $state(false);
-  let seatViewActive = $state(false);
+  let seatViewMode = $state(null);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
   let tooltipEl;
 
@@ -157,13 +157,19 @@
         setColor(i, base(i));
       }
       pinned = false;
-      seatViewActive = false;
+      seatViewMode = null;
       clearInfo();
     }
 
     function viewFromSeat(i) {
       const view = getSeatView(placements[i], stage);
-      seatViewActive = true;
+      seatViewMode = 'stage';
+      flyTo(view.target, view.cameraPosition);
+    }
+
+    function viewSeatSurroundings(i) {
+      const view = getSeatSurroundingsView(placements[i], stage);
+      seatViewMode = 'surroundings';
       flyTo(view.target, view.cameraPosition);
     }
 
@@ -254,9 +260,9 @@
     flyFn = (target, camPos) => flyTo(target, camPos);
 
     // toggles
-    $effect(() => { controls.autoRotate = autoRotate && !seatViewActive; });
+    $effect(() => { controls.autoRotate = autoRotate && !seatViewMode; });
     $effect(() => { roofGroup.visible = showRoof; });
-    $effect(() => { labelGroup.visible = showLabels && !seatViewActive; });
+    $effect(() => { labelGroup.visible = showLabels && !seatViewMode; });
     // Flip the tooltip away from the viewport edges once it is measured.
     $effect(() => {
       if (!tooltip.show || !tooltipEl) return;
@@ -273,8 +279,10 @@
       searchMsg = '';
       selectSeat(i);
     };
-    viewSeatFn = () => {
-      if (pinnedId >= 0) viewFromSeat(pinnedId);
+    viewSeatFn = (mode) => {
+      if (pinnedId < 0) return;
+      if (mode === 'surroundings') viewSeatSurroundings(pinnedId);
+      else viewFromSeat(pinnedId);
     };
     clearPinFn = clearPin;
 
@@ -294,14 +302,15 @@
   });
 
   function goSeat() { goSeatFn && goSeatFn(); }
-  function viewFromSelectedSeat() { viewSeatFn && viewSeatFn(); }
+  function viewFromSelectedSeat() { viewSeatFn && viewSeatFn('stage'); }
+  function viewSelectedSeatSurroundings() { viewSeatFn && viewSeatFn('surroundings'); }
   function unselect() {
     clearPinFn && clearPinFn();
     resetCamera();
   }
   function resetCamera() {
     if (!engine || !flyFn) return;
-    seatViewActive = false;
+    seatViewMode = null;
     const dc = venue.defaultCamera;
     flyFn(
       new engine.THREE.Vector3(...(dc?.target ?? [0, 4, 0])),
@@ -426,12 +435,22 @@
   </div>
   {#if pinned}
     <div class="seat-actions">
-      <button class:viewing={seatViewActive} class="view-seat" onclick={viewFromSelectedSeat}>
+      <button class:active={seatViewMode === 'stage'} class="view-seat stage" onclick={viewFromSelectedSeat}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
           <circle cx="12" cy="12" r="2.75"></circle>
         </svg>
         {t('viewFromSeat')}
+      </button>
+      <button class:active={seatViewMode === 'surroundings'} class="view-seat surroundings" onclick={viewSelectedSeatSurroundings}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="2.4"></circle>
+          <circle cx="5.5" cy="7" r="1.5"></circle>
+          <circle cx="18.5" cy="7" r="1.5"></circle>
+          <circle cx="5.5" cy="17" r="1.5"></circle>
+          <circle cx="18.5" cy="17" r="1.5"></circle>
+        </svg>
+        {t('seatSurroundings')}
       </button>
       <button class="clear" onclick={unselect} aria-label={t('unselectSeat')}>✕</button>
     </div>
@@ -518,10 +537,11 @@
   #info .sub { font-size: 12px; color: #7d8ca3; margin-top: 3px; }
   .seat-actions { display: flex; gap: 6px; margin-top: 10px; }
   button.view-seat { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-    background: rgba(255,211,77,.09); border: 1px solid rgba(255,211,77,.42); color: #ffd34d;
-    font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 7px; cursor: pointer; }
+    background: rgba(255,255,255,.04); border: 1px solid rgba(120,150,200,.28); color: #aebbd0;
+    font-size: 11.5px; font-weight: 700; padding: 7px 9px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
   button.view-seat svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-  button.view-seat:hover, button.view-seat.viewing { background: rgba(255,211,77,.2); border-color: #ffd34d; }
+  button.view-seat.stage:hover, button.view-seat.stage.active { color: #ffd34d; background: rgba(255,211,77,.18); border-color: #ffd34d; }
+  button.view-seat.surroundings:hover, button.view-seat.surroundings.active { color: #22d3ee; background: rgba(34,211,238,.16); border-color: #22d3ee; }
   button.clear { flex: 0 0 34px; background: rgba(34,211,238,.14); border: 1px solid rgba(34,211,238,.5);
     color: #22d3ee; font-size: 12px; font-weight: 600; padding: 6px 0; border-radius: 7px; cursor: pointer; }
   button.clear:hover { background: rgba(34,211,238,.28); }
