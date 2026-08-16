@@ -550,13 +550,6 @@
           <button class:active={locale === ENGLISH} onclick={() => changeLocale(ENGLISH)}>EN</button>
         </div>
       </div>
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">{t('viewerEyebrow')}</p>
-          <h2>{t('viewerTitle')}</h2>
-        </div>
-        <p>{t('viewerBody')}</p>
-      </div>
 
       <div class="viewer-frame">
         <div class="canvas-stage">
@@ -1204,11 +1197,8 @@
   .viewer-language { justify-self: end; display: flex; border: 1px solid rgba(120,150,200,.24); padding: 3px; border-radius: 8px; }
   .viewer-language button { min-width: 38px; height: 30px; border: 0; border-radius: 5px; background: transparent; color: #8d9bb0; cursor: pointer; }
   .viewer-language button.active { background: #ffd34d; color: #07111e; }
-  .viewer-page > .section-heading { width: min(1440px, 100%); margin: 24px auto 30px; }
-  .viewer-page .section-heading h2 { color: #fff; }
-  .viewer-page .section-heading > p { color: #8d9bb0; }
-  .viewer-page .viewer-frame { min-height: calc(100vh - 220px); background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
-  .viewer-page .canvas-stage { min-height: calc(100vh - 220px); background: #05070c; border-color: rgba(120,150,200,.22); }
+  .viewer-page .viewer-frame { min-height: calc(100vh - 90px); background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
+  .viewer-page .canvas-stage { min-height: calc(100vh - 90px); background: #05070c; border-color: rgba(120,150,200,.22); }
   .viewer-page .canvas-label, .viewer-page .canvas-reset { border-color: rgba(120,150,200,.24); background: rgba(13,18,28,.88); color: #dbe6f5; }
   .viewer-page .viewer-panel { background: #0d121c; color: #dbe6f5; }
   .viewer-page .venue-meta, .viewer-page .model-note, .viewer-page .seat-sub, .viewer-page .picker-stack label > span { color: #7d8ca3; }
