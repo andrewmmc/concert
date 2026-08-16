@@ -1,320 +1,455 @@
-// Queen Elizabeth Stadium (伊利沙伯體育館) — multiple arena layouts modelled
-// from the official LCSD seating-plan PDFs in misc/qes.  The drawings use
-// stand sections 1-8 around the arena and event-floor sections 9-10 for the
-// concert/ring layouts.
+// Queen Elizabeth Stadium (伊利沙伯體育館) — modelled from the five official
+// LCSD seating plans in misc/qes (central_stage_layout.pdf,
+// end_stage_layout.pdf, 3_side_end_stage_layout.pdf, boxing_ring_layout.pdf,
+// central_court_layout.pdf).  The plans are pure-vector drawings with all text
+// converted to outlines, so the seat rectangles, section dividers, row bands
+// and printed seat numbers were recovered geometrically and by OCR, then
+// reconciled against the section totals printed on each plan.
+//
+// The stadium seats surround a rectangular arena on four raked stands spread
+// over three levels:
+//   · 3/F (ground) — the arena floor plus the low north/south rows C-G
+//   · 4/F          — north/south rows H-L and east/west rows F-L
+//   · 5/F          — north/south rows M-P and east/west rows M-U
+// Eight numbered stand sections wrap the arena (page placement: 6 = NW,
+// 7 = NE, 3 = SW, 2 = SE, 5 = W-north, 4 = W-south, 8 = E-north, 1 = E-south).
+// The arena floor carries sections 9 (south half) and 10 (north half) whenever
+// a layout uses floor seating.
 import * as THREE from 'three';
 import { addGround, addOutline, createSeatInstances, labelTexture } from '../scene.js';
 
-// QES label texture styling (fonts and baselines).
-const QES_LABEL = { font: '800 70px system-ui', subFont: '600 36px system-ui', subColor: '#c8d4e8', textY: 104, subY: 170 };
+const QES_LABEL = {
+  font: '800 70px system-ui',
+  subFont: '600 36px system-ui',
+  subColor: '#c8d4e8',
+  textY: 104,
+  subY: 170,
+};
 
+// ---------------------------------------------------------------------------
+// Stand sections.  Totals are read directly off the plans and are identical in
+// every layout that keeps the section open.  `stand` is the physical side;
+// `sideIndex` indexes the four legend gates below.  Sections 1/4/5/8 each hide
+// a 10-seat wheelchair platform (5 wheelchair + 5 minder) inside their total
+// that is drawn as a platform slab rather than individual seats, so the
+// per-row seat specs below sum to `total - platform`.
+// ---------------------------------------------------------------------------
 export const QES_STAND_SECTIONS = [
-  { id: 1, label: 'Section 1', total: 395, rows: 22, side: 'east', center: -9, color: '#52b7ff' },
-  { id: 2, label: 'Section 2', total: 345, rows: 18, side: 'south', center: 8.5, color: '#41d37d' },
-  { id: 3, label: 'Section 3', total: 337, rows: 20, side: 'south', center: -8.5, color: '#8fdc63' },
-  { id: 4, label: 'Section 4', total: 396, rows: 22, side: 'west', center: -9, color: '#f1c84c' },
-  { id: 5, label: 'Section 5', total: 398, rows: 22, side: 'west', center: 9, color: '#f59b5f' },
-  { id: 6, label: 'Section 6', total: 325, rows: 18, side: 'north', center: -8.5, color: '#ee6a78' },
-  { id: 7, label: 'Section 7', total: 274, rows: 17, side: 'north', center: 8.5, color: '#b789ff' },
-  { id: 8, label: 'Section 8', total: 413, rows: 22, side: 'east', center: 9, color: '#22c7c9' },
+  { id: 1, total: 413, stand: 'east',  sideIndex: 1, platform: '1W' },
+  { id: 2, total: 345, stand: 'south', sideIndex: 2, platform: null },
+  { id: 3, total: 337, stand: 'south', sideIndex: 2, platform: null },
+  { id: 4, total: 396, stand: 'west',  sideIndex: 3, platform: '4W' },
+  { id: 5, total: 389, stand: 'west',  sideIndex: 3, platform: '5W' },
+  { id: 6, total: 325, stand: 'north', sideIndex: 0, platform: null },
+  { id: 7, total: 274, stand: 'north', sideIndex: 0, platform: null },
+  { id: 8, total: 413, stand: 'east',  sideIndex: 1, platform: '8W' },
 ];
 
+// Compact per-section seat data.  `|` separates physically-separate blocks
+// (aisle gaps); `,` separates seat-number skips *within* one contiguous block;
+// `a-b` is an inclusive range.  Row keys are letter ranges (`G-L`) or comma
+// groups (`P,Q`) expanded by expandRows().
+const STAND_ROWS_RAW = {
+  1: [
+    ['F', '29-33 | 36-47'], ['G-L', '22-33 | 36-47'],
+    ['M', '3-10 | 14-17 | 20-26 | 32-34 | 37-47'],
+    ['N', '5-12 | 14-17 | 20-26 | 32-34 | 37-47'],
+    ['O', '6-12 | 13-17 | 20-26 | 32-34 | 37-47'],
+    ['P-S', '14-17 | 20-34 | 37-47'],
+    ['T', '28-34 | 37-39 | 43-47'], ['U', '37-39 | 43-47'],
+  ],
+  2: [
+    ['C', '30-32,34-35 | 37-39,41-43 | 48-57'],
+    ['D-G', '30-32,34-35 | 37-39,41-43 | 48-60'],
+    ['H-L', '38-51 | 54-67'],
+    ['M', '45-56 | 59-69 | 72'], ['N', '45-56 | 59-68'], ['O', '45-56 | 59-67'],
+    ['P', '42-47 | 50-55 | 58-63 | 65-67'],
+  ],
+  3: [
+    ['C-G', '13-25'], ['H-L', '6-19 | 22-35'],
+    ['M', '1 | 4-14 | 17-28 | 31-42'], ['N', '5-14 | 17-28 | 31-42'],
+    ['O', '6-14 | 17-28 | 31-42'],
+    ['P', '6-8 | 10-15 | 18-23 | 26-31 | 33-40'],
+  ],
+  4: [
+    ['F', '51-62 | 65-69'], ['G-L', '51-62 | 65-76'],
+    ['M', '51-61 | 64-66 | 72-78 | 81-84 | 86-93'],
+    ['N', '51-61 | 64-66 | 72-78 | 81-84 | 87-91'],
+    ['O', '51-61 | 64-66 | 72-78 | 81 | 86-89'],
+    ['P,Q', '51-61 | 64-78 | 81'], ['R,S', '51-61 | 64-78 | 81-82'],
+    ['T', '51-55 | 59-61 | 64-70'], ['U', '51-55 | 59-61 | 64-66'],
+  ],
+  5: [
+    ['F', '30-34 | 37-48'], ['G-L', '23-34 | 37-48'],
+    ['M', '6-13 | 15-18 | 21-27 | 33-35 | 38-48'],
+    ['N', '8-12 | 15-18 | 21-27 | 33-35 | 38-48'],
+    ['O', '10-13 | 21-27 | 33-35 | 38-48'],
+    ['P-S', '21-35 | 38-48'],
+    ['T', '29-35 | 38-40 | 44-48'], ['U', '33-35 | 38-40 | 44-48'],
+  ],
+  6: [
+    ['C-G', '30-32,34-35 | 37-39,41-43 | 48-60'], ['H-L', '38-51 | 54-67'],
+    ['M,N', '48-51 | 54-64 | 67-72'], ['O', '47-55 | 58-71'],
+  ],
+  7: [
+    ['C', '16-25'], ['D-G', '13-25'], ['H-L', '6-19 | 22-35'],
+    ['M', '1-7 | 16-22 | 25-34 | 37-41'], ['N', '16-22 | 25-34 | 37-41'],
+    ['O', '18-31 | 33-39'],
+  ],
+  8: [
+    ['F', '50-61 | 64-68'], ['G-L', '50-61 | 64-75'],
+    ['M', '50-60 | 63-65 | 71-77 | 80-83 | 87-94'],
+    ['N', '50-60 | 63-65 | 71-77 | 80-84 | 86-92'],
+    ['O', '50-60 | 63-65 | 71-77 | 80-84 | 85-91'],
+    ['P-S', '50-60 | 63-77 | 80-83'],
+    ['T', '50-54 | 58-60 | 63-69'], ['U', '50-54 | 58-60'],
+  ],
+};
+
+/* Expand a row-letter key such as 'G-L' or 'P,Q' into individual letters. */
+export function expandRows(key) {
+  const out = [];
+  for (const part of key.split(',')) {
+    if (part.includes('-')) {
+      const a = part.charCodeAt(0), b = part.charCodeAt(part.length - 1);
+      for (let c = a; c <= b; c++) out.push(String.fromCharCode(c));
+    } else {
+      out.push(part);
+    }
+  }
+  return out;
+}
+
+/* QES_STAND_ROWS[section][rowLetter] = compact seat spec string. */
+export const QES_STAND_ROWS = (() => {
+  const map = {};
+  for (const [sec, rows] of Object.entries(STAND_ROWS_RAW)) {
+    map[sec] = {};
+    for (const [key, spec] of rows) {
+      for (const row of expandRows(key)) map[sec][row] = spec;
+    }
+  }
+  return map;
+})();
+
+/* Parse "a-b" / "a" (ascending or descending) into an array of seat numbers. */
+function parseRange(token) {
+  const parts = token.split('-');
+  if (parts.length === 1) return [Number(parts[0])];
+  const a = Number(parts[0]), b = Number(parts[1]);
+  const step = a <= b ? 1 : -1, out = [];
+  for (let n = a; ; n += step) { out.push(n); if (n === b) break; }
+  return out;
+}
+
+/* Parse a seat spec into an array of physical blocks, each an array of seat
+   numbers.  `|` = new physical block; `,` = number skip within a block. */
+export function parseSeatSpec(spec) {
+  return spec.split('|').map((block) =>
+    block.trim().split(',').flatMap((tok) => parseRange(tok.trim())));
+}
+
+/* Number of drawn seats a row spec contains. */
+export function standRowSeatCount(spec) {
+  return parseSeatSpec(spec).reduce((sum, block) => sum + block.length, 0);
+}
+
+// ---------------------------------------------------------------------------
+// Floor level (3/F / 4/F / 5/F) for a stand section + row.  North/south stands
+// gain a 3/F ground tier (rows C-G); east/west stands start at 4/F (row F).
+// ---------------------------------------------------------------------------
+const NS_SECTIONS = [2, 3, 6, 7];
+
+export function tierOf(section, row) {
+  const c = row.charCodeAt(0) - 64; // A = 1
+  if (NS_SECTIONS.includes(section)) {
+    if (c <= 7) return '3/F';   // C-G
+    if (c <= 12) return '4/F';  // H-L
+    return '5/F';               // M-P
+  }
+  if (c <= 12) return '4/F';    // F-L
+  return '5/F';                 // M-U
+}
+
+// ---------------------------------------------------------------------------
+// Layouts.  Floor holds the arena sections 9/10 published totals (including
+// their arena-floor wheelchair zones); closedStands lists stand sections hidden
+// behind an end stage.  Wheelchair platforms are the E/W stand slabs.
+// ---------------------------------------------------------------------------
 export const QES_LAYOUTS = [
   {
-    id: 'end-stage',
-    label: 'End Stage',
-    zh: '正面舞台',
-    // 32' x 48' platform stage against the west stand; floor rows face it.
-    stage: { kind: 'end', label: 'End Stage 正面舞台', x: -13.6, z: 0, w: 9.75, d: 14.63, rotation: 0, arrow: '正面 →' },
-    floorSections: [
-      { id: 9, label: 'Section 9', total: 308, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: -5.0, w: 17.5, d: 9.4, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: 5.0, w: 17.5, d: 9.4, color: '#d9a45f' },
-    ],
+    id: 'end-stage', label: 'End Stage', zh: '正面舞台',
+    closedStands: [], floor: { 9: 308, 10: 302 },
+    platforms: ['1W', '4W', '5W', '8W'], floorZones: ['10W'], stage: 'west',
   },
   {
-    id: '3-side-end-stage',
-    label: '3-side End Stage',
-    zh: '三面台',
-    // Same stage and floor plan as End Stage, but west-stand sections 4 and 5
-    // behind the stage are closed off on the official plan.
-    stage: { kind: 'end', label: '3-side End Stage 三面台', x: -13.6, z: 0, w: 9.75, d: 14.63, rotation: 0, arrow: '三面 →' },
-    closedStands: [4, 5],
-    floorSections: [
-      { id: 9, label: 'Section 9', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: -5.0, w: 17.5, d: 9.4, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 302, rows: 22, side: 'floor', axis: 'x', yaw: -Math.PI / 2, x: 2.8, z: 5.0, w: 17.5, d: 9.4, color: '#d9a45f' },
-    ],
+    id: '3-side-end-stage', label: '3-Side End Stage', zh: '三面舞台',
+    closedStands: [4, 5], floor: { 9: 302, 10: 302 },
+    platforms: ['1W', '8W'], floorZones: ['9W', '10W'], stage: 'west',
   },
   {
-    id: 'central-stage',
-    label: 'Central Stage',
-    zh: '中央舞台',
-    // 28' x 28' central stage with tiered platforms flanking it east and west.
-    stage: { kind: 'central', label: 'Central Stage 中央舞台', x: 0, z: 0, w: 8.5, d: 8.5, rotation: 0, arrow: '360°' },
-    floorSections: [
-      { id: 9, label: 'Section 9', total: 320, rows: 10, side: 'floor', x: 0, z: -9.3, w: 22, d: 6.0, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 314, rows: 10, side: 'floor', x: 0, z: 9.3, w: 22, d: 6.0, color: '#d9a45f', yaw: Math.PI },
-    ],
+    id: 'central-stage', label: 'Central Stage', zh: '中央舞台',
+    closedStands: [], floor: { 9: 320, 10: 314 },
+    platforms: ['1W', '4W', '5W', '8W'], floorZones: ['10W'], stage: 'center',
   },
   {
-    id: 'boxing-ring',
-    label: 'Boxing Ring',
-    zh: '擂台',
-    // 24' x 24' ring with tiered platforms flanking it east and west.
-    stage: { kind: 'ring', label: 'Boxing Ring 擂台', x: 0, z: 0, w: 7.3, d: 7.3, rotation: 0, arrow: 'RING' },
-    floorSections: [
-      { id: 9, label: 'Section 9', total: 240, rows: 8, side: 'floor', x: 0, z: -8.1, w: 26, d: 5.2, color: '#cf8f52' },
-      { id: 10, label: 'Section 10', total: 222, rows: 8, side: 'floor', x: 0, z: 8.1, w: 26, d: 5.2, color: '#d9a45f', yaw: Math.PI },
-    ],
+    id: 'boxing-ring', label: 'Boxing Ring', zh: '擂台',
+    closedStands: [], floor: { 9: 240, 10: 222 },
+    platforms: ['1W', '4W', '5W', '8W'], floorZones: ['10W'], stage: 'ring',
   },
   {
-    id: 'central-court',
-    label: 'Central Court',
-    zh: '中央場地',
-    // 104' x 60' court covering most of the arena floor.
-    stage: { kind: 'court', label: 'Central Court 中央場地', x: 0, z: 0, w: 31.7, d: 18.3, rotation: 0, arrow: 'COURT' },
-    floorSections: [],
+    id: 'central-court', label: 'Central Court', zh: '中央場地',
+    closedStands: [], floor: {},
+    platforms: ['1W', '4W', '5W', '8W'], floorZones: [], stage: 'center',
   },
 ];
 
+/* Resolve a layout id, falling back to the default end-stage plan. */
 export function qesLayout(id) {
-  return QES_LAYOUTS.find((layout) => layout.id === id) || QES_LAYOUTS[0];
+  return QES_LAYOUTS.find((l) => l.id === id) || QES_LAYOUTS[0];
 }
 
-export function rowSeatCounts(total, rows) {
-  const base = Math.floor(total / rows);
-  const extra = total % rows;
-  return Array.from({ length: rows }, (_, i) => base + (i >= rows - extra ? 1 : 0));
+/* Total modelled seats for a layout: open stand totals + floor section totals. */
+export function layoutSeatTotal(id) {
+  const layout = qesLayout(id);
+  let total = 0;
+  for (const s of QES_STAND_SECTIONS) {
+    if (!layout.closedStands.includes(s.id)) total += s.total;
+  }
+  for (const t of Object.values(layout.floor)) total += t;
+  return total;
 }
 
-export function layoutSeatTotal(layoutId) {
-  const layout = qesLayout(layoutId);
-  const closed = new Set(layout.closedStands || []);
-  const stands = QES_STAND_SECTIONS.reduce((sum, section) => sum + (closed.has(section.id) ? 0 : section.total), 0);
-  const floor = layout.floorSections.reduce((sum, section) => sum + section.total, 0);
-  return stands + floor;
+// ---------------------------------------------------------------------------
+// Geometry mapping.  Plan coordinates are A3 points; the arena centre sits at
+// (481.85, 389.70).  Seat numbers map to the along-row axis by the linear fits
+// recovered from the plan; row bands give the perpendicular (depth) position.
+// ---------------------------------------------------------------------------
+const PDF_CX = 481.85, PDF_CY = 389.70;
+const SCALE = 0.06; // points → world units
+const toX = (px) => (px - PDF_CX) * SCALE;
+const toZ = (py) => (py - PDF_CY) * SCALE;
+
+// Along-row seat-number → plan-coordinate fits (central-stage extraction).
+const SEAT_FIT = {
+  north: (n) => -6.8506 * n + 735.95, // → plan x
+  south: (n) => 7.0420 * n + 227.81,  // → plan x
+  west: (n) => 6.7733 * n + 47.46,    // → plan y
+  east: (n) => -6.7699 * n + 710.88,  // → plan y
+};
+
+// Perpendicular row-band plan coordinate (arena-side row first).
+const WEST_BANDS = {
+  U: 42, T: 54, S: 64, R: 76, Q: 88, P: 100, O: 110, N: 122, M: 134,
+  L: 162, K: 174, J: 186, I: 196, H: 208, G: 220, F: 230,
+};
+const ROW_BANDS = {
+  west: WEST_BANDS,
+  east: Object.fromEntries(Object.entries(WEST_BANDS).map(([r, v]) => [r, 964 - v])),
+  north: {
+    O: 64, N: 76, M: 86, L: 120, K: 132, J: 142, I: 154, H: 166,
+    G: 190, F: 200, E: 212, D: 224, C: 234,
+  },
+  south: {
+    C: 538, D: 550, E: 560, F: 572, G: 584, H: 606, I: 618, J: 630,
+    K: 640, L: 652, M: 682, N: 692, O: 704, P: 716,
+  },
+};
+
+/* Raked seat height: rows step up away from the arena, with a jump at each
+   floor-level boundary so the three tiers read as separate decks. */
+function rowHeight(section, row) {
+  const c = row.charCodeAt(0) - 64;
+  const idx = NS_SECTIONS.includes(section) ? c - 3 : c - 6; // 0 at arena row
+  const tier = tierOf(section, row);
+  const off = tier === '3/F' ? 0 : tier === '4/F' ? 2.6 : 5.2;
+  return 1.0 + idx * 0.34 + off;
 }
 
-const SIDES = [
-  { base: 1, color: '#52b7ff', name: 'Sections 1 and 8' },
-  { base: 2, color: '#41d37d', name: 'Sections 2 and 3' },
-  { base: 4, color: '#f1c84c', name: 'Sections 4 and 5' },
-  { base: 6, color: '#ee6a78', name: 'Sections 6 and 7' },
-  { base: 9, color: '#cf8f52', name: 'Arena Floor Sections 9 and 10' },
+const SIDE_COLOR = ['#ff5f5f', '#4aa3ff', '#46d39a', '#ffc44d'];
+const SIDE_NAME = [
+  'North Stand 北看台', 'East Stand 東看台',
+  'South Stand 南看台', 'West Stand 西看台',
 ];
 
-function sectionYaw(side, fallback = 0) {
-  if (side === 'north') return Math.PI;
-  if (side === 'south') return 0;
-  if (side === 'east') return Math.PI / 2;
-  if (side === 'west') return -Math.PI / 2;
-  return fallback;
-}
-
-function sectionPosition(section, rowIndex, seatIndex, seatsInRow) {
-  const rowPitch = 0.74;
-  const seatPitch = 0.50;
-  const standY = 1.0 + rowIndex * 0.38;
-  const lateral = (seatIndex - (seatsInRow - 1) / 2) * seatPitch;
-
-  if (section.side === 'north') {
-    return { x: section.center + lateral, y: standY, z: 16.3 + rowIndex * rowPitch, yaw: Math.PI };
-  }
-  if (section.side === 'south') {
-    return { x: section.center - lateral, y: standY, z: -16.3 - rowIndex * rowPitch, yaw: 0 };
-  }
-  if (section.side === 'east') {
-    return { x: 20.5 + rowIndex * rowPitch, y: standY, z: section.center + lateral, yaw: -Math.PI / 2 };
-  }
-  return { x: -20.5 - rowIndex * rowPitch, y: standY, z: section.center - lateral, yaw: Math.PI / 2 };
-}
-
-function addFloorSectionPlacements(placements, section) {
-  const counts = rowSeatCounts(section.total, section.rows);
-  // axis 'x': rows step along x away from the (west) stage and seats run
-  // along z facing it; otherwise rows step along z with seats along x.
-  const rowPitch = (section.axis === 'x' ? section.w : section.d) / Math.max(1, section.rows - 1);
-  counts.forEach((count, rowIndex) => {
-    const seatPitch = (section.axis === 'x' ? section.d : section.w) / Math.max(1, count);
-    for (let seatIndex = 0; seatIndex < count; seatIndex++) {
-      const along = seatPitch * (seatIndex + 0.5);
-      placements.push({
-        x: section.axis === 'x'
-          ? section.x - section.w / 2 + rowPitch * rowIndex
-          : section.x - section.w / 2 + along,
-        y: 0,
-        z: section.axis === 'x'
-          ? section.z - section.d / 2 + along
-          : section.z + section.d / 2 - rowPitch * rowIndex,
-        yaw: section.yaw || 0,
-        sec: section.id,
-        row: String.fromCharCode(65 + rowIndex),
-        seat: seatIndex + 1,
-        tier: 'Arena Floor',
-        zone: section.label,
-        color: section.color,
-        alt: rowIndex % 2,
-        widthScale: Math.min(1.05, seatPitch * 1.42),
-      });
-    }
-  });
-}
-
-function addStandPlacements(placements, closedStands) {
-  for (const section of QES_STAND_SECTIONS) {
-    if (closedStands.has(section.id)) continue;
-    const counts = rowSeatCounts(section.total, section.rows);
-    counts.forEach((count, rowIndex) => {
-      for (let seatIndex = 0; seatIndex < count; seatIndex++) {
-        const p = sectionPosition(section, rowIndex, seatIndex, count);
-        placements.push({
-          ...p,
-          sec: section.id,
-          row: rowIndex + 1,
-          seat: seatIndex + 1,
-          tier: rowIndex < 10 ? 'Lower Stand' : rowIndex < 18 ? 'Upper Stand' : 'Gallery',
-          zone: section.label,
-          color: section.color,
-          alt: rowIndex % 2,
-          widthScale: 1,
-        });
-      }
-    });
-  }
-}
-
-function makeStage(scene, layout) {
-  const { stage: spec } = layout;
-  const group = new THREE.Group();
-  const h = spec.kind === 'court' ? 0.08 : 0.9;
-  const mat = new THREE.MeshStandardMaterial({
-    color: spec.kind === 'court' ? 0x13261f : 0x2a3242,
-    roughness: 0.72,
-    metalness: 0.02,
-  });
-  const stage = new THREE.Mesh(new THREE.BoxGeometry(spec.w, h, spec.d), mat);
-  stage.position.set(spec.x, h / 2 + 0.02, spec.z);
-  stage.rotation.y = spec.rotation;
-  stage.userData.label = spec.label;
-  group.add(stage);
-
-  if (spec.kind === 'ring') {
-    const ropeMat = new THREE.LineBasicMaterial({ color: 0xd7e4df });
-    for (const y of [1.0, 1.45, 1.9]) {
-      const pts = [
-        new THREE.Vector3(-spec.w / 2, y, -spec.d / 2), new THREE.Vector3(spec.w / 2, y, -spec.d / 2),
-        new THREE.Vector3(spec.w / 2, y, spec.d / 2), new THREE.Vector3(-spec.w / 2, y, spec.d / 2),
-      ];
-      const rope = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), ropeMat);
-      rope.position.set(spec.x, 0, spec.z);
-      group.add(rope);
-    }
-  } else {
-    const trim = new THREE.Mesh(new THREE.BoxGeometry(spec.w + 0.3, 0.1, spec.d + 0.3),
-      new THREE.MeshStandardMaterial({ color: 0x102019, emissive: 0x00c58a, emissiveIntensity: 0.45 }));
-    trim.position.set(spec.x, h + 0.08, spec.z);
-    trim.rotation.y = spec.rotation;
-    group.add(trim);
-  }
-
-  const top = new THREE.Mesh(
-    new THREE.PlaneGeometry(Math.max(1, spec.w - 0.9), Math.max(1, spec.d - 0.9)),
-    new THREE.MeshBasicMaterial({ map: labelTexture(spec.arrow, spec.label, '#00d299', QES_LABEL) }),
-  );
-  top.rotation.x = -Math.PI / 2;
-  top.rotation.z = -spec.rotation;
-  top.position.set(spec.x, h + 0.13, spec.z);
-  group.add(top);
-
-  scene.add(group);
-  return stage;
-}
+// Wheelchair-platform plan anchors (arena-side row F band, section centre).
+const PLATFORM_ANCHOR = {
+  '1W': { stand: 'east', sec: 1 }, '8W': { stand: 'east', sec: 8 },
+  '4W': { stand: 'west', sec: 4 }, '5W': { stand: 'west', sec: 5 },
+};
 
 export const qes = {
   id: 'qes',
   name: 'Queen Elizabeth Stadium',
   zh: '伊利沙伯體育館',
-  subtitle: 'Multi-layout arena configuration',
-  dims: 'Arena seating sections 1-8 · event-floor sections 9-10',
+  subtitle: 'Multi-purpose arena — five official seating configurations',
+  dims: 'Arena stands over three levels (3/F ground · 4/F · 5/F) around a central floor',
   defaultLayout: 'end-stage',
-  layouts: QES_LAYOUTS.map(({ id, label, zh }) => ({ id, label, zh })),
-  sides: SIDES,
+  layouts: QES_LAYOUTS.map((l) => ({ id: l.id, label: l.label, zh: l.zh })),
+
+  sides: [
+    { base: 'N', color: SIDE_COLOR[0], name: `${SIDE_NAME[0]} (6–7)` },
+    { base: 'E', color: SIDE_COLOR[1], name: `${SIDE_NAME[1]} (1 · 8)` },
+    { base: 'S', color: SIDE_COLOR[2], name: `${SIDE_NAME[2]} (2–3)` },
+    { base: 'W', color: SIDE_COLOR[3], name: `${SIDE_NAME[3]} (4–5)` },
+  ],
 
   build(ctx, opts = {}) {
     const { scene } = ctx;
     const layout = qesLayout(opts.layout);
+    const closed = new Set(layout.closedStands);
+
     const placements = [];
 
-    addGround(scene, 180, 0x070c10, -0.02);
-
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(37, 25),
-      new THREE.MeshStandardMaterial({ color: 0x101820, roughness: 0.9 }));
-    floor.rotation.x = -Math.PI / 2; floor.position.y = 0; scene.add(floor);
-    addOutline(scene, 0, 0, 37, 25, 0x24644f, 0.045);
-
-    const terraceMat = new THREE.MeshStandardMaterial({ color: 0x182534, roughness: 0.95 });
-    for (const section of QES_STAND_SECTIONS) {
-      const counts = rowSeatCounts(section.total, section.rows);
-      const maxSeats = Math.max(...counts);
-      const w = section.side === 'north' || section.side === 'south' ? maxSeats * 0.54 : section.rows * 0.78;
-      const d = section.side === 'north' || section.side === 'south' ? section.rows * 0.78 : maxSeats * 0.54;
-      const centerRow = sectionPosition(section, (section.rows - 1) / 2, (maxSeats - 1) / 2, maxSeats);
-      const slab = new THREE.Mesh(new THREE.BoxGeometry(w, 0.08, d), terraceMat);
-      slab.position.set(centerRow.x, 0.12, centerRow.z);
-      scene.add(slab);
+    /* raked stand seats */
+    for (const s of QES_STAND_SECTIONS) {
+      if (closed.has(s.id)) continue;
+      const bands = ROW_BANDS[s.stand];
+      const fit = SEAT_FIT[s.stand];
+      const rows = QES_STAND_ROWS[s.id];
+      const color = SIDE_COLOR[s.sideIndex];
+      for (const [row, spec] of Object.entries(rows)) {
+        const depth = bands[row];
+        if (depth == null) continue;
+        const y = rowHeight(s.id, row);
+        const seats = parseSeatSpec(spec).flat();
+        for (const n of seats) {
+          let x3, z3;
+          if (s.stand === 'north' || s.stand === 'south') {
+            x3 = toX(fit(n)); z3 = toZ(depth);
+          } else {
+            z3 = toZ(fit(n)); x3 = toX(depth);
+          }
+          placements.push({
+            x: x3, y, z: z3, yaw: Math.atan2(-x3, -z3),
+            sec: s.id, row, seat: n, tier: tierOf(s.id, row),
+            zone: SIDE_NAME[s.sideIndex], color, side: s.sideIndex,
+            alt: row.charCodeAt(0) % 2, widthScale: 0.72,
+          });
+        }
+      }
     }
 
-    addStandPlacements(placements, new Set(layout.closedStands || []));
-    for (const floorSection of layout.floorSections) {
-      addOutline(scene, floorSection.x, floorSection.z, floorSection.w, floorSection.d, 0x806132, 0.075);
-      addFloorSectionPlacements(placements, floorSection);
+    /* arena-floor sections 9 (south half) / 10 (north half) */
+    const floorEntries = Object.entries(layout.floor);
+    if (floorEntries.length) {
+      const focus = layout.stage === 'west' ? [toX(250), 0] : [0, 0];
+      for (const [secStr, total] of floorEntries) {
+        const sec = Number(secStr);
+        const north = sec === 10;
+        const yr = north ? [252, 378] : [388, 516];
+        const perRow = 24;
+        const rowN = Math.ceil(total / perRow);
+        let placed = 0;
+        for (let r = 0; r < rowN && placed < total; r++) {
+          const py = yr[0] + (rowN === 1 ? 0.5 : r / (rowN - 1)) * (yr[1] - yr[0]);
+          const inRow = Math.min(perRow, total - placed);
+          for (let sIdx = 0; sIdx < inRow; sIdx++) {
+            const px = 258 + (sIdx / (perRow - 1)) * (712 - 258);
+            const x3 = toX(px), z3 = toZ(py);
+            placements.push({
+              x: x3, y: 0, z: z3,
+              yaw: Math.atan2(focus[0] - x3, focus[1] - z3),
+              sec, row: 'AA', seat: placed + 1, tier: '3/F',
+              zone: 'Arena Floor 場地', color: '#cf8f52', side: 2,
+              alt: r % 2, widthScale: 0.7,
+            });
+            placed++;
+          }
+        }
+      }
     }
 
-    const stage = makeStage(scene, layout);
-
+    /* seat instances */
     const { seats, baseColors, seatIndex } = createSeatInstances(placements, {
       boxes: [
-        { size: [0.44, 0.10, 0.34], pos: [0, 0.22, 0.03] },
-        { size: [0.44, 0.38, 0.08], pos: [0, 0.40, -0.15] },
+        { size: [0.42, 0.10, 0.36], pos: [0, 0.24, 0.03] },
+        { size: [0.42, 0.42, 0.08], pos: [0, 0.44, -0.16] },
       ],
-      shade: (p) => (p.tier === 'Arena Floor' ? 0.86 : 0.70),
-      altShade: 0.06,
+      shade: (p) => (p.tier === '5/F' ? 0.66 : p.tier === '4/F' ? 0.76 : 0.86),
+      altShade: 0.05,
+      roughness: 0.75,
+      metalness: 0.05,
     });
     scene.add(seats);
 
+    /* arena floor slab + outline */
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x11161f, roughness: 0.9 });
+    const arena = new THREE.Mesh(new THREE.PlaneGeometry(toX(720) - toX(244), toZ(524) - toZ(246)), floorMat);
+    arena.rotation.x = -Math.PI / 2; arena.position.set(0, 0, 0); scene.add(arena);
+    addOutline(scene, 0, 0, toX(720) - toX(244), toZ(524) - toZ(246), 0x24644f, 0.045);
+    addGround(scene, 80, 0x090d14, -0.05);
+
+    /* wheelchair platforms */
+    const wpMeshes = [];
+    const wpMat = new THREE.MeshStandardMaterial({ color: 0x6b7684, roughness: 0.85, side: THREE.DoubleSide });
+    for (const id of layout.platforms) {
+      const a = PLATFORM_ANCHOR[id];
+      if (!a || closed.has(a.sec)) continue;
+      const depth = ROW_BANDS[a.stand].F;
+      const along = SEAT_FIT[a.stand](a.stand === 'east' ? 46 : (a.stand === 'west' && a.sec === 4 ? 60 : 46));
+      let x3, z3;
+      if (a.stand === 'east' || a.stand === 'west') { x3 = toX(depth); z3 = toZ(along); }
+      else { x3 = toX(along); z3 = toZ(depth); }
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.12, 2.0), wpMat);
+      slab.position.set(x3, 0.9, z3); slab.userData.wp = id;
+      scene.add(slab); wpMeshes.push(slab);
+      const decal = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 0.9),
+        new THREE.MeshBasicMaterial({ map: labelTexture(id, 'Wheelchair', '#e8edf4', QES_LABEL) }));
+      decal.position.set(x3, 0.97, z3); decal.rotation.x = -Math.PI / 2; scene.add(decal);
+    }
+
+    /* stage */
+    const stageGroup = new THREE.Group();
+    const stagePos = layout.stage === 'west' ? new THREE.Vector3(toX(250), 0.6, 0)
+      : new THREE.Vector3(0, 0.6, 0);
+    const stageW = layout.stage === 'west' ? 3.0 : layout.stage === 'ring' ? 8.0 : 10.0;
+    const stageD = layout.stage === 'west' ? 14.0 : layout.stage === 'ring' ? 8.0 : 10.0;
+    const stage = new THREE.Mesh(new THREE.BoxGeometry(stageW, 1.2, stageD),
+      new THREE.MeshStandardMaterial({ color: 0x2a3242, roughness: 0.6 }));
+    stage.position.copy(stagePos); stage.name = 'stage';
+    stage.userData.label = `${layout.label} ${layout.zh}`;
+    stageGroup.add(stage);
+    if (layout.stage === 'ring') {
+      const ropes = new THREE.Mesh(new THREE.BoxGeometry(stageW + 0.4, 0.1, stageD + 0.4),
+        new THREE.MeshStandardMaterial({ color: 0x111622, emissive: 0xffc44d, emissiveIntensity: 0.5 }));
+      ropes.position.set(stagePos.x, 1.25, stagePos.z); stageGroup.add(ropes);
+    }
+    scene.add(stageGroup);
+
+    /* roof + side labels */
     const roofGroup = new THREE.Group();
     {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(33, 0.08, 8, 128),
-        new THREE.MeshBasicMaterial({ color: 0x2a6573, transparent: true, opacity: 0.38 }));
-      ring.rotation.x = Math.PI / 2; ring.position.y = 23; ring.scale.z = 0.68;
-      roofGroup.add(ring);
-      const ribs = [];
-      for (let i = 0; i < 16; i++) {
-        const t = (i / 16) * Math.PI * 2;
-        ribs.push(new THREE.Vector3(Math.cos(t) * 28, 17, Math.sin(t) * 19));
-        ribs.push(new THREE.Vector3(Math.cos(t) * 35, 24, Math.sin(t) * 24));
-      }
-      roofGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ribs),
-        new THREE.LineBasicMaterial({ color: 0x315a86, transparent: true, opacity: 0.45 })));
+      const half = 34, rimY = 22;
+      const rim = [
+        new THREE.Vector3(-half, rimY, -half), new THREE.Vector3(half, rimY, -half),
+        new THREE.Vector3(half, rimY, half), new THREE.Vector3(-half, rimY, half),
+      ];
+      const pts = [];
+      for (let i = 0; i < 4; i++) pts.push(rim[i], rim[(i + 1) % 4]);
+      roofGroup.add(new THREE.LineSegments(
+        new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: 0x3f5a8a, transparent: true, opacity: 0.5 })));
     }
     scene.add(roofGroup);
 
     const labelGroup = new THREE.Group();
-    for (const section of QES_STAND_SECTIONS) {
-      const yaw = sectionYaw(section.side);
-      const pos = sectionPosition(section, section.rows + 2, 0, 1);
-      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: labelTexture(String(section.id), section.label, section.color, QES_LABEL),
+    const SIDE_POS = [
+      new THREE.Vector3(0, 16, toZ(64) - 3),   // north
+      new THREE.Vector3(toX(922) + 3, 16, 0),  // east
+      new THREE.Vector3(0, 16, toZ(716) + 3),  // south
+      new THREE.Vector3(toX(42) - 3, 16, 0),   // west
+    ];
+    qes.sides.forEach((s, i) => {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: labelTexture(s.base, s.name, s.color, QES_LABEL),
         transparent: true,
         depthTest: false,
       }));
-      sprite.position.set(pos.x, 10.5, pos.z);
-      sprite.scale.set(6.5, 3.25, 1);
-      sprite.material.rotation = yaw;
-      labelGroup.add(sprite);
-    }
+      sp.scale.set(12, 3.75, 1); sp.position.copy(SIDE_POS[i]); labelGroup.add(sp);
+    });
     scene.add(labelGroup);
 
-    const wpMeshes = [];
     const describe = (p) => ({
       main: `Sec ${p.sec} · Row ${p.row} · Seat ${p.seat}`,
       sub: `${p.zone} — ${p.tier}`,
