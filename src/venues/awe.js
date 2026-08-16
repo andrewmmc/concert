@@ -16,9 +16,10 @@ const TIER = {
   wheelchair: { name: 'Wheelchair', color: '#7fff00' },
 };
 
-// Blocks run clockwise from stage-right Block 1 to stage-left Block 17. The
-// event map leaves some seats uncoloured, but the AWA-ES-16 all-seats drawing
-// confirms that those seats and both stage-end blocks remain part of the bowl.
+// From the stage-right end, the PDF runs Blocks 1-7 across the north stand,
+// Blocks 8-10 around the west end, then Blocks 11-17 across the south stand.
+// The event map leaves some seats uncoloured, but the AWA-ES-16 all-seats
+// drawing confirms that those seats and both stage-end blocks remain in use.
 export const AWE_STAND_BLOCKS = [
   { id: 1, side: 'north', center: [22.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 24 },
   { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
@@ -220,7 +221,7 @@ export const awe = {
   subtitle: 'Hall 1 EDAN LUI 2023 end-stage seating plan',
   dims: `Stands 1-17 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
-  defaultCamera: { target: [-8, 4, 0] },
+  defaultCamera: { position: [-8, 70, 90], target: [-8, 4, 0] },
   defaultLayout: 'end-stage',
   layouts: [{ id: 'end-stage', label: 'End Stage', zh: '正面舞台' }],
   sides: [

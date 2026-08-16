@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import * as THREE from 'three';
 
 import {
   AWE_FLOOR_BLOCKS,
@@ -118,7 +119,7 @@ test('places sections on the correct side of the bowl', () => {
   assert.ok(meanX('B') > meanX('C'));
 });
 
-test('orders blocks and seats clockwise from stage-right Block 1', () => {
+test('orders blocks and seats around the bowl from stage-right Block 1', () => {
   const placements = awePlacements();
   const bySec = (id) => placements.filter((p) => p.sec === id);
   const meanX = (id) => bySec(id).reduce((sum, p) => sum + p.x, 0) / bySec(id).length;
@@ -130,6 +131,26 @@ test('orders blocks and seats clockwise from stage-right Block 1', () => {
   assert.ok(meanX(16) > meanX(15));
   assert.ok(at(1, 'A', 1).x > at(1, 'A', 24).x);
   assert.ok(at(17, 'A', 1).x < at(17, 'A', 24).x);
+});
+
+test('default view matches the PDF block order', () => {
+  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 800);
+  camera.position.set(...awe.defaultCamera.position);
+  camera.lookAt(new THREE.Vector3(...awe.defaultCamera.target));
+  camera.updateMatrixWorld();
+
+  const projected = new Map(AWE_STAND_BLOCKS.map((block) => [
+    block.id,
+    new THREE.Vector3(block.center[0], 0, block.center[1]).project(camera),
+  ]));
+  const stage = new THREE.Vector3(26, 0, 0).project(camera);
+
+  assert.ok(projected.get(1).x > projected.get(2).x);
+  assert.ok(projected.get(2).x > projected.get(3).x);
+  assert.ok(projected.get(17).x > projected.get(16).x);
+  assert.ok(projected.get(16).x > projected.get(15).x);
+  assert.ok(projected.get(1).y < projected.get(17).y);
+  assert.ok(stage.x > projected.get(1).x);
 });
 
 test('stand seats rise through two tiers while floor stays flat', () => {
