@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { createScene, HOVER, PIN } from './scene.js';
+  import { createScene, getSeatView, HOVER, PIN } from './scene.js';
   import { venues } from './venues/index.js';
   import { parseHash, goTo, onRoute } from './lib/router.js';
   import {
@@ -46,13 +46,14 @@
   let seatMain = $state(translate(startingLocale, 'noSeatSelected'));
   let seatSub = $state(translate(startingLocale, 'selectSeatHint'));
   let pinned = $state(false);
+  let seatViewActive = $state(false);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
   let tooltipEl;
 
   let engine;
   let modelGroup, buildSceneFn;
   let hoveredId = -1, pinnedId = -1;
-  let restoreFn, pickFn, flyFn, goSeatFn, clearPinFn, refreshLocalizedInfoFn;
+  let restoreFn, pickFn, flyFn, goSeatFn, viewSeatFn, clearPinFn, refreshLocalizedInfoFn;
 
   const t = (key) => translate(locale, key);
 
@@ -155,7 +156,15 @@
         const i = pinnedId; pinnedId = -1;
         setColor(i, base(i));
       }
-      pinned = false; clearInfo();
+      pinned = false;
+      seatViewActive = false;
+      clearInfo();
+    }
+
+    function viewFromSeat(i) {
+      const view = getSeatView(placements[i], stage);
+      seatViewActive = true;
+      flyTo(view.target, view.cameraPosition);
     }
 
     function selectSeat(i) {
@@ -166,9 +175,7 @@
       const p = placements[i];
       showInfo(p);
       pinned = true;
-      const target = new engine.THREE.Vector3(p.x, p.y + 0.5, p.z);
-      const camPos = new engine.THREE.Vector3(p.x * 0.45, p.y + 15, p.z * 0.45);
-      flyTo(target, camPos);
+      viewFromSeat(i);
     }
 
     function onMove(e) {
@@ -247,9 +254,9 @@
     flyFn = (target, camPos) => flyTo(target, camPos);
 
     // toggles
-    $effect(() => { controls.autoRotate = autoRotate; });
+    $effect(() => { controls.autoRotate = autoRotate && !seatViewActive; });
     $effect(() => { roofGroup.visible = showRoof; });
-    $effect(() => { labelGroup.visible = showLabels; });
+    $effect(() => { labelGroup.visible = showLabels && !seatViewActive; });
     // Flip the tooltip away from the viewport edges once it is measured.
     $effect(() => {
       if (!tooltip.show || !tooltipEl) return;
@@ -265,6 +272,9 @@
       if (i === undefined) { searchMsg = t('seatNotFound'); return; }
       searchMsg = '';
       selectSeat(i);
+    };
+    viewSeatFn = () => {
+      if (pinnedId >= 0) viewFromSeat(pinnedId);
     };
     clearPinFn = clearPin;
 
@@ -284,12 +294,14 @@
   });
 
   function goSeat() { goSeatFn && goSeatFn(); }
+  function viewFromSelectedSeat() { viewSeatFn && viewSeatFn(); }
   function unselect() {
     clearPinFn && clearPinFn();
     resetCamera();
   }
   function resetCamera() {
     if (!engine || !flyFn) return;
+    seatViewActive = false;
     const dc = venue.defaultCamera;
     flyFn(
       new engine.THREE.Vector3(...(dc?.target ?? [0, 4, 0])),
@@ -413,7 +425,16 @@
     <div class="sub">{seatSub}</div>
   </div>
   {#if pinned}
-    <button class="clear" onclick={unselect}>✕ {t('unselectSeat')}</button>
+    <div class="seat-actions">
+      <button class:viewing={seatViewActive} class="view-seat" onclick={viewFromSelectedSeat}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+          <circle cx="12" cy="12" r="2.75"></circle>
+        </svg>
+        {t('viewFromSeat')}
+      </button>
+      <button class="clear" onclick={unselect} aria-label={t('unselectSeat')}>✕</button>
+    </div>
   {/if}
 </div>
 
@@ -495,7 +516,13 @@
   #info .cap { font-size: 10.5px; color: #7d8ca3; text-transform: uppercase; letter-spacing: 1px; }
   #info .seat { font-size: 19px; font-weight: 700; margin-top: 3px; }
   #info .sub { font-size: 12px; color: #7d8ca3; margin-top: 3px; }
-  button.clear { margin-top: 9px; width: 100%; background: rgba(34,211,238,.14); border: 1px solid rgba(34,211,238,.5);
+  .seat-actions { display: flex; gap: 6px; margin-top: 10px; }
+  button.view-seat { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+    background: rgba(255,211,77,.09); border: 1px solid rgba(255,211,77,.42); color: #ffd34d;
+    font-size: 12px; font-weight: 700; padding: 7px 10px; border-radius: 7px; cursor: pointer; }
+  button.view-seat svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  button.view-seat:hover, button.view-seat.viewing { background: rgba(255,211,77,.2); border-color: #ffd34d; }
+  button.clear { flex: 0 0 34px; background: rgba(34,211,238,.14); border: 1px solid rgba(34,211,238,.5);
     color: #22d3ee; font-size: 12px; font-weight: 600; padding: 6px 0; border-radius: 7px; cursor: pointer; }
   button.clear:hover { background: rgba(34,211,238,.28); }
 

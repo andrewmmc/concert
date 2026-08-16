@@ -9,6 +9,35 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 export const HOVER = new THREE.Color('#ffe14d');
 export const PIN   = new THREE.Color('#22d3ee');
 
+const SEATED_EYE_HEIGHT = 1.28;
+const SEATED_FORWARD_OFFSET = 0.14;
+
+export function getSeatView(placement, stage) {
+  if (!placement || ![placement.x, placement.y, placement.z].every(Number.isFinite) || !stage?.isObject3D) {
+    throw new TypeError('A seat placement and stage Object3D are required.');
+  }
+
+  const stageBounds = new THREE.Box3().setFromObject(stage);
+  if (stageBounds.isEmpty()) {
+    throw new TypeError('The stage Object3D must contain geometry.');
+  }
+  const target = stageBounds.getCenter(new THREE.Vector3());
+  target.y = stageBounds.max.y;
+
+  const cameraPosition = new THREE.Vector3(
+    placement.x,
+    placement.y + SEATED_EYE_HEIGHT,
+    placement.z,
+  );
+  const towardStage = target.clone().sub(cameraPosition);
+  towardStage.y = 0;
+  if (towardStage.lengthSq() > 0) {
+    cameraPosition.addScaledVector(towardStage.normalize(), SEATED_FORWARD_OFFSET);
+  }
+
+  return { target, cameraPosition };
+}
+
 /* superellipse ring radius at angle θ for "square size" S */
 export function makeRingR(P) {
   return (theta, S) => {
@@ -55,7 +84,7 @@ export function createScene(canvas) {
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
   controls.maxPolarAngle = Math.PI * 0.495;
-  controls.minDistance = 12;
+  controls.minDistance = 1.5;
   controls.maxDistance = 300;
   controls.autoRotateSpeed = 0.7;
   controls.target.set(0, 4, 0);

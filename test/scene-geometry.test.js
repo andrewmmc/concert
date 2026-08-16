@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createSeatInstances, makeRingR, ringStripGeo } from '../src/scene.js';
+import * as THREE from 'three';
+
+import { createSeatInstances, getSeatView, makeRingR, ringStripGeo } from '../src/scene.js';
 
 const closeTo = (actual, expected, tolerance = 1e-6) => {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} ≉ ${expected}`);
@@ -97,4 +99,34 @@ test('createSeatInstances falls back to numeric-row alternation', () => {
   // row 5 is odd → alt 1 → white × (1 + 0.1)
   const [r, g, b] = baseColors.slice(0, 3);
   closeTo(r, 1.1); closeTo(g, 1.1); closeTo(b, 1.1);
+});
+
+test('getSeatView places the camera at seated eye height facing the stage', () => {
+  const stage = new THREE.Mesh(new THREE.BoxGeometry(10, 1.2, 6));
+  stage.position.set(0, 0.6, 0);
+  const placement = { x: 10, y: 2, z: 20 };
+
+  const { target, cameraPosition } = getSeatView(placement, stage);
+
+  closeTo(target.x, 0);
+  closeTo(target.y, 1.2);
+  closeTo(target.z, 0);
+  closeTo(cameraPosition.y, 3.28);
+  closeTo(Math.hypot(cameraPosition.x - placement.x, cameraPosition.z - placement.z), 0.14);
+
+  const stageDirection = new THREE.Vector2(target.x - placement.x, target.z - placement.z).normalize();
+  const cameraOffset = new THREE.Vector2(
+    cameraPosition.x - placement.x,
+    cameraPosition.z - placement.z,
+  ).normalize();
+  closeTo(cameraOffset.dot(stageDirection), 1);
+
+  stage.geometry.dispose();
+});
+
+test('getSeatView rejects incomplete inputs', () => {
+  assert.throws(() => getSeatView(null, new THREE.Group()), TypeError);
+  assert.throws(() => getSeatView({ x: 0, y: 0, z: 0 }, null), TypeError);
+  assert.throws(() => getSeatView({ x: 0, y: 0, z: 0 }, new THREE.Group()), TypeError);
+  assert.throws(() => getSeatView({ x: 0, y: NaN, z: 0 }, new THREE.Mesh()), TypeError);
 });
