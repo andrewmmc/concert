@@ -364,6 +364,8 @@
   }
 </script>
 
+<svelte:body class:viewer-open={route.page === 'viewer'} />
+
 <div class="portal" id="top">
   {#if route.page !== 'viewer'}
   <header class="topbar">
@@ -703,6 +705,7 @@
     font-family: var(--sans);
   }
   :global(body) { overflow-x: hidden; }
+  :global(body.viewer-open) { height: 100vh; overflow: hidden; background: #05070c; }
   :global(button, input, select) { font: inherit; }
   :global(button:focus-visible), :global(a:focus-visible), :global(input:focus-visible), :global(select:focus-visible) {
     outline: 3px solid rgba(27, 77, 255, .28);
@@ -1182,25 +1185,29 @@
   .detail-grid .viewer-callout p { color: #aeb1aa; }
   .viewer-callout button { width: 100%; margin-top: 28px; padding: 13px; border: 1px solid var(--acid); background: var(--acid); color: var(--ink); font-weight: 900; cursor: pointer; }
 
-  .viewer-main { background: #05070c; min-height: 100vh; }
+  .viewer-main { height: 100vh; min-height: 0; overflow: hidden; background: #05070c; }
   .viewer-page {
-    min-height: 100vh;
+    height: 100vh;
+    min-height: 0;
     padding: 18px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     background: #05070c;
     color: #dbe6f5;
     border: 0;
   }
-  .viewer-topbar { min-height: 54px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; color: #8d9bb0; }
+  .viewer-topbar { min-height: 54px; flex: 0 0 54px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; color: #8d9bb0; }
   .viewer-topbar > span { font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
   .viewer-back { width: fit-content; border: 0; background: transparent; color: #dbe6f5; font-weight: 800; cursor: pointer; }
   .viewer-back:hover { color: #ffd34d; }
   .viewer-language { justify-self: end; display: flex; border: 1px solid rgba(120,150,200,.24); padding: 3px; border-radius: 8px; }
   .viewer-language button { min-width: 38px; height: 30px; border: 0; border-radius: 5px; background: transparent; color: #8d9bb0; cursor: pointer; }
   .viewer-language button.active { background: #ffd34d; color: #07111e; }
-  .viewer-page .viewer-frame { min-height: calc(100vh - 90px); background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
-  .viewer-page .canvas-stage { min-height: calc(100vh - 90px); background: #05070c; border-color: rgba(120,150,200,.22); }
+  .viewer-page .viewer-frame { flex: 1 1 auto; height: auto; min-height: 0; background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
+  .viewer-page .canvas-stage { height: auto; min-height: 0; background: #05070c; border-color: rgba(120,150,200,.22); }
   .viewer-page .canvas-label, .viewer-page .canvas-reset { border-color: rgba(120,150,200,.24); background: rgba(13,18,28,.88); color: #dbe6f5; }
-  .viewer-page .viewer-panel { background: #0d121c; color: #dbe6f5; }
+  .viewer-page .viewer-panel { min-height: 0; overflow-y: auto; background: #0d121c; color: #dbe6f5; }
   .viewer-page .venue-meta, .viewer-page .model-note, .viewer-page .seat-sub, .viewer-page .picker-stack label > span { color: #7d8ca3; }
   .viewer-page .picker { background-color: #0b1120; color: #dbe6f5; border-color: rgba(120,150,200,.24); }
   .viewer-page .chip { background: rgba(255,255,255,.03); color: #dbe6f5; border-color: rgba(120,150,200,.22); }
@@ -1282,6 +1289,9 @@
     .viewer-frame { grid-template-columns: 1fr; }
     .canvas-stage { min-height: 540px; border-right: 0; border-bottom: 1px solid #cfd2ca; }
     .viewer-panel { overflow: visible; }
+    .viewer-page .viewer-frame { grid-template-columns: 1fr; grid-template-rows: minmax(0, 58%) minmax(0, 42%); }
+    .viewer-page .canvas-stage { min-height: 0; }
+    .viewer-page .viewer-panel { overflow-y: auto; }
     .concert-board { grid-template-columns: 180px 1fr; }
     .calendar-stamp strong { font-size: 58px; }
   }
