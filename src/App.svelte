@@ -1211,7 +1211,20 @@
   .viewer-page .viewer-frame { flex: 1 1 auto; height: auto; min-height: 0; background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
   .viewer-page .canvas-stage { height: auto; min-height: 0; background: #05070c; border-color: rgba(120,150,200,.22); }
   .viewer-page .canvas-label, .viewer-page .canvas-reset { border-color: rgba(120,150,200,.24); background: rgba(13,18,28,.88); color: #dbe6f5; }
-  .viewer-page .viewer-panel { min-height: 0; overflow: hidden; padding: 20px; background: #0d121c; color: #dbe6f5; }
+  .viewer-page .viewer-panel {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: #42516a #0d121c;
+    scrollbar-width: thin;
+    padding: 20px;
+    background: #0d121c;
+    color: #dbe6f5;
+  }
+  .viewer-page .viewer-panel::-webkit-scrollbar { width: 8px; }
+  .viewer-page .viewer-panel::-webkit-scrollbar-track { background: #0d121c; }
+  .viewer-page .viewer-panel::-webkit-scrollbar-thumb { background: #42516a; border: 2px solid #0d121c; border-radius: 999px; }
   .viewer-page .picker-stack { gap: 8px; margin-top: 14px; }
   .viewer-page .model-note { margin-top: 9px; }
   .viewer-page .legend { margin-top: 8px; }
@@ -1303,7 +1316,7 @@
     .viewer-panel { overflow: visible; }
     .viewer-page .viewer-frame { grid-template-columns: minmax(0, 1fr) minmax(250px, 42vw); grid-template-rows: 1fr; }
     .viewer-page .canvas-stage { min-height: 0; }
-    .viewer-page .viewer-panel { overflow: hidden; }
+    .viewer-page .viewer-panel { overflow-x: hidden; overflow-y: auto; }
     .concert-board { grid-template-columns: 180px 1fr; }
     .calendar-stamp strong { font-size: 58px; }
   }
