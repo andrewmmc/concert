@@ -95,13 +95,12 @@ export function ringStripGeo(ringR, rings, segs = 200, th0 = 0, th1 = Math.PI * 
 export function createScene(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.setClearColor(0x05070c);
+  renderer.setClearColor(0xf1f3ef);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x05070c, 220, 460);
+  scene.fog = new THREE.Fog(0xf1f3ef, 220, 460);
 
-  const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 800);
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 800);
   camera.position.set(76, 58, 76);
 
   const controls = new OrbitControls(camera, canvas);
@@ -113,11 +112,11 @@ export function createScene(canvas) {
   controls.autoRotateSpeed = 0.7;
   controls.target.set(0, 4, 0);
 
-  scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x1a1410, 1.0));
+  scene.add(new THREE.HemisphereLight(0xeaf3ff, 0xb7aa91, 1.35));
   const sun = new THREE.DirectionalLight(0xffffff, 1.35);
   sun.position.set(60, 95, 35);
   scene.add(sun);
-  const fill = new THREE.DirectionalLight(0x88aaff, 0.35);
+  const fill = new THREE.DirectionalLight(0xb9d2e8, 0.45);
   fill.position.set(-50, 40, -60);
   scene.add(fill);
 
@@ -143,13 +142,35 @@ export function createScene(canvas) {
   }
 
   function onResize() {
-    camera.aspect = innerWidth / innerHeight;
+    const width = Math.max(1, canvas.clientWidth);
+    const height = Math.max(1, canvas.clientHeight);
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
+    renderer.setSize(width, height, false);
   }
+  onResize();
   addEventListener('resize', onResize);
+  const resizeObserver = typeof ResizeObserver === 'undefined'
+    ? null
+    : new ResizeObserver(onResize);
+  resizeObserver?.observe(canvas);
 
-  return { THREE, renderer, scene, camera, controls, animate, flyTo, isFlying: () => !!fly };
+  return {
+    THREE,
+    renderer,
+    scene,
+    camera,
+    controls,
+    animate,
+    flyTo,
+    isFlying: () => !!fly,
+    destroy() {
+      resizeObserver?.disconnect();
+      removeEventListener('resize', onResize);
+      controls.dispose();
+      renderer.dispose();
+    },
+  };
 }
 
 // Instanced seat mesh from placement data. Each placement supplies
