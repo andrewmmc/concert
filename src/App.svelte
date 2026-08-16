@@ -168,7 +168,7 @@
     }
 
     function viewSeatSurroundings(i) {
-      const view = getSeatSurroundingsView(placements[i], stage);
+      const view = getSeatSurroundingsView(placements[i]);
       seatViewMode = 'surroundings';
       flyTo(view.target, view.cameraPosition);
     }

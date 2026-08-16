@@ -130,27 +130,17 @@ test('getSeatView places the camera at seated eye height facing the stage', () =
   stage.geometry.dispose();
 });
 
-test('getSeatSurroundingsView frames the seat from above and behind', () => {
-  const stage = new THREE.Mesh(new THREE.BoxGeometry(10, 1.2, 6));
-  stage.position.set(0, 0.6, 0);
+test('getSeatSurroundingsView restores the elevated seat-area overview', () => {
   const placement = { x: 10, y: 2, z: 20, yaw: 0 };
 
-  const { target, cameraPosition } = getSeatSurroundingsView(placement, stage);
+  const { target, cameraPosition } = getSeatSurroundingsView(placement);
 
   closeTo(target.x, placement.x);
-  closeTo(target.y, 2.42);
+  closeTo(target.y, 2.5);
   closeTo(target.z, placement.z);
-  closeTo(cameraPosition.y, 7.4);
-  closeTo(Math.hypot(cameraPosition.x - placement.x, cameraPosition.z - placement.z), 7);
-
-  const awayFromStage = new THREE.Vector2(placement.x, placement.z).normalize();
-  const cameraOffset = new THREE.Vector2(
-    cameraPosition.x - placement.x,
-    cameraPosition.z - placement.z,
-  ).normalize();
-  closeTo(cameraOffset.dot(awayFromStage), 1);
-
-  stage.geometry.dispose();
+  closeTo(cameraPosition.x, 4.5);
+  closeTo(cameraPosition.y, 17);
+  closeTo(cameraPosition.z, 9);
 });
 
 test('getSeatView rejects incomplete inputs', () => {
@@ -158,4 +148,5 @@ test('getSeatView rejects incomplete inputs', () => {
   assert.throws(() => getSeatView({ x: 0, y: 0, z: 0 }, null), TypeError);
   assert.throws(() => getSeatView({ x: 0, y: 0, z: 0 }, new THREE.Group()), TypeError);
   assert.throws(() => getSeatView({ x: 0, y: NaN, z: 0 }, new THREE.Mesh()), TypeError);
+  assert.throws(() => getSeatSurroundingsView({ x: 0, y: NaN, z: 0 }), TypeError);
 });

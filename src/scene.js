@@ -11,12 +11,17 @@ export const PIN   = new THREE.Color('#22d3ee');
 
 const SEATED_EYE_HEIGHT = 1.28;
 const SEATED_FORWARD_OFFSET = 0.14;
-const SEAT_AREA_DISTANCE = 7;
-const SEAT_AREA_HEIGHT = 5.4;
+
+function validateSeatPlacement(placement) {
+  if (!placement || ![placement.x, placement.y, placement.z].every(Number.isFinite)) {
+    throw new TypeError('A valid seat placement is required.');
+  }
+}
 
 function seatViewBounds(placement, stage) {
-  if (!placement || ![placement.x, placement.y, placement.z].every(Number.isFinite) || !stage?.isObject3D) {
-    throw new TypeError('A seat placement and stage Object3D are required.');
+  validateSeatPlacement(placement);
+  if (!stage?.isObject3D) {
+    throw new TypeError('A stage Object3D is required.');
   }
 
   const stageBounds = new THREE.Box3().setFromObject(stage);
@@ -45,24 +50,14 @@ export function getSeatView(placement, stage) {
   return { target, cameraPosition };
 }
 
-export function getSeatSurroundingsView(placement, stage) {
-  const stageBounds = seatViewBounds(placement, stage);
-  const stageCenter = stageBounds.getCenter(new THREE.Vector3());
-  const target = new THREE.Vector3(placement.x, placement.y + 0.42, placement.z);
-  const awayFromStage = target.clone().sub(stageCenter);
-  awayFromStage.y = 0;
-
-  if (awayFromStage.lengthSq() === 0) {
-    awayFromStage.set(
-      -Math.sin(placement.yaw || 0),
-      0,
-      -Math.cos(placement.yaw || 0),
-    );
-  }
-
-  const cameraPosition = target.clone()
-    .addScaledVector(awayFromStage.normalize(), SEAT_AREA_DISTANCE);
-  cameraPosition.y = placement.y + SEAT_AREA_HEIGHT;
+export function getSeatSurroundingsView(placement) {
+  validateSeatPlacement(placement);
+  const target = new THREE.Vector3(placement.x, placement.y + 0.5, placement.z);
+  const cameraPosition = new THREE.Vector3(
+    placement.x * 0.45,
+    placement.y + 15,
+    placement.z * 0.45,
+  );
 
   return { target, cameraPosition };
 }
