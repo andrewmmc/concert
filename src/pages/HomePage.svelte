@@ -60,6 +60,6 @@
     <div><p class="eyebrow">{t('venueDirectoryEyebrow')}</p><h2>{t('venueDirectoryTitle')}</h2></div>
     <p>{t('venueDirectoryBody')}</p>
   </div>
-  <VenueGrid venues={venues.slice(0, 3)} {locale} onSelect={onSelectVenue} featuredFirst compact />
+  <VenueGrid {venues} {locale} onSelect={onSelectVenue} featuredFirst compact />
   <button class="wide-link" onclick={() => onNavigate('venues')}>{t('compareVenues')} <span>→</span></button>
 </section>

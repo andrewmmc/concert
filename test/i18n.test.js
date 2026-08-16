@@ -40,6 +40,8 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(TRADITIONAL_CHINESE, 'exploreOtherArenas'), '探索其他場館');
   assert.equal(translate(ENGLISH, 'guidePageTitle'), 'The things worth knowing before show day.');
   assert.equal(translate(TRADITIONAL_CHINESE, 'openDedicatedViewer'), '開啟獨立 3D 座位視圖');
+  assert.equal(translate(ENGLISH, 'venueDirectoryTitle'), 'Venue directory');
+  assert.equal(translate(TRADITIONAL_CHINESE, 'venueDirectoryTitle'), '場館目錄');
   assert.equal(copy.name, '香港體育館');
   assert.equal(copy.layoutName, '三面台');
   assert.equal(copy.sides[0], '紅閘 40 段');
