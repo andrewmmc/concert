@@ -1,0 +1,68 @@
+---
+import VenueGrid from '../components/VenueGrid.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ENGLISH, translate } from '../lib/i18n.js';
+import { venues } from '../venues/index.js';
+
+const t = (key) => translate(ENGLISH, key);
+---
+
+<BaseLayout currentPage="home">
+  <section class="hero">
+    <div class="hero-copy reveal">
+      <p class="eyebrow" data-i18n="portalEyebrow">{t('portalEyebrow')}</p>
+      <h1><span data-i18n="heroTitle">{t('heroTitle')}</span> <em data-i18n="heroTitleAccent">{t('heroTitleAccent')}</em></h1>
+      <p class="hero-body" data-i18n="heroBody">{t('heroBody')}</p>
+      <div class="hero-actions">
+        <a class="button-primary" href="/guide/">
+          <span data-i18n="beforeYouGo">{t('beforeYouGo')}</span><span aria-hidden="true">↘</span>
+        </a>
+        <a class="button-link" href="/concerts/">
+          <span data-i18n="seeAllConcerts">{t('seeAllConcerts')}</span><span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>{venues.length}</strong><span data-i18n="modelsAvailable">{t('modelsAvailable')}</span></div>
+        <div><strong>繁 / EN</strong><span data-i18n="bilingualGuide">{t('bilingualGuide')}</span></div>
+        <div><strong>852</strong><span data-i18n="builtForHongKong">{t('builtForHongKong')}</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal delay-one" aria-hidden="true">
+      <div class="city-card">
+        <div class="city-card-head"><span data-i18n="tonightInHongKong">{t('tonightInHongKong')}</span><span>20:15 HKT</span></div>
+        <div class="route-map">
+          <div class="route-line"></div>
+          <span class="station station-one"><i></i>HUNG HOM</span>
+          <span class="station station-two"><i></i>KAI TAK</span>
+          <span class="station station-three"><i></i>ASIAWORLD</span>
+          <div class="pulse-ring"></div>
+        </div>
+        <div class="city-card-foot"><span data-i18n="cityNote">{t('cityNote')}</span><b>22°19'N<br />114°10'E</b></div>
+      </div>
+      <div class="ticket-strip">LIVE / PLAN / GO / 852 / LIVE / PLAN / GO</div>
+      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+    </div>
+  </section>
+
+  <section class="portal-paths">
+    <div class="section-heading">
+      <div><p class="eyebrow" data-i18n="homePathEyebrow">{t('homePathEyebrow')}</p><h2 data-i18n="homePathTitle">{t('homePathTitle')}</h2></div>
+      <p data-i18n="homePathBody">{t('homePathBody')}</p>
+    </div>
+    <div class="path-grid">
+      <article><span>01</span><h3 data-i18n="beforeYouGo">{t('beforeYouGo')}</h3><p data-i18n="beforeYouGoBody">{t('beforeYouGoBody')}</p><a href="/guide/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
+      <article><span>02</span><h3 data-i18n="seeAllConcerts">{t('seeAllConcerts')}</h3><p data-i18n="seeAllConcertsBody">{t('seeAllConcertsBody')}</p><a href="/concerts/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
+      <article><span>03</span><h3 data-i18n="compareVenues">{t('compareVenues')}</h3><p data-i18n="compareVenuesBody">{t('compareVenuesBody')}</p><a href="/venues/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
+    </div>
+  </section>
+
+  <section class="home-venue-preview">
+    <div class="section-heading">
+      <div><p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p><h2 data-i18n="venueDirectoryTitle">{t('venueDirectoryTitle')}</h2></div>
+      <p data-i18n="venueDirectoryBody">{t('venueDirectoryBody')}</p>
+    </div>
+    <VenueGrid venues={venues} featuredFirst compact />
+    <a class="wide-link" href="/venues/"><span data-i18n="compareVenues">{t('compareVenues')}</span><span>→</span></a>
+  </section>
+</BaseLayout>

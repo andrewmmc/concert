@@ -1,0 +1,28 @@
+---
+import { ENGLISH, translate } from '../lib/i18n.js';
+
+const { currentPage = '' } = Astro.props;
+const t = (key) => translate(ENGLISH, key);
+---
+
+<header class="topbar">
+  <a class="brand" href="/" aria-label={t('siteName')}>
+    <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span data-i18n="shortBrand">{t('shortBrand')}</span>
+  </a>
+
+  <nav aria-label={t('navLabel')} data-i18n-aria-label="navLabel">
+    <a class:list={{ active: currentPage === 'home' }} href="/" data-i18n="navHome">{t('navHome')}</a>
+    <a class:list={{ active: currentPage === 'guide' }} href="/guide/" data-i18n="navGuide">{t('navGuide')}</a>
+    <a class:list={{ active: currentPage === 'concerts' }} href="/concerts/" data-i18n="navConcerts">{t('navConcerts')}</a>
+    <a class:list={{ active: currentPage === 'venues' || currentPage === 'venue' }} href="/venues/" data-i18n="navVenues">{t('navVenues')}</a>
+  </nav>
+
+  <div class="top-actions">
+    <div class="language-switcher" role="group" aria-label={t('language')} data-i18n-aria-label="language">
+      <button type="button" data-locale="zh-HK" aria-label={t('traditionalChinese')} data-i18n-aria-label="traditionalChinese">繁</button>
+      <button type="button" data-locale="en" aria-label={t('english')} data-i18n-aria-label="english">EN</button>
+    </div>
+    <a class="top-cta" href="/concerts/" data-i18n="navConcerts">{t('navConcerts')}</a>
+  </div>
+</header>

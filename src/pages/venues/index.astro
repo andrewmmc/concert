@@ -1,0 +1,19 @@
+---
+import VenueGrid from '../../components/VenueGrid.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ENGLISH, translate } from '../../lib/i18n.js';
+import { venues } from '../../venues/index.js';
+
+const t = (key) => translate(ENGLISH, key);
+---
+
+<BaseLayout currentPage="venues">
+  <section class="page-hero venues-hero">
+    <p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p>
+    <h1 data-i18n="venueIndexTitle">{t('venueIndexTitle')}</h1>
+    <p data-i18n="venueIndexBody">{t('venueIndexBody')}</p>
+  </section>
+  <section class="venue-directory-page">
+    <VenueGrid venues={venues} featuredFirst />
+  </section>
+</BaseLayout>

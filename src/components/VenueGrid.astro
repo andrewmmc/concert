@@ -1,0 +1,28 @@
+---
+import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../lib/i18n.js';
+
+const { venues, featuredFirst = false, compact = false } = Astro.props;
+const t = (key) => translate(ENGLISH, key);
+---
+
+<div class:list={['venue-grid', { 'compact-grid': compact }]}>
+  {venues.map((venue, index) => {
+    const english = getVenueText(ENGLISH, venue);
+    const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
+    return (
+      <article class:list={['venue-card', { featured: featuredFirst && index === 0 }]}>
+        <div class="venue-number">{String(index + 1).padStart(2, '0')}</div>
+        <div class="venue-graphic" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="venue-card-copy">
+          <p>{venue.id.toUpperCase()}</p>
+          <h3 data-en={english.name} data-zh-hk={chinese.name}>{english.name}</h3>
+          <span data-en={english.subtitle} data-zh-hk={chinese.subtitle}>{english.subtitle}</span>
+        </div>
+        <a href={`/venues/${venue.id}/`} aria-label={`${t('venueDetails')}: ${english.name}`}>
+          <span data-i18n="venueDetails">{t('venueDetails')}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </article>
+    );
+  })}
+</div>

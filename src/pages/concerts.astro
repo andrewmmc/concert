@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ENGLISH, translate } from '../lib/i18n.js';
+
+const t = (key) => translate(ENGLISH, key);
+const concerts = [
+  ['concertOne', 'concertOneMeta'],
+  ['concertTwo', 'concertTwoMeta'],
+  ['concertThree', 'concertThreeMeta'],
+];
+---
+
+<BaseLayout currentPage="concerts">
+  <section class="page-hero concerts-hero">
+    <p class="eyebrow" data-i18n="concertPageEyebrow">{t('concertPageEyebrow')}</p>
+    <h1 data-i18n="concertPageTitle">{t('concertPageTitle')}</h1>
+    <p data-i18n="concertPageBody">{t('concertPageBody')}</p>
+  </section>
+  <section class="concert-section standalone-concerts">
+    <div class="concert-board">
+      <div class="calendar-stamp"><span>AUG — DEC</span><strong>2026</strong><small data-i18n="calendarPreview">{t('calendarPreview')}</small></div>
+      <div class="concert-list">
+        {concerts.map(([title, meta], index) => (
+          <article>
+            <time>TBA</time>
+            <div><h3 data-i18n={title}>{t(title)}</h3><p data-i18n={meta}>{t(meta)}</p></div>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

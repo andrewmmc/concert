@@ -1,0 +1,67 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import '../app.css';
+
+const {
+  currentPage = '',
+  description = 'A bilingual Hong Kong concert portal with interactive 3D venue seating plans, transport guides and community features.',
+  title = 'Hong Kong Concert Guide',
+  titleZh = '香港演唱會指南',
+  venueId,
+  layoutId,
+  viewer = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class:list={{ 'viewer-open': viewer }}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={viewer ? '#05070c' : '#fffdf8'} />
+    <meta name="color-scheme" content={viewer ? 'dark' : 'light'} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="Plan your next Hong Kong concert with interactive 3D venue views and practical local guides." />
+    <script is:inline>
+      (() => {
+        const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+        if (!parts.length) return;
+        if (parts[0] === 'venue' && parts[1]) {
+          location.replace(`/venues/${parts[1]}/`);
+          return;
+        }
+        const portalRoutes = new Set(['guide', 'concerts', 'venues']);
+        if (portalRoutes.has(parts[0])) {
+          location.replace(`/${parts[0]}/`);
+          return;
+        }
+        if (parts.length >= 2) location.replace(`/viewer/${parts[0]}/${parts[1]}/`);
+      })();
+    </script>
+  </head>
+  <body
+    class:list={{ 'viewer-open': viewer }}
+    data-venue-id={venueId}
+    data-layout-id={layoutId}
+    data-title-en={title}
+    data-title-zh-hk={titleZh}
+  >
+    <div class:list={['portal', { 'viewer-shell': viewer }]} id="top">
+      {!viewer && <Header currentPage={currentPage} />}
+      <main class:list={{ 'viewer-main': viewer }}>
+        <slot />
+      </main>
+      {!viewer && <Footer />}
+    </div>
+
+    <script>
+      import { initializeLocale } from '../scripts/locale.js';
+      initializeLocale();
+    </script>
+  </body>
+</html>

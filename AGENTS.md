@@ -3,14 +3,17 @@
 ## Project overview
 
 This repository contains an interactive 3D seating-plan viewer for Hong Kong
-concert venues. It uses Svelte 5, Vite, Three.js, and native JavaScript ES
-modules. Keep changes focused and preserve the existing lightweight setup.
+concert venues. It uses Astro 5, Three.js, and native JavaScript ES modules.
+Keep changes focused and preserve the existing lightweight setup.
 
 ## Important paths
 
-- `src/App.svelte` — application UI and interaction state
+- `src/pages/` — Astro file-based routes
+- `src/layouts/BaseLayout.astro` — shared document shell and metadata
+- `src/components/` — reusable Astro components
+- `src/scripts/viewer.js` — client-side 3D viewer controller
 - `src/scene.js` — shared Three.js scene and geometry helpers
-- `src/lib/router.js` — hash-based routing
+- `src/lib/router.js` — legacy hash-route compatibility helpers
 - `src/venues/` — venue metadata and 3D model builders
 - `test/` — unit tests using Node.js's built-in test runner
 - `.github/workflows/` — GitHub Actions workflows
@@ -30,12 +33,15 @@ Use `npm ci` rather than `npm install` in CI.
 ## Coding conventions
 
 - Use JavaScript ES modules and preserve the repository's semicolon style.
-- Follow existing Svelte 5 rune patterns in components.
+- Prefer static Astro components and server-rendered markup.
+- Use framework-free client scripts for browser interaction; load Three.js only
+  on viewer routes.
 - Keep reusable Three.js geometry and scene behavior in `src/scene.js`.
 - Keep venue-specific dimensions, seat rules, labels, and model construction in
   the relevant module under `src/venues/`.
 - Register new venues in `src/venues/index.js`.
-- Preserve the route format `#/<venue>/<layout>`.
+- Preserve redirects from legacy `#/<venue>/<layout>` links.
+- Use `/viewer/<venue>/<layout>/` for canonical viewer routes.
 - Avoid introducing a framework, dependency, or abstraction when the native
   platform or an existing project helper is sufficient.
 - Do not edit generated files under `dist/` directly.

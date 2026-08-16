@@ -19,14 +19,14 @@ for a specific seat, and fly the camera straight to it.
 
 | Venue | Layouts | Route |
 |-------|---------|-------|
-| **Hong Kong Coliseum** 香港體育館 | Centre Stage 四面台 (360°) | `#/hkc/center-stage` |
-| | End Stage 三面台 (with arena-floor Brown Gate blocks) | `#/hkc/end-stage` |
-| **Queen Elizabeth Stadium** 伊利沙伯體育館 | Five arena layouts | `#/qes/end-stage` |
-| **Kai Tak Arena** 啟德體藝館 | End Stage 正面舞台 | `#/kta/end-stage` |
-| **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `#/kts/stadium` |
-| **AsiaWorld Expo (Hall 1 Arena)** 亞洲國際博覽館 | EDAN LUI 2023 End Stage | `#/awe/end-stage` |
-| **AsiaWorld Expo (Halls 6, 8 & 10)** 亞洲國際博覽館 | TH8400 End Stage | `#/awe-halls/th8400` |
-| | TH5600 End Stage (Halls 8 & 10) | `#/awe-halls/th5600` |
+| **Hong Kong Coliseum** 香港體育館 | Centre Stage 四面台 (360°) | `/viewer/hkc/center-stage/` |
+| | End Stage 三面台 (with arena-floor Brown Gate blocks) | `/viewer/hkc/end-stage/` |
+| **Queen Elizabeth Stadium** 伊利沙伯體育館 | Five arena layouts | `/viewer/qes/end-stage/` |
+| **Kai Tak Arena** 啟德體藝館 | End Stage 正面舞台 | `/viewer/kta/end-stage/` |
+| **Kai Tak Stadium** 啟德主場館 | Fixed stadium seating plan | `/viewer/kts/stadium/` |
+| **AsiaWorld Expo (Hall 1 Arena)** 亞洲國際博覽館 | EDAN LUI 2023 End Stage | `/viewer/awe/end-stage/` |
+| **AsiaWorld Expo (Halls 6, 8 & 10)** 亞洲國際博覽館 | TH8400 End Stage | `/viewer/awe-halls/th8400/` |
+| | TH5600 End Stage (Halls 8 & 10) | `/viewer/awe-halls/th5600/` |
 
 The Kai Tak Stadium model follows the row domains and gate totals printed on
 the project source drawing. Level 2 row depth varies by stand: the inset north
@@ -63,15 +63,18 @@ two arena-floor wheelchair seating zones.
 
 ## Tech stack
 
-- **Svelte 5** (runes) + **Vite 8**
+- **Astro 5** with static, file-based routes and framework-free client scripts
 - **three.js** for the 3D scene (instanced seats, raycast picking, orbit controls)
-- Hash routing — `#/<venue>/<layout>`
+- Generated viewer routes — `/viewer/<venue>/<layout>/`
+
+Legacy hash links such as `#/<venue>/<layout>` redirect to the matching Astro
+route.
 
 ## Getting started
 
 ```bash
 npm install
-npm run dev      # → http://localhost:5173
+npm run dev      # → http://localhost:4321
 ```
 
 Production build:
@@ -91,7 +94,8 @@ Venues are data modules under `src/venues/`:
    (`{ target: [x, y, z], position: [x, y, z] }`) frames the initial view;
    missing entries fall back to the default framing.
 2. Register it in `src/venues/index.js` (`venues` array).
-3. It's automatically available at `#/<id>/<layout>` and in the venue picker.
+3. Astro generates its venue and viewer pages at build time, and the venue
+   picker includes it automatically.
 
 ## Data sources
 

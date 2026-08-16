@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../../../lib/i18n.js';
+import { venues } from '../../../venues/index.js';
+
+export function getStaticPaths() {
+  return venues.flatMap((venue) => venue.layouts
+    .filter((layout) => !layout.comingSoon)
+    .map((layout) => ({
+      params: { venue: venue.id, layout: layout.id },
+      props: { venue, layout },
+    })));
+}
+
+const { venue, layout } = Astro.props;
+const t = (key) => translate(ENGLISH, key);
+const text = getVenueText(ENGLISH, venue, layout);
+const chineseText = getVenueText(TRADITIONAL_CHINESE, venue, layout);
+---
+
+<BaseLayout
+  viewer
+  venueId={venue.id}
+  layoutId={layout.id}
+  title={`${text.name} — ${t('siteName')}`}
+  titleZh={`${chineseText.name} — ${translate(TRADITIONAL_CHINESE, 'siteName')}`}
+>
+  <section
+    class="viewer-section viewer-page"
+    data-viewer
+    data-venue-id={venue.id}
+    data-layout-id={layout.id}
+  >
+    <div class="viewer-topbar">
+      <a class="viewer-back" href={`/venues/${venue.id}/`}>← <span data-i18n="viewerBackToVenue">{t('viewerBackToVenue')}</span></a>
+      <span><span data-i18n="viewerModeLabel">{t('viewerModeLabel')}</span> / {venue.id.toUpperCase()}</span>
+      <div class="viewer-language" role="group" aria-label={t('language')} data-i18n-aria-label="language">
+        <button type="button" data-locale="zh-HK" aria-label={t('traditionalChinese')} data-i18n-aria-label="traditionalChinese">繁</button>
+        <button type="button" data-locale="en" aria-label={t('english')} data-i18n-aria-label="english">EN</button>
+      </div>
+    </div>
+
+    <div class="viewer-frame">
+      <div class="canvas-stage">
+        <div class="canvas-label"><i></i><span data-i18n="liveModel">{t('liveModel')}</span></div>
+        <button class="canvas-reset" type="button" data-action="reset" aria-label={t('resetCamera')} data-i18n-aria-label="resetCamera">
+          <span aria-hidden="true">↺</span> <span data-i18n="resetView">{t('resetView')}</span>
+        </button>
+        <canvas id="scene" aria-label={t('canvasLabel')} data-i18n-aria-label="canvasLabel"></canvas>
+        <div class="canvas-hint" data-i18n="controlsHint">{t('controlsHint')}</div>
+      </div>
+
+      <aside class="viewer-panel">
+        <div class="panel-kicker" data-i18n="viewerPanelLabel">{t('viewerPanelLabel')}</div>
+        <h3 data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</h3>
+        <p class="venue-meta" data-en={text.layoutName} data-zh-hk={chineseText.layoutName}>{text.layoutName}</p>
+
+        <div class="picker-stack">
+          <label>
+            <span data-i18n="venue">{t('venue')}</span>
+            <select class="picker" data-picker="venue" aria-label={t('venue')} data-i18n-aria-label="venue">
+              {venues.map((item) => {
+                const optionText = getVenueText(ENGLISH, item).name;
+                const chineseText = getVenueText('zh-HK', item).name;
+                return <option value={item.id} selected={item.id === venue.id} data-en={optionText} data-zh-hk={chineseText}>{optionText}</option>;
+              })}
+            </select>
+          </label>
+          <label>
+            <span data-i18n="seatingLayout">{t('seatingLayout')}</span>
+            <select class="picker" data-picker="layout" aria-label={t('seatingLayout')} data-i18n-aria-label="seatingLayout">
+              {venue.layouts.map((item) => {
+                const optionText = getVenueText(ENGLISH, venue, item).layoutName;
+                const chineseText = getVenueText('zh-HK', venue, item).layoutName;
+                return (
+                  <option
+                    value={item.id}
+                    selected={item.id === layout.id}
+                    disabled={item.comingSoon}
+                    data-en={item.comingSoon ? `${optionText} (${t('comingSoon')})` : optionText}
+                    data-zh-hk={item.comingSoon ? `${chineseText} (${translate('zh-HK', 'comingSoon')})` : chineseText}
+                  >
+                    {item.comingSoon ? `${optionText} (${t('comingSoon')})` : optionText}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+        </div>
+
+        <p class="model-note"><span data-en={text.dims} data-zh-hk={chineseText.dims}>{text.dims}</span><span data-i18n="sentenceEnd">{t('sentenceEnd')}</span></p>
+
+        <div class="legend">
+          {venue.sides.map((side, index) => (
+            <span class="chip">
+              <i style={`background:${side.color}`}></i>
+              <span data-en={text.sides[index]} data-zh-hk={chineseText.sides[index]}>{text.sides[index]}</span>
+            </span>
+          ))}
+        </div>
+
+        <div class="panel-rule"></div>
+
+        <div class="search-block">
+          <div class="search-label" data-i18n="findSeat">{t('findSeat')}</div>
+          <div class="fields">
+            <input data-search="section" type="text" placeholder={t('sectionShort')} data-i18n-placeholder="sectionShort" maxlength="3" aria-label={t('section')} data-i18n-aria-label="section" />
+            <input data-search="row" type="text" placeholder={t('row')} data-i18n-placeholder="row" maxlength="3" aria-label={t('row')} data-i18n-aria-label="row" />
+            <input data-search="seat" type="text" inputmode="numeric" placeholder={t('seat')} data-i18n-placeholder="seat" maxlength="4" aria-label={t('seat')} data-i18n-aria-label="seat" />
+            <button class="search-go" type="button" data-action="search" aria-label={t('goToSeat')} data-i18n-aria-label="goToSeat">→</button>
+          </div>
+          <div class="search-message" data-search-message aria-live="polite"></div>
+        </div>
+
+        <div class="seat-card" data-seat-card>
+          <div class="seat-copy" aria-live="polite">
+            <div class="cap" data-i18n="seat">{t('seat')}</div>
+            <div class="seat-name" data-seat-main>{t('noSeatSelected')}</div>
+            <div class="seat-sub" data-seat-sub>{t('selectSeatHint')}</div>
+          </div>
+          <div class="seat-actions" data-seat-actions hidden>
+            <button class="view-seat stage" type="button" data-action="stage-view" data-i18n="viewFromSeat">{t('viewFromSeat')}</button>
+            <button class="view-seat surroundings" type="button" data-action="surroundings-view" data-i18n="seatSurroundings">{t('seatSurroundings')}</button>
+            <button class="clear" type="button" data-action="clear" aria-label={t('unselectSeat')} data-i18n-aria-label="unselectSeat">×</button>
+          </div>
+        </div>
+
+        <button class="settings-toggle" type="button" data-action="settings" aria-expanded="false" aria-controls="portal-settings">
+          <span data-i18n="settings">{t('settings')}</span><span aria-hidden="true" data-settings-symbol>+</span>
+        </button>
+        <div class="portal-settings" id="portal-settings" hidden>
+          <div class="setting-row"><span data-i18n="autoRotate">{t('autoRotate')}</span>
+            <label class="switch"><input type="checkbox" data-setting="auto-rotate" /><span class="slider"></span></label></div>
+          <div class="setting-row"><span data-en={text.roofLabel || t('roofStructure')} data-zh-hk={chineseText.roofLabel || translate(TRADITIONAL_CHINESE, 'roofStructure')}>{text.roofLabel || t('roofStructure')}</span>
+            <label class="switch"><input type="checkbox" data-setting="roof" checked /><span class="slider"></span></label></div>
+          <div class="setting-row"><span data-i18n="sideLabels">{t('sideLabels')}</span>
+            <label class="switch"><input type="checkbox" data-setting="labels" checked /><span class="slider"></span></label></div>
+        </div>
+
+        {(layout.planUrl || venue.planUrl) && (
+          <a class="plan-link" href={layout.planUrl || venue.planUrl} target="_blank" rel="noopener noreferrer">
+            <span data-i18n="officialPlan">{t('officialPlan')}</span><span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  <div id="tooltip" aria-hidden="true" hidden><b></b><br /><span class="dim"></span></div>
+
+  <script>
+    import { initializeViewer } from '../../../scripts/viewer.js';
+    initializeViewer();
+  </script>
+</BaseLayout>

@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ENGLISH, translate } from '../lib/i18n.js';
+
+const t = (key) => translate(ENGLISH, key);
+const guides = [
+  ['guideTicketTitle', 'guideTicketBody'],
+  ['guideArrivalTitle', 'guideArrivalBody'],
+  ['guideInsideTitle', 'guideInsideBody'],
+  ['guideAfterTitle', 'guideAfterBody'],
+  ['guideAccessibilityTitle', 'guideAccessibilityBody'],
+];
+---
+
+<BaseLayout currentPage="guide">
+  <section class="page-hero guide-hero">
+    <p class="eyebrow" data-i18n="guidePageEyebrow">{t('guidePageEyebrow')}</p>
+    <h1 data-i18n="guidePageTitle">{t('guidePageTitle')}</h1>
+    <p data-i18n="guidePageBody">{t('guidePageBody')}</p>
+  </section>
+  <section class="guide-grid">
+    {guides.map(([title, body], index) => (
+      <article>
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <h2 data-i18n={title}>{t(title)}</h2>
+        <p data-i18n={body}>{t(body)}</p>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
