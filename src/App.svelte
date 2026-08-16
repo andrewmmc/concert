@@ -3,12 +3,38 @@
   import { createScene, HOVER, PIN } from './scene.js';
   import { venues } from './venues/index.js';
   import { parseHash, goTo, onRoute } from './lib/router.js';
+  import {
+    ENGLISH,
+    TRADITIONAL_CHINESE,
+    describeSeat,
+    describeStage,
+    describeWheelchair,
+    getVenueText,
+    initialLocale,
+    saveLocale,
+    translate,
+    updateDocumentLocale,
+  } from './lib/i18n.js';
 
-  const siteName = 'Hong Kong Concert Seats View';
+  function browserStorage() {
+    try {
+      return globalThis.localStorage;
+    } catch {
+      return undefined;
+    }
+  }
+
+  const storage = browserStorage();
+  const startingLocale = initialLocale({
+    storage,
+    languages: globalThis.navigator?.languages || [globalThis.navigator?.language],
+  });
 
   let route = $state(parseHash());
   let venue = $derived(route.venue);
   let layout = $derived(route.layout);
+  let locale = $state(startingLocale);
+  let text = $derived(getVenueText(locale, venue, layout));
 
   let canvas;
   let autoRotate = $state(false);
@@ -17,8 +43,8 @@
   let settingsOpen = $state(false);
   let inSec = $state(''), inRow = $state(''), inSeat = $state('');
   let searchMsg = $state('');
-  let seatMain = $state('— no seat selected —');
-  let seatSub = $state('Click a seat to select it');
+  let seatMain = $state(translate(startingLocale, 'noSeatSelected'));
+  let seatSub = $state(translate(startingLocale, 'selectSeatHint'));
   let pinned = $state(false);
   let tooltip = $state({ show: false, x: 0, y: 0, main: '', sub: '' });
   let tooltipEl;
@@ -26,7 +52,13 @@
   let engine;
   let modelGroup, buildSceneFn;
   let hoveredId = -1, pinnedId = -1;
-  let restoreFn, pickFn, flyFn, goSeatFn, clearPinFn;
+  let restoreFn, pickFn, flyFn, goSeatFn, clearPinFn, refreshLocalizedInfoFn;
+
+  const t = (key) => translate(locale, key);
+
+  $effect(() => {
+    updateDocumentLocale(locale);
+  });
 
   onMount(() => {
     route = parseHash();
@@ -94,8 +126,25 @@
     const base = (i) => new engine.THREE.Color(baseColors[i * 3], baseColors[i * 3 + 1], baseColors[i * 3 + 2]);
     restoreFn = (i) => { if (i < 0 || i === pinnedId) return; setColor(i, base(i)); };
 
-    function showInfo(p) { const d = describe(p); seatMain = d.main; seatSub = d.sub; }
-    function clearInfo() { seatMain = '— no seat selected —'; seatSub = 'Click a seat to select it'; }
+    function localizedSeat(p) {
+      return describeSeat(locale, venue, p, describe(p));
+    }
+    function showInfo(p) { const d = localizedSeat(p); seatMain = d.main; seatSub = d.sub; }
+    function clearInfo() {
+      seatMain = t('noSeatSelected');
+      seatSub = t('selectSeatHint');
+    }
+    refreshLocalizedInfoFn = () => {
+      searchMsg = '';
+      tooltip = { ...tooltip, show: false };
+      if (pinnedId >= 0) showInfo(placements[pinnedId]);
+      else clearInfo();
+      if (hoveredId >= 0) {
+        restoreFn(hoveredId);
+        hoveredId = -1;
+      }
+      mouseDirty = true;
+    };
 
     function clearPin() {
       // clear every highlighted seat (pinned + hovered)
@@ -160,17 +209,28 @@
       }
       if (hit.object === stage) {
         if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
-        tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: stage.userData.label, sub: 'Performance area' };
-        canvas.classList.add('hovering'); return;
-      }
-      if (hit.object.userData.wp) {
-        if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
         tooltip = {
           show: true,
           x: tooltip.x,
           y: tooltip.y,
-          main: hit.object.userData.main || `Wheelchair Platform WP${hit.object.userData.wp}`,
-          sub: hit.object.userData.sub || 'Promenade · rows 14–15 · wheelchair patron + minder',
+          main: describeStage(locale, venue, layout, stage.userData.label),
+          sub: t('performanceArea'),
+        };
+        canvas.classList.add('hovering'); return;
+      }
+      if (hit.object.userData.wp) {
+        if (hoveredId >= 0) { restoreFn(hoveredId); hoveredId = -1; }
+        const wheelchair = describeWheelchair(locale, {
+          id: hit.object.userData.wp,
+          main: hit.object.userData.main,
+          sub: hit.object.userData.sub,
+        });
+        tooltip = {
+          show: true,
+          x: tooltip.x,
+          y: tooltip.y,
+          main: wheelchair.main || `${t('wheelchairPlatform')} WP${hit.object.userData.wp}`,
+          sub: wheelchair.sub || t('wheelchairDetails'),
         };
         canvas.classList.add('hovering'); return;
       }
@@ -178,7 +238,7 @@
       if (id !== hoveredId) {
         restoreFn(hoveredId); hoveredId = id;
         setColor(hoveredId, HOVER);
-        const p = placements[hoveredId], d = describe(p);
+        const p = placements[hoveredId], d = localizedSeat(p);
         tooltip = { show: true, x: tooltip.x, y: tooltip.y, main: d.main, sub: d.sub };
         canvas.classList.add('hovering');
       }
@@ -202,7 +262,7 @@
     goSeatFn = () => {
       const key = `${inSec.trim().toUpperCase()}-${inRow.trim().toUpperCase()}-${inSeat.trim().toUpperCase()}`;
       const i = seatIndex.get(key);
-      if (i === undefined) { searchMsg = 'Seat not found — check Sec / Row / Seat.'; return; }
+      if (i === undefined) { searchMsg = t('seatNotFound'); return; }
       searchMsg = '';
       selectSeat(i);
     };
@@ -239,45 +299,70 @@
   function onKey(e) { if (e.key === 'Enter') goSeat(); }
   function selectVenue(e) { goTo(e.currentTarget.value, layout?.id); }
   function selectLayout(e) { goTo(venue.id, e.currentTarget.value); }
+  function changeLocale(nextLocale) {
+    if (locale === nextLocale) return;
+    locale = nextLocale;
+    saveLocale(locale, storage);
+    refreshLocalizedInfoFn?.();
+    if (!refreshLocalizedInfoFn) {
+      seatMain = t('noSeatSelected');
+      seatSub = t('selectSeatHint');
+    }
+  }
 </script>
 
-<canvas bind:this={canvas} id="scene" role="img" aria-label="3D view of the venue seating plan. Hover or click a seat to select it, or search for a seat by section, row and seat number."></canvas>
+<canvas bind:this={canvas} id="scene" role="img" aria-label={t('canvasLabel')}></canvas>
 
 <div id="header" class="card">
-  <div class="site">{siteName}</div>
-  <h1><span class="zh">{venue.zh}</span> {venue.name}</h1>
+  <div class="site">{t('siteName')}</div>
+  <h1>{text.name}</h1>
 
   <div class="pickers">
-    <select class="picker" value={venue.id} onchange={selectVenue} aria-label="Venue">
+    <select class="picker" value={venue.id} onchange={selectVenue} aria-label={t('venue')}>
       {#each venues as v}
-        <option value={v.id} selected={v.id === venue.id}>{v.zh} {v.name}</option>
+        <option value={v.id} selected={v.id === venue.id}>{getVenueText(locale, v).name}</option>
       {/each}
     </select>
     {#if venue.layouts && venue.layouts.length}
-      <select class="picker" value={layout?.id} onchange={selectLayout} aria-label="Seating layout">
+      <select class="picker" value={layout?.id} onchange={selectLayout} aria-label={t('seatingLayout')}>
         {#each venue.layouts as l}
           <option value={l.id} selected={l.id === layout?.id} disabled={l.comingSoon}>
-            {l.label} {l.zh}{l.comingSoon ? ' (coming soon)' : ''}
+            {getVenueText(locale, venue, l).layoutName}{l.comingSoon ? ` (${t('comingSoon')})` : ''}
           </option>
         {/each}
       </select>
     {/if}
   </div>
 
-  <p>Interactive 3D seating model — <b>{layout ? `${layout.label} ${layout.zh}` : venue.subtitle}</b>.<br>{layout?.dims || venue.dims}.<br>
-     Hover any seat for its <b>section · row · seat number</b>.</p>
+  <p>{t('modelIntro')} — <b>{layout ? text.layoutName : text.subtitle}</b>{t('sentenceEnd')}<br>{text.dims}{t('sentenceEnd')}<br>
+     {t('hoverIntro')} <b>{t('seatReference')}</b>{t('sentenceEnd')}</p>
 
   {#if layout?.planUrl || venue.planUrl}
     <a class="plan" href={layout?.planUrl || venue.planUrl} target="_blank" rel="noopener noreferrer">
-      📄 Official seating plan (PDF) ↗
+      📄 {t('officialPlan')} ↗
     </a>
   {/if}
 
   <div id="legend">
-    {#each venue.sides as s}
-      <span class="chip"><i style="background:{s.color}"></i>{s.name}</span>
+    {#each venue.sides as s, i}
+      <span class="chip"><i style="background:{s.color}"></i>{text.sides[i]}</span>
     {/each}
   </div>
+</div>
+
+<div id="language-switcher" class="card" role="group" aria-label={t('language')}>
+  <button
+    class:active={locale === TRADITIONAL_CHINESE}
+    onclick={() => changeLocale(TRADITIONAL_CHINESE)}
+    aria-label={t('traditionalChinese')}
+    aria-pressed={locale === TRADITIONAL_CHINESE}
+  >繁</button>
+  <button
+    class:active={locale === ENGLISH}
+    onclick={() => changeLocale(ENGLISH)}
+    aria-label={t('english')}
+    aria-pressed={locale === ENGLISH}
+  >EN</button>
 </div>
 
 <button
@@ -285,10 +370,10 @@
   class="card"
   class:active={settingsOpen}
   onclick={() => settingsOpen = !settingsOpen}
-  aria-label="Settings"
+  aria-label={t('settings')}
   aria-expanded={settingsOpen}
   aria-controls="settings"
-  title="Settings"
+  title={t('settings')}
 >
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
@@ -298,43 +383,43 @@
 
 {#if settingsOpen}
   <div id="settings" class="card">
-    <div class="settings-title">Settings</div>
-    <div class="row"><span>Auto-rotate</span>
+    <div class="settings-title">{t('settings')}</div>
+    <div class="row"><span>{t('autoRotate')}</span>
       <label class="switch"><input type="checkbox" bind:checked={autoRotate}><span class="slider"></span></label></div>
-    <div class="row"><span>{venue.roofLabel || 'Roof structure'}</span>
+    <div class="row"><span>{text.roofLabel || t('roofStructure')}</span>
       <label class="switch"><input type="checkbox" bind:checked={showRoof}><span class="slider"></span></label></div>
-    <div class="row"><span>Side labels</span>
+    <div class="row"><span>{t('sideLabels')}</span>
       <label class="switch"><input type="checkbox" bind:checked={showLabels}><span class="slider"></span></label></div>
   </div>
 {/if}
 
 <div id="search" class="card">
-  <div class="search-label">Find a seat</div>
+  <div class="search-label">{t('findSeat')}</div>
   <div class="search-content">
     <div class="fields">
-      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Sec"  maxlength="3" aria-label="Section">
-      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder="Row"  maxlength="3" aria-label="Row">
-      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder="Seat" maxlength="4" aria-label="Seat">
+      <input value={inSec}  oninput={e => inSec  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder={t('sectionShort')} maxlength="3" aria-label={t('section')}>
+      <input value={inRow}  oninput={e => inRow  = e.currentTarget.value} onkeydown={onKey} type="text" placeholder={t('row')} maxlength="3" aria-label={t('row')}>
+      <input value={inSeat} oninput={e => inSeat = e.currentTarget.value} onkeydown={onKey} type="text" inputmode="numeric" placeholder={t('seat')} maxlength="4" aria-label={t('seat')}>
     </div>
-    <button class="go" onclick={goSeat}>Go to seat</button>
+    <button class="go" onclick={goSeat}>{t('goToSeat')}</button>
   </div>
   <div id="searchmsg" aria-live="polite">{searchMsg}</div>
 </div>
 
 <div id="info" class="card">
   <div aria-live="polite">
-    <div class="cap">Seat</div>
+    <div class="cap">{t('seat')}</div>
     <div class="seat">{seatMain}</div>
     <div class="sub">{seatSub}</div>
   </div>
   {#if pinned}
-    <button class="clear" onclick={unselect}>✕ Unselect seat</button>
+    <button class="clear" onclick={unselect}>✕ {t('unselectSeat')}</button>
   {/if}
 </div>
 
-<div id="hint" class="card">Drag · orbit&nbsp;&nbsp;|&nbsp;&nbsp;Scroll · zoom&nbsp;&nbsp;|&nbsp;&nbsp;Right-drag · pan</div>
-<button id="reset-camera" class="card" onclick={resetCamera} aria-label="Reset camera position" title="Reset camera position">
-  <span aria-hidden="true">↺</span> Reset view
+<div id="hint" class="card">{t('controlsHint')}</div>
+<button id="reset-camera" class="card" onclick={resetCamera} aria-label={t('resetCamera')} title={t('resetCamera')}>
+  <span aria-hidden="true">↺</span> {t('resetView')}
 </button>
 
 {#if tooltip.show}
@@ -361,7 +446,7 @@
   #header { top: 16px; left: 16px; padding: 12px 16px; max-width: 350px; }
   #header .site { font-size: 10.5px; color: #7d8ca3; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 4px; }
   #header h1 { font-size: 17px; font-weight: 700; letter-spacing: .3px; }
-  #header h1 .zh { color: #ffd34d; }
+  #header h1 { color: #ffd34d; }
   .pickers { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .picker { flex: 1; min-width: 0; background: #0b1120; border: 1px solid rgba(120,150,200,.22); color: #dbe6f5;
     border-radius: 7px; padding: 6px 7px; font-size: 12px; outline: none; }
@@ -380,6 +465,11 @@
   #settings-button:hover, #settings-button.active { color: #fff; border-color: rgba(47,111,237,.8); background: rgba(32,49,82,.92); }
   #settings-button svg { display: block; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7;
     stroke-linecap: round; stroke-linejoin: round; }
+  #language-switcher { top: 16px; right: 68px; display: flex; padding: 3px; border-radius: 10px; }
+  #language-switcher button { min-width: 34px; height: 34px; padding: 0 8px; border: 0; border-radius: 7px;
+    background: transparent; color: #7d8ca3; font-size: 11px; font-weight: 700; cursor: pointer; }
+  #language-switcher button:hover { color: #dbe6f5; }
+  #language-switcher button.active { color: #07111e; background: #ffd34d; box-shadow: 0 2px 8px rgba(255,211,77,.22); }
   #settings { top: 68px; right: 16px; padding: 12px 14px; width: 228px; }
   #settings .settings-title { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
   #settings .row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 5px 0; }
@@ -432,6 +522,9 @@
   }
 
   @media (max-width: 460px) {
+    #header { max-width: calc(100vw - 112px); }
+    #language-switcher { top: 68px; right: 16px; }
+    #settings { top: 120px; }
     #search .search-content { display: block; }
     #search .fields { width: 100%; }
     #search input { flex: 1; min-width: 0; }
