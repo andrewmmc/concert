@@ -1,4 +1,4 @@
-// AsiaWorld-Arena (亞洲國際博覽館 Arena Hall 1) — AWA-ES-16 Draft 02.
+// AsiaWorld Expo (Hall 1 Arena) (亞洲國際博覽館 Arena Hall 1) — AWA-ES-16 Draft 02.
 import * as THREE from 'three';
 import { addGround, createSeatInstances, labelTexture } from '../scene.js';
 import { AWE_PDF_ROWS, AWE_PDF_SEAT_TOTAL } from './awe-seat-data.js';
@@ -169,7 +169,7 @@ function addLabels(scene, placements) {
 
 export const awe = {
   id: 'awe',
-  name: 'AsiaWorld-Arena',
+  name: 'AsiaWorld Expo (Hall 1 Arena)',
   zh: '亞洲國際博覽館',
   subtitle: 'Hall 1 AWA-ES-16 Draft 02 end-stage seating plan',
   dims: `Stands 1-17 and floor Blocks A-D · ${AWE_PDF_SEAT_TOTAL.toLocaleString()} PDF seats`,
@@ -218,7 +218,7 @@ export const awe = {
 
     const describe = (placement) => ({
       main: `Block ${placement.sec} · Row ${placement.row} · Seat ${placement.seat}`,
-      sub: `${placement.tier} — AsiaWorld-Arena`,
+      sub: `${placement.tier} — AsiaWorld Expo (Hall 1 Arena)`,
     });
 
     return {
