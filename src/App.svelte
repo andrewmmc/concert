@@ -1190,6 +1190,7 @@
   .viewer-callout button { width: 100%; margin-top: 28px; padding: 13px; border: 1px solid var(--acid); background: var(--acid); color: var(--ink); font-weight: 900; cursor: pointer; }
 
   .viewer-main { height: 100vh; min-height: 0; overflow: hidden; background: #05070c; }
+  .viewer-page[hidden] { display: none !important; }
   .viewer-page {
     height: 100vh;
     min-height: 0;
