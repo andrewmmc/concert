@@ -1,6 +1,6 @@
 // AsiaWorld-Arena (亞洲國際博覽館 Arena Hall 1) — EDAN LUI 2023 end-stage plan
-// reconstructed from the labelled concert map in misc/awe_hall1. The generic
-// AWA-ES-16 drawing is used only to confirm the bowl and aisle geometry.
+// reconstructed from the labelled concert map in misc/awe_hall1, with the
+// complete bowl and all-seat coverage taken from the AWA-ES-16 drawing.
 import * as THREE from 'three';
 import { addGround, addOutline, createSeatInstances, labelTexture } from '../scene.js';
 
@@ -16,10 +16,11 @@ const TIER = {
   wheelchair: { name: 'Wheelchair', color: '#7fff00' },
 };
 
-// `maxSeat` is the highest printed seat number, not a rectangular seat count.
-// Some blocks contain numbering gaps or lose their front rows around handrails,
-// wheelchair bays and the rear control panel; standSeatNumbers preserves them.
+// Blocks run clockwise from stage-right Block 1 to stage-left Block 17. The
+// event map leaves some seats uncoloured, but the AWA-ES-16 all-seats drawing
+// confirms that those seats and both stage-end blocks remain part of the bowl.
 export const AWE_STAND_BLOCKS = [
+  { id: 1, side: 'north', center: [22.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 24 },
   { id: 2, side: 'north', center: [16, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
   { id: 3, side: 'north', center: [9.5, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 21 },
   { id: 4, side: 'north', center: [3, 10], outward: [0, 1], lateral: [-1, 0], yaw: Math.PI, width: 6, maxSeat: 26 },
@@ -34,7 +35,8 @@ export const AWE_STAND_BLOCKS = [
   { id: 13, side: 'south', center: [-3.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 25 },
   { id: 14, side: 'south', center: [3, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 26 },
   { id: 15, side: 'south', center: [9.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21 },
-  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 12 },
+  { id: 16, side: 'south', center: [16, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 21 },
+  { id: 17, side: 'south', center: [22.5, -10], outward: [0, -1], lateral: [1, 0], yaw: 0, width: 6, maxSeat: 24 },
 ];
 
 // The event map letters floor rows from the stage towards the panel and numbers
@@ -58,7 +60,6 @@ const FLOOR_HALF_Z = 8.5;
 const STAND_ROW_PITCH = 0.58;
 const STAND_ROW_RISE = 0.31;
 const TIER_AISLE = 1.15;
-const FLOOR_SEAT_PITCH = 0.48;
 const FLOOR_ROW_PITCH = 0.58;
 
 export function aweRowLabels(id) {
@@ -76,41 +77,6 @@ function rangeInclusive(first, last) {
 function standSeatNumbers(block, row) {
   const rowIndex = AWE_STAND_ROWS.indexOf(row);
   if (rowIndex < 0) return [];
-  const rowAtoG = rowIndex <= AWE_STAND_ROWS.indexOf('G');
-  const rowAtoH = rowIndex <= AWE_STAND_ROWS.indexOf('H');
-  const rowNtoS = rowIndex >= AWE_STAND_ROWS.indexOf('N') &&
-    rowIndex <= AWE_STAND_ROWS.indexOf('S');
-  if (block.id === 16) {
-    return rowNtoS ? rangeInclusive(1, 5) : rangeInclusive(1, 12);
-  }
-  if (block.id === 4) {
-    return rowAtoH ? rangeInclusive(14, 26) : rangeInclusive(1, 26);
-  }
-  if (block.id === 14) {
-    return rowAtoH ? rangeInclusive(1, 13) : rangeInclusive(1, 26);
-  }
-  if (block.id === 7) {
-    const lowerSeats = rowIndex <= AWE_STAND_ROWS.indexOf('C')
-      ? [1, 2, ...rangeInclusive(9, 12)]
-      : rangeInclusive(1, 12);
-    return rowIndex < AWE_STAND_ROWS.indexOf('N')
-      ? lowerSeats
-      : [...rangeInclusive(1, 12), ...rangeInclusive(16, 36)];
-  }
-  if (block.id === 8) {
-    const seats = [...rangeInclusive(1, 24), ...rangeInclusive(27, 53)];
-    return rowAtoG ? seats.filter((seat) => seat <= 12 || seat >= 27) : seats;
-  }
-  if (block.id === 9) {
-    return rowIndex < AWE_STAND_ROWS.indexOf('J') ? [] : rangeInclusive(1, 35);
-  }
-  if (block.id === 10) {
-    const seats = rangeInclusive(1, 52);
-    return rowAtoG ? seats.filter((seat) => seat <= 25 || seat >= 41) : seats;
-  }
-  if (block.id === 11) {
-    return [...rangeInclusive(7, 26), ...rangeInclusive(30, 41)];
-  }
   return rangeInclusive(1, block.maxSeat);
 }
 
@@ -193,7 +159,7 @@ export function awePlacements() {
 
 function addStage(scene) {
   const material = new THREE.MeshStandardMaterial({ color: 0xc9005c, roughness: 0.72 });
-  const stage = new THREE.Mesh(new THREE.BoxGeometry(6, 0.9, 22), material);
+  const stage = new THREE.Mesh(new THREE.BoxGeometry(6, 0.9, 12), material);
   stage.position.set(STAGE_X, 0.47, 0);
   stage.userData.label = 'End Stage 舞台';
   scene.add(stage);
@@ -252,7 +218,7 @@ export const awe = {
   name: 'AsiaWorld-Arena',
   zh: '亞洲國際博覽館',
   subtitle: 'Hall 1 EDAN LUI 2023 end-stage seating plan',
-  dims: `Stands 2-16 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
+  dims: `Stands 1-17 and floor Blocks A-C · ${aweSeatTotal().toLocaleString()} modelled seats`,
   roofLabel: 'Arena roof structure',
   defaultCamera: { target: [-8, 4, 0] },
   defaultLayout: 'end-stage',
@@ -274,12 +240,12 @@ export const awe = {
     scene.add(arenaFloor);
 
     const terraceMaterial = new THREE.MeshStandardMaterial({ color: 0x1b2433, roughness: 0.96 });
-    const northSouth = new THREE.BoxGeometry(44, 0.18, 16);
+    const northSouth = new THREE.BoxGeometry(51, 0.18, 16);
     const north = new THREE.Mesh(northSouth, terraceMaterial);
-    north.position.set(-2, 0.05, NORTH_Z + 6);
+    north.position.set(1.5, 0.05, NORTH_Z + 6);
     scene.add(north);
     const south = new THREE.Mesh(northSouth, terraceMaterial);
-    south.position.set(-2, 0.05, SOUTH_Z - 6);
+    south.position.set(1.5, 0.05, SOUTH_Z - 6);
     scene.add(south);
     const west = new THREE.Mesh(new THREE.BoxGeometry(14, 0.18, 26), terraceMaterial);
     west.position.set(WEST_X - 5, 0.05, 0);
