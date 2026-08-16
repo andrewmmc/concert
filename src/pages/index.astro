@@ -1,7 +1,8 @@
 ---
 import VenueGrid from '../components/VenueGrid.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ENGLISH, translate } from '../lib/i18n.js';
+import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../lib/i18n.js';
+import { venueLine } from '../lib/venueLines.js';
 import { venues } from '../venues/index.js';
 
 const t = (key) => translate(ENGLISH, key);
@@ -14,11 +15,11 @@ const t = (key) => translate(ENGLISH, key);
       <h1><span data-i18n="heroTitle">{t('heroTitle')}</span> <em data-i18n="heroTitleAccent">{t('heroTitleAccent')}</em></h1>
       <p class="hero-body" data-i18n="heroBody">{t('heroBody')}</p>
       <div class="hero-actions">
-        <a class="button-primary" href="/guide/">
-          <span data-i18n="beforeYouGo">{t('beforeYouGo')}</span><span aria-hidden="true">↘</span>
+        <a class="button-primary" href="/venues/">
+          <span data-i18n="browseVenues">{t('browseVenues')}</span><span aria-hidden="true">→</span>
         </a>
-        <a class="button-link" href="/concerts/">
-          <span data-i18n="seeAllConcerts">{t('seeAllConcerts')}</span><span aria-hidden="true">→</span>
+        <a class="button-link" href="/guide/">
+          <span data-i18n="beforeYouGo">{t('beforeYouGo')}</span><span aria-hidden="true">→</span>
         </a>
       </div>
       <div class="hero-stats">
@@ -28,21 +29,29 @@ const t = (key) => translate(ENGLISH, key);
       </div>
     </div>
 
-    <div class="hero-visual reveal delay-one" aria-hidden="true">
-      <div class="city-card">
-        <div class="city-card-head"><span data-i18n="tonightInHongKong">{t('tonightInHongKong')}</span><span>20:15 HKT</span></div>
-        <div class="route-map">
-          <div class="route-line"></div>
-          <span class="station station-one"><i></i>HUNG HOM</span>
-          <span class="station station-two"><i></i>KAI TAK</span>
-          <span class="station station-three"><i></i>ASIAWORLD</span>
-          <div class="pulse-ring"></div>
-        </div>
-        <div class="city-card-foot"><span data-i18n="cityNote">{t('cityNote')}</span><b>22°19'N<br />114°10'E</b></div>
+    <nav class="hero-board reveal delay-one" aria-label={t('navVenues')}>
+      <div class="board-head">
+        <span data-i18n="heroBoardTitle">{t('heroBoardTitle')}</span>
+        <span class="board-stamp">852 · HKT</span>
       </div>
-      <div class="ticket-strip">LIVE / PLAN / GO / 852 / LIVE / PLAN / GO</div>
-      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
-    </div>
+      <ul>
+        {venues.map((venue) => {
+          const line = venueLine(venue.id);
+          const english = getVenueText(ENGLISH, venue);
+          const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
+          return (
+            <li>
+              <a href={`/viewer/${venue.id}/${venue.defaultLayout}/`} style={`--line-color: ${line.color}`}>
+                <span class="line-chip" aria-hidden="true">{line.code}</span>
+                <span class="board-name" data-en={english.name} data-zh-hk={chinese.name}>{english.name}</span>
+                <span class="board-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <p class="board-foot" data-i18n="heroBoardNote">{t('heroBoardNote')}</p>
+    </nav>
   </section>
 
   <section class="portal-paths">
@@ -51,9 +60,9 @@ const t = (key) => translate(ENGLISH, key);
       <p data-i18n="homePathBody">{t('homePathBody')}</p>
     </div>
     <div class="path-grid">
-      <article><span>01</span><h3 data-i18n="beforeYouGo">{t('beforeYouGo')}</h3><p data-i18n="beforeYouGoBody">{t('beforeYouGoBody')}</p><a href="/guide/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
-      <article><span>02</span><h3 data-i18n="seeAllConcerts">{t('seeAllConcerts')}</h3><p data-i18n="seeAllConcertsBody">{t('seeAllConcertsBody')}</p><a href="/concerts/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
-      <article><span>03</span><h3 data-i18n="compareVenues">{t('compareVenues')}</h3><p data-i18n="compareVenuesBody">{t('compareVenuesBody')}</p><a href="/venues/"><span data-i18n="openPage">{t('openPage')}</span> ↗</a></article>
+      <article><span>01</span><h3 data-i18n="beforeYouGo">{t('beforeYouGo')}</h3><p data-i18n="beforeYouGoBody">{t('beforeYouGoBody')}</p><a href="/guide/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
+      <article><span>02</span><h3 data-i18n="seeAllConcerts">{t('seeAllConcerts')}</h3><p data-i18n="seeAllConcertsBody">{t('seeAllConcertsBody')}</p><a href="/concerts/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
+      <article><span>03</span><h3 data-i18n="compareVenues">{t('compareVenues')}</h3><p data-i18n="compareVenuesBody">{t('compareVenuesBody')}</p><a href="/venues/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
     </div>
   </section>
 

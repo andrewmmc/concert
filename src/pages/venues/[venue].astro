@@ -2,6 +2,7 @@
 import VenueGrid from '../../components/VenueGrid.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../../lib/i18n.js';
+import { venueLine } from '../../lib/venueLines.js';
 import { venues } from '../../venues/index.js';
 
 export function getStaticPaths() {
@@ -32,9 +33,9 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
       <p class="arena-intro" data-en={text.dims} data-zh-hk={chineseText.dims}>{text.dims}</p>
       <a class="button-primary venue-viewer-button" href={viewerUrl}><span data-i18n="openDedicatedViewer">{t('openDedicatedViewer')}</span><span aria-hidden="true">↗</span></a>
     </div>
-    <div class="arena-index reveal delay-one" aria-hidden="true">
-      <span>{venueNumber}</span>
-      <div class="arena-rings"><i></i><i></i><i></i><b></b></div>
+    <div class="arena-index reveal delay-one" aria-hidden="true" style={`--line-color: ${venueLine(venue.id).color}`}>
+      <span class="line-chip">{venueLine(venue.id).code}</span>
+      <span class="arena-number">{venueNumber}</span>
       <small>{venue.id.toUpperCase()} / 852</small>
     </div>
   </section>
