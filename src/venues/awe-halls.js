@@ -266,7 +266,7 @@ export const aweHalls = {
   layouts: [
     {
       id: 'th8400',
-      label: 'TH8400 · Halls 6, 8 & 10',
+      label: 'Halls 6, 8 & 10',
       zh: '正面舞台',
       dims: `Hall 8 floor Blocks A-C and Hall 10 riser Blocks C-D · ${aweHallsSeatTotal('th8400').toLocaleString()} drawn seats`,
     },
