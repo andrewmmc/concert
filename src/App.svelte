@@ -59,6 +59,7 @@
 
   $effect(() => {
     updateDocumentLocale(locale);
+    document.documentElement.classList.toggle('viewer-open', route.page === 'viewer');
     if (route.page === 'venue' || route.page === 'viewer') {
       document.title = `${text.name} — ${t('siteName')}`;
     }
@@ -680,6 +681,8 @@
 {/if}
 
 <style>
+  :global(*), :global(*::before), :global(*::after) { box-sizing: border-box; }
+
   :global(:root) {
     --paper: #fffdf8;
     --ink: #171714;
@@ -705,7 +708,8 @@
     font-family: var(--sans);
   }
   :global(body) { overflow-x: hidden; }
-  :global(body.viewer-open) { height: 100vh; overflow: hidden; background: #05070c; }
+  :global(html.viewer-open), :global(body.viewer-open) { height: 100%; min-height: 0; overflow: hidden; background: #05070c; }
+  :global(html.viewer-open #app) { height: 100%; min-height: 0; overflow: hidden; }
   :global(button, input, select) { font: inherit; }
   :global(button:focus-visible), :global(a:focus-visible), :global(input:focus-visible), :global(select:focus-visible) {
     outline: 3px solid rgba(27, 77, 255, .28);
@@ -1207,7 +1211,15 @@
   .viewer-page .viewer-frame { flex: 1 1 auto; height: auto; min-height: 0; background: #0d121c; border-color: rgba(120,150,200,.22); box-shadow: 0 22px 70px rgba(0,0,0,.5); }
   .viewer-page .canvas-stage { height: auto; min-height: 0; background: #05070c; border-color: rgba(120,150,200,.22); }
   .viewer-page .canvas-label, .viewer-page .canvas-reset { border-color: rgba(120,150,200,.24); background: rgba(13,18,28,.88); color: #dbe6f5; }
-  .viewer-page .viewer-panel { min-height: 0; overflow-y: auto; background: #0d121c; color: #dbe6f5; }
+  .viewer-page .viewer-panel { min-height: 0; overflow: hidden; padding: 20px; background: #0d121c; color: #dbe6f5; }
+  .viewer-page .picker-stack { gap: 8px; margin-top: 14px; }
+  .viewer-page .model-note { margin-top: 9px; }
+  .viewer-page .legend { margin-top: 8px; }
+  .viewer-page .panel-rule { margin: 14px 0; }
+  .viewer-page .seat-card { margin-top: 8px; padding: 10px; }
+  .viewer-page .settings-toggle { margin-top: 10px; padding: 8px 0; }
+  .viewer-page .setting-row { padding: 4px 0; }
+  .viewer-page .plan-link { margin-top: 8px; }
   .viewer-page .venue-meta, .viewer-page .model-note, .viewer-page .seat-sub, .viewer-page .picker-stack label > span { color: #7d8ca3; }
   .viewer-page .picker { background-color: #0b1120; color: #dbe6f5; border-color: rgba(120,150,200,.24); }
   .viewer-page .chip { background: rgba(255,255,255,.03); color: #dbe6f5; border-color: rgba(120,150,200,.22); }
@@ -1289,9 +1301,9 @@
     .viewer-frame { grid-template-columns: 1fr; }
     .canvas-stage { min-height: 540px; border-right: 0; border-bottom: 1px solid #cfd2ca; }
     .viewer-panel { overflow: visible; }
-    .viewer-page .viewer-frame { grid-template-columns: 1fr; grid-template-rows: minmax(0, 58%) minmax(0, 42%); }
+    .viewer-page .viewer-frame { grid-template-columns: minmax(0, 1fr) minmax(250px, 42vw); grid-template-rows: 1fr; }
     .viewer-page .canvas-stage { min-height: 0; }
-    .viewer-page .viewer-panel { overflow-y: auto; }
+    .viewer-page .viewer-panel { overflow: hidden; }
     .concert-board { grid-template-columns: 180px 1fr; }
     .calendar-stamp strong { font-size: 58px; }
   }
@@ -1333,6 +1345,9 @@
     .viewer-page { padding: 10px; }
     .viewer-topbar { grid-template-columns: 1fr auto; }
     .viewer-topbar > span { display: none; }
+    .viewer-page .viewer-frame { display: block; position: relative; }
+    .viewer-page .canvas-stage { height: 100%; }
+    .viewer-page .viewer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(290px, 80vw); z-index: 5; background: rgba(13,18,28,.96); }
     .canvas-stage { min-height: 430px; }
     .canvas-hint { display: none; }
     .canvas-label { top: 12px; left: 12px; }
