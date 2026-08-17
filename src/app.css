@@ -453,8 +453,8 @@
   }
   .venue-hours-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, .72fr);
-    gap: clamp(48px, 7vw, 92px);
+    grid-template-columns: minmax(0, 760px);
+    gap: 32px;
     align-items: start;
   }
   .venue-hours-list { margin: 0; border-top: 1px solid var(--ink); }
