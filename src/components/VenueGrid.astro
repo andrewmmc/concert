@@ -12,7 +12,11 @@ const t = (key) => translate(ENGLISH, key);
     const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
     const line = venueLine(venue.id);
     return (
-      <article class="venue-card" style={`--line-color: ${line.color}`}>
+      <a
+        class="venue-card"
+        href={`/venues/${venue.id}/`}
+        style={`--line-color: ${line.color}`}
+      >
         <div class="venue-card-top">
           <span class="line-chip" aria-hidden="true">{line.code}</span>
         </div>
@@ -20,11 +24,11 @@ const t = (key) => translate(ENGLISH, key);
           <h3 data-en={english.name} data-zh-hk={chinese.name}>{english.name}</h3>
           <span data-en={english.subtitle} data-zh-hk={chinese.subtitle}>{english.subtitle}</span>
         </div>
-        <a href={`/venues/${venue.id}/`} aria-label={`${t('venueDetails')}: ${english.name}`}>
+        <div class="venue-card-action">
           <span data-i18n="venueDetails">{t('venueDetails')}</span>
           <span aria-hidden="true">→</span>
-        </a>
-      </article>
+        </div>
+      </a>
     );
   })}
 </div>
