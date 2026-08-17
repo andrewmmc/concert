@@ -27,6 +27,10 @@ function goToViewer(venueId, layoutId) {
   location.assign(`/viewer/${venueId}/${layoutId}/`);
 }
 
+export function shouldDestroyViewer(event) {
+  return !event?.persisted;
+}
+
 export function initializeViewer() {
   initializeLocale();
   const root = document.querySelector('[data-viewer]');
@@ -360,10 +364,14 @@ export function initializeViewer() {
   pickingLoop();
   engine.animate();
 
-  addEventListener('pagehide', () => {
+  addEventListener('pageshow', () => {
+    engine.resize();
+  });
+  addEventListener('pagehide', (event) => {
+    if (!shouldDestroyViewer(event)) return;
     picking = false;
     cancelAnimationFrame(pickingFrame);
     engine.destroy();
     disposeGroup(modelGroup);
-  }, { once: true });
+  });
 }

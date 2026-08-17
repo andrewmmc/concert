@@ -175,6 +175,7 @@ export function createScene(canvas) {
     animate,
     flyTo,
     isFlying: () => !!fly,
+    resize: onResize,
     destroy() {
       running = false;
       cancelAnimationFrame(animationFrame);
