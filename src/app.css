@@ -470,11 +470,30 @@
     font-weight: 700;
     text-align: right;
   }
-  .venue-transport-layout {
+  .venue-transport-copy { max-width: 880px; }
+  .venue-map-layout {
     display: grid;
     grid-template-columns: minmax(280px, .7fr) minmax(0, 1.3fr);
     gap: clamp(48px, 7vw, 92px);
     align-items: start;
+  }
+  .venue-address-label {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ink);
+    color: var(--signal);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .venue-address {
+    max-width: 500px;
+    margin-top: 24px;
+    font-family: var(--display);
+    font-size: clamp(24px, 2.5vw, 36px);
+    font-style: normal;
+    line-height: 1.35;
   }
   .venue-map-link {
     margin-top: 38px;
@@ -1012,7 +1031,7 @@
     .viewer-frame { grid-template-columns: minmax(0, 1fr) 330px; }
     .canvas-stage { min-height: 650px; }
     .venue-profile-grid { grid-template-columns: minmax(0, .9fr) minmax(380px, 1.1fr); gap: 44px; }
-    .venue-hours-layout, .venue-transport-layout { grid-template-columns: 1fr; }
+    .venue-hours-layout, .venue-map-layout { grid-template-columns: 1fr; }
     .venue-grid { grid-template-columns: repeat(2, 1fr); }
     .path-grid { grid-template-columns: repeat(2, 1fr); }
   }

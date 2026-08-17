@@ -86,23 +86,38 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
       </div>
     </section>
 
-    <section class="venue-info-section" aria-labelledby="transport-maps">
+    <section class="venue-info-section" aria-labelledby="transport">
       <header class="venue-section-heading">
-        <span>02 / 04</span>
-        <h2 id="transport-maps" data-i18n="transportAndMaps">{t('transportAndMaps')}</h2>
+        <span>02 / 05</span>
+        <h2 id="transport" data-i18n="arenaTransportTitle">{t('arenaTransportTitle')}</h2>
       </header>
-      <div class="venue-section-body venue-transport-layout">
+      <div class="venue-section-body">
+        <p
+          class="venue-section-lead venue-transport-copy"
+          data-en={detail.transport}
+          data-zh-hk={detail.transportZh}
+        >{detail.transport}</p>
+      </div>
+    </section>
+
+    <section class="venue-info-section" aria-labelledby="address-map">
+      <header class="venue-section-heading">
+        <span>03 / 05</span>
+        <h2 id="address-map" data-i18n="addressAndMap">{t('addressAndMap')}</h2>
+      </header>
+      <div class="venue-section-body venue-map-layout">
         <div>
-          <p
-            class="venue-section-lead"
-            data-en={detail.transport}
-            data-zh-hk={detail.transportZh}
-          >{detail.transport}</p>
+          <p class="venue-address-label" data-i18n="venueAddress">{t('venueAddress')}</p>
+          <address
+            class="venue-address"
+            data-en={detail.address}
+            data-zh-hk={detail.addressZh}
+          >{detail.address}</address>
           <p
             class="venue-section-note"
-            data-en={detail.transportNote}
-            data-zh-hk={detail.transportNoteZh}
-          >{detail.transportNote}</p>
+            data-en={detail.mapNote}
+            data-zh-hk={detail.mapNoteZh}
+          >{detail.mapNote}</p>
           <a class="venue-map-link" href={detail.mapUrl} target="_blank" rel="noreferrer">
             <span data-i18n="openInOpenStreetMap">{t('openInOpenStreetMap')}</span>
             <span aria-hidden="true">↗</span>
@@ -122,7 +137,7 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
 
     <section class="venue-info-section" aria-labelledby="facilities">
       <header class="venue-section-heading">
-        <span>03 / 04</span>
+        <span>04 / 05</span>
         <h2 id="facilities" data-i18n="venueFacilities">{t('venueFacilities')}</h2>
       </header>
       <div class="venue-section-body">
@@ -145,7 +160,7 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
 
     <section class="venue-info-section venue-album-section" aria-labelledby="photo-album">
       <header class="venue-section-heading">
-        <span>04 / 04</span>
+        <span>05 / 05</span>
         <h2 id="photo-album" data-i18n="photoAlbum">{t('photoAlbum')}</h2>
       </header>
       <div class="venue-section-body">
