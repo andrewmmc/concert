@@ -65,10 +65,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Catering or refreshment service may operate for events. Check the organiser's notice for available outlets and rules on outside food and drinks.", descriptionZh: "活動期間可能提供餐飲或輕食服務。可用餐飲點及攜帶外來食物或飲品的規定，請查閱主辦單位通知。" }
   - { title: "Washrooms and family facilities", titleZh: "洗手間及家庭設施", description: "Washrooms are available on the venue levels, including accessible toilets. Baby-care and breastfeeding facilities are also provided.", descriptionZh: "場館各層設有洗手間及無障礙廁所，另提供嬰兒護理及哺乳設施。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "Event entrances may use bag checks. Bag-size limits, prohibited items, camera rules and any storage arrangements are determined by the organiser.", descriptionZh: "活動入口可能設有手袋檢查。手袋尺寸、禁止物品、攝影器材及寄存安排由主辦單位訂定。" }
-galleryIntro: "Views of Queen Elizabeth Stadium from the entrance and lobby."
-galleryIntroZh: "伊利沙伯體育館入口及大堂景觀。"
+galleryIntro: "Exterior, arena and lobby views of Queen Elizabeth Stadium."
+galleryIntroZh: "伊利沙伯體育館外觀、主場及大堂景觀。"
 gallery:
-  - { image: "/images/venues/qes/entrance-sign.webp", caption: "Entrance signage", captionZh: "入口標示" }
-  - { image: "/images/venues/qes/lobby.webp", caption: "Venue lobby", captionZh: "場館大堂" }
-  - { image: "/images/venues/qes/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
+  - { image: "/images/venues/qes/exterior.webp", caption: "Exterior view from Morrison Hill", captionZh: "從摩理臣山望向場館外觀", credit: "Photo: LN9267 / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Queen_Elizabeth_Stadium_11-09-2022.jpg" }
+  - { image: "/images/venues/qes/arena-interior.webp", caption: "Arena seating", captionZh: "主場座位", credit: "Photo: YAOLUN EEIY TAEWWLA / Wikimedia Commons", license: "CC0", sourceUrl: "https://commons.wikimedia.org/wiki/File:HK_WC_%E7%81%A3%E4%BB%94_Wan_Chai_%E6%84%9B%E7%BE%A4%E9%81%93_Oi_Kwan_Road_%E4%BC%8A%E5%88%A9%E6%B2%99%E4%BC%AF%E9%AB%94%E8%82%B2%E9%A4%A8_Queen_Elizabeth_Stadium_%E7%A0%B4%E5%86%B0%E8%88%B9_Icebreakers_%E9%9B%AA%E9%BE%8D2%E8%99%9F_Xue_Long_2_ship_%E8%A8%AA%E6%B8%AF%E6%AD%A1%E8%BF%8E%E5%8C%AF%E6%BC%94_visiting_Hong_Kong_show_April_2024_R12S_03.jpg" }
+  - { image: "/images/venues/qes/lobby.webp", caption: "Main lobby", captionZh: "主要大堂", credit: "Photo: KEWO gHOO Meandui 2000 / Wikimedia Commons", license: "CC0", sourceUrl: "https://commons.wikimedia.org/wiki/File:HK_WC_%E7%81%A3%E4%BB%94_Wan_Chai_%E6%84%9B%E7%BE%A4%E9%81%93_Oi_Kwan_Road_%E4%BC%8A%E5%88%A9%E6%B2%99%E4%BC%AF%E9%AB%94%E8%82%B2%E9%A4%A8_Queen_Elizabeth_Stadium_main_lobby_June_2025_R12S_02.jpg" }
 ---

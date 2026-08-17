@@ -245,7 +245,14 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
                 <img src={photo.image} alt="" loading="lazy" />
                 <span>{String(index + 1).padStart(2, '0')}</span>
               </div>
-              <figcaption data-en={photo.caption} data-zh-hk={photo.captionZh}>{photo.caption}</figcaption>
+              <figcaption>
+                <span data-en={photo.caption} data-zh-hk={photo.captionZh}>{photo.caption}</span>
+                {photo.credit && photo.sourceUrl && (
+                  <a href={photo.sourceUrl} target="_blank" rel="noreferrer">
+                    {photo.credit}{photo.license ? ` · ${photo.license}` : ''}
+                  </a>
+                )}
+              </figcaption>
             </figure>
           ))}
         </div>

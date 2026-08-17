@@ -9,7 +9,7 @@ descriptionZh: >-
   場館最多可容納14,000人，並直接連接機場快綫亞洲國際博覽館站。
 cardDescription: "A 14,000-capacity airport-side arena with direct Airport Express access."
 cardDescriptionZh: "機場旁的14,000人場館，直接連接機場快綫。"
-cover: "/images/venues/awe/exterior.webp"
+cover: "/images/venues/awe/arena-entrance.webp"
 openingHoursIntro: >-
   Hall 1 opens according to each event rather than fixed daily public hours.
   Check the ticket or organiser's notice for doors, admission zones and re-entry
@@ -66,7 +66,7 @@ facilities:
 galleryIntro: "A selection of views around AsiaWorld-Expo and the Arena."
 galleryIntroZh: "亞洲國際博覽館及Arena周邊景觀精選。"
 gallery:
-  - { image: "/images/venues/awe/exterior-angle.webp", caption: "Exterior angle view", captionZh: "場館外觀側景" }
-  - { image: "/images/venues/awe/walkway.webp", caption: "Covered walkway from the MTR station", captionZh: "由港鐵站前往場館的有蓋通道" }
-  - { image: "/images/venues/awe/hall-1-interior.webp", caption: "Arena interior", captionZh: "場館內部" }
+  - { image: "/images/venues/awe/arena-entrance.webp", caption: "AsiaWorld-Arena entrance", captionZh: "亞洲國際博覽館Arena入口", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_2025_10_part1.jpg" }
+  - { image: "/images/venues/awe/main-concourse.webp", caption: "Main concourse", captionZh: "主要大堂", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_2025_10_part3.jpg" }
+  - { image: "/images/venues/awe/hall-1-interior.webp", caption: "Hall 1 interior", captionZh: "1號展館內部", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_in_Chek_Lap_Kok_2025_03_part1.jpg" }
 ---

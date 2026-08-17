@@ -41,6 +41,9 @@ const localizedPhoto = z.object({
   image: z.string(),
   caption: z.string(),
   captionZh: z.string(),
+  credit: z.string().optional(),
+  license: z.string().optional(),
+  sourceUrl: z.string().url().optional(),
 });
 
 const localizedPageFields = {

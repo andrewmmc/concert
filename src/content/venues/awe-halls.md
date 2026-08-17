@@ -9,7 +9,7 @@ descriptionZh: >-
   粉絲見面會及音樂節。三館合併面積達17,040平方米，彈性容量約8,400人。
 cardDescription: "Three adjoining flexible halls for concerts and fan events, combining for about 8,400 people."
 cardDescriptionZh: "三個相鄰彈性展館，合併可容納約8,400人舉辦演唱會及粉絲活動。"
-cover: "/images/venues/awe/exterior.webp"
+cover: "/images/venues/awe/hall-1-interior.webp"
 openingHoursIntro: >-
   These halls open according to each event rather than fixed daily public
   hours. Check the ticket or organiser's notice for the active hall entrance,
@@ -66,7 +66,7 @@ facilities:
 galleryIntro: "Views around AsiaWorld-Expo, shared by Halls 6, 8 and 10."
 galleryIntroZh: "亞洲國際博覽館周邊景觀，6、8及10號展館共用。"
 gallery:
-  - { image: "/images/venues/awe/exterior-angle.webp", caption: "Expo exterior", captionZh: "博覽館外觀" }
-  - { image: "/images/venues/awe/exhibition-halls.webp", caption: "Exhibition hall interior", captionZh: "展館內部" }
-  - { image: "/images/venues/awe/walkway.webp", caption: "Covered walkway from the MTR station", captionZh: "由港鐵站前往場館的有蓋通道" }
+  - { image: "/images/venues/awe/hall-1-interior.webp", caption: "Column-free exhibition hall", captionZh: "無柱式展館內部", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_in_Chek_Lap_Kok_2025_03_part1.jpg" }
+  - { image: "/images/venues/awe/main-concourse.webp", caption: "Main concourse", captionZh: "主要大堂", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_2025_10_part3.jpg" }
+  - { image: "/images/venues/awe/walkway.webp", caption: "Hall 1 and station concourse", captionZh: "1號展館及車站大堂", credit: "Photo: Qwer132477 / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:AsiaWorld-Expo_in_Chek_Lap_Kok_2025_03_part2.jpg" }
 ---

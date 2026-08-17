@@ -67,10 +67,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Light-refreshment counters operate for events. Availability and rules on bringing outside food or drinks depend on the organiser, so check the event notice before arrival.", descriptionZh: "活動期間設有輕食服務。餐飲供應及攜帶外來食物或飲品的規定視乎主辦單位，出發前請查閱活動通知。" }
   - { title: "Washrooms and family facilities", titleZh: "洗手間及家庭設施", description: "Washrooms are located around the concourses, including six accessible toilets. Baby-care and breastfeeding facilities are also available.", descriptionZh: "各層大堂設有洗手間，包括六個無障礙洗手間，另設嬰兒護理及哺乳設施。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "Entrances may use bag checks and security screening. Bag-size limits, prohibited items, camera rules and any storage arrangements are event-specific.", descriptionZh: "入口可能設有手袋檢查及保安檢查。手袋尺寸、禁止物品、攝影器材及寄存安排均按個別活動訂定。" }
-galleryIntro: "Views of Hong Kong Coliseum from the approach and exterior."
-galleryIntroZh: "香港體育館外觀及到場路線景觀。"
+galleryIntro: "Exterior, arrival and arena views of Hong Kong Coliseum."
+galleryIntroZh: "香港體育館外觀、到場位置及主場景觀。"
 gallery:
-  - { image: "/images/venues/hkc/exterior-angle.webp", caption: "Exterior angle view", captionZh: "場館外觀側景" }
-  - { image: "/images/venues/hkc/approach.webp", caption: "Approach from Hung Hom Station", captionZh: "由紅磡站前往場館" }
-  - { image: "/images/venues/hkc/exterior.webp", caption: "Main exterior facade", captionZh: "場館正門外觀" }
+  - { image: "/images/venues/hkc/exterior.webp", caption: "Main exterior facade", captionZh: "場館正門外觀", credit: "Photo: Wpcpey / Wikimedia Commons", license: "CC BY 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Hong_Kong_Coliseum_202009.jpg" }
+  - { image: "/images/venues/hkc/interior.webp", caption: "Arena interior", captionZh: "主場內部", credit: "Photo: Wongpong / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:2017_HKOpen_HK_Coliseum_6.jpg" }
+  - { image: "/images/venues/hkc/approach.webp", caption: "Cheong Wan Road arrival area", captionZh: "暢運道到場位置", credit: "Photo: Ralf Roletschek / Wikimedia Commons", license: "CC BY 3.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:13-08-07-hongkong-by-RalfR-13.jpg" }
 ---

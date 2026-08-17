@@ -650,7 +650,16 @@
     font-size: 10px;
     font-weight: 600;
     letter-spacing: .08em;
+    line-height: 1.5;
     text-transform: uppercase;
+  }
+  .venue-gallery figcaption > span { display: block; }
+  .venue-gallery figcaption > a {
+    display: inline-block;
+    margin-top: 4px;
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
 
   /* ---------- 3D viewer (shared base — keep in sync with viewer page) ---------- */
