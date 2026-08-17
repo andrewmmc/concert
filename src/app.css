@@ -716,7 +716,6 @@
     outline: none;
   }
   .portal .picker:focus { border-color: var(--blue); }
-  .model-note { margin-top: 13px; color: var(--muted); font-size: 12px; line-height: 1.55; }
   .legend { display: flex; gap: 5px; margin-top: 13px; flex-wrap: wrap; }
   .portal .chip {
     display: inline-flex;
@@ -1042,7 +1041,6 @@
   .viewer-page .viewer-panel::-webkit-scrollbar-track { background: #fff; }
   .viewer-page .viewer-panel::-webkit-scrollbar-thumb { background: #d9dbd4; border: 2px solid #fff; border-radius: 999px; }
   .viewer-page .picker-stack { gap: 8px; margin-top: 14px; }
-  .viewer-page .model-note { margin-top: 9px; }
   .viewer-page .legend { margin-top: 8px; }
   .viewer-page .panel-rule { margin: 14px 0; }
   .viewer-page .seat-card { margin-top: 8px; padding: 12px; }

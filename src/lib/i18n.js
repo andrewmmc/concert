@@ -203,7 +203,7 @@ const messages = {
     row: '行',
     seat: '座位',
     goToSeat: '前往座位',
-    noSeatSelected: '— 尚未選擇座位 —',
+    noSeatSelected: '尚未選擇座位',
     selectSeatHint: '按一下座位，即可查看舞台及座位周邊視角',
     viewFromSeat: '舞台視角',
     seatSurroundings: '座位周邊',
