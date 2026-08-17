@@ -110,14 +110,6 @@ const pages = defineCollection({
           href: z.string(),
         }),
       }),
-      stats: z.object({
-        venueModels: z.string(),
-        venueModelsZh: z.string(),
-        languages: z.string(),
-        languagesZh: z.string(),
-        localFocus: z.string(),
-        localFocusZh: z.string(),
-      }),
       board: z.object({
         title: z.string(),
         titleZh: z.string(),

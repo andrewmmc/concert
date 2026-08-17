@@ -17,13 +17,6 @@ hero:
     label: "Before you go"
     labelZh: "入場前須知"
     href: "/guide/"
-stats:
-  venueModels: "venue models"
-  venueModelsZh: "個場館模型"
-  languages: "Chinese / English"
-  languagesZh: "中英雙語"
-  localFocus: "built for Hong Kong"
-  localFocusZh: "香港本地製作"
 board:
   title: "Venue board"
   titleZh: "場館一覽"

@@ -229,12 +229,6 @@
   }
   .button-link:hover { color: var(--signal); border-color: var(--signal); }
   .button-link > span:last-child { margin-left: 8px; color: var(--signal); }
-  .hero-stats { margin-top: 44px; display: flex; border-top: 1px dashed var(--line); max-width: 560px; }
-  .hero-stats div { flex: 1; padding: 18px 20px 0 0; }
-  .hero-stats div + div { border-left: 1px dashed var(--line); padding-left: 20px; }
-  .hero-stats strong { display: block; font-family: var(--mono); font-size: 20px; font-weight: 600; }
-  .hero-stats span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
-
   /* Departures-board style venue list */
   .hero-board {
     background: #fff;
@@ -1103,11 +1097,6 @@
     .hero-actions { align-items: stretch; flex-direction: column; gap: 14px; }
     .button-primary { width: 100%; justify-content: space-between; }
     .button-link { width: fit-content; }
-    .hero-stats { margin-top: 34px; }
-    .hero-stats div { padding-right: 10px; }
-    .hero-stats div + div { padding-left: 10px; }
-    .hero-stats strong { font-size: 15px; }
-    .hero-stats span { font-size: 11px; }
     .section-heading h2 { font-size: 30px; }
     .concert-section { padding-left: 18px; padding-right: 18px; }
     .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page, .page-hero { padding-left: 18px; padding-right: 18px; }

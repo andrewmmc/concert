@@ -5,7 +5,7 @@ import test from 'node:test';
 const pages = [
   { id: 'guide', type: 'guide', fields: ['eyebrow', 'title', 'description', 'sections'] },
   { id: 'concerts', type: 'concerts', fields: ['eyebrow', 'title', 'description', 'calendar', 'events'] },
-  { id: 'home', type: 'home', fields: ['hero', 'stats', 'board', 'paths', 'venueDirectory'] },
+  { id: 'home', type: 'home', fields: ['hero', 'board', 'paths', 'venueDirectory'] },
   { id: 'venue-directory', type: 'venue-directory', fields: ['eyebrow', 'title', 'description'] },
 ];
 
