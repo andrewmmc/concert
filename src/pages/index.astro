@@ -56,8 +56,9 @@ const t = (key) => translate(ENGLISH, key);
 
   <section class="portal-paths">
     <div class="section-heading">
-      <div><p class="eyebrow" data-i18n="homePathEyebrow">{t('homePathEyebrow')}</p><h2 data-i18n="homePathTitle">{t('homePathTitle')}</h2></div>
-      <p data-i18n="homePathBody">{t('homePathBody')}</p>
+      <p class="eyebrow" data-i18n="homePathEyebrow">{t('homePathEyebrow')}</p>
+      <h2 data-i18n="homePathTitle">{t('homePathTitle')}</h2>
+      <p class="section-description" data-i18n="homePathBody">{t('homePathBody')}</p>
     </div>
     <div class="path-grid">
       <article><span>01</span><h3 data-i18n="beforeYouGo">{t('beforeYouGo')}</h3><p data-i18n="beforeYouGoBody">{t('beforeYouGoBody')}</p><a href="/guide/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
@@ -68,8 +69,9 @@ const t = (key) => translate(ENGLISH, key);
 
   <section class="home-venue-preview">
     <div class="section-heading">
-      <div><p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p><h2 data-i18n="venueDirectoryTitle">{t('venueDirectoryTitle')}</h2></div>
-      <p data-i18n="venueDirectoryBody">{t('venueDirectoryBody')}</p>
+      <p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p>
+      <h2 data-i18n="venueDirectoryTitle">{t('venueDirectoryTitle')}</h2>
+      <p class="section-description" data-i18n="venueDirectoryBody">{t('venueDirectoryBody')}</p>
     </div>
     <VenueGrid venues={venues} compact />
     <a class="wide-link" href="/venues/"><span data-i18n="compareVenues">{t('compareVenues')}</span><span>→</span></a>

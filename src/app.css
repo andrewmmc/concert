@@ -735,7 +735,7 @@
   .plan-link:hover { color: var(--signal); }
 
   /* ---------- Portal sections ---------- */
-  .section-heading { display: grid; grid-template-columns: 1fr minmax(280px, 420px); gap: 44px; align-items: end; margin-bottom: 32px; }
+  .section-heading { max-width: 780px; margin-bottom: 32px; }
   .section-heading h2 {
     margin-top: 18px;
     max-width: 780px;
@@ -745,7 +745,13 @@
     line-height: 1.08;
     letter-spacing: -.015em;
   }
-  .section-heading > p { color: var(--muted); font-size: 15px; line-height: 1.75; }
+  .section-heading > .section-description {
+    max-width: 620px;
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.75;
+  }
 
   .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page {
     padding: 72px max(32px, calc((100vw - 1280px) / 2));
@@ -1071,7 +1077,6 @@
     .venue-map iframe { height: 360px; }
     .venue-gallery { grid-template-columns: 1.2fr .8fr; }
     .venue-gallery figure:last-child { grid-column: 2; }
-    .section-heading { grid-template-columns: 1fr; gap: 20px; }
     .concert-section { padding-top: 56px; padding-bottom: 56px; }
     .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page { padding-top: 56px; padding-bottom: 56px; }
     .path-grid, .guide-grid { grid-template-columns: 1fr; }
