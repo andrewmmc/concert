@@ -87,9 +87,5 @@ const content = entry.data;
       <p class="section-description" data-en={content.venueDirectory.description} data-zh-hk={content.venueDirectory.descriptionZh}>{content.venueDirectory.description}</p>
     </div>
     <VenueGrid venues={venues} compact />
-    <a class="wide-link" href="/venues/">
-      <span data-en={content.venueDirectory.action} data-zh-hk={content.venueDirectory.actionZh}>{content.venueDirectory.action}</span>
-      <span aria-hidden="true">→</span>
-    </a>
   </section>
 </BaseLayout>

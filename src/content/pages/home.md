@@ -58,6 +58,4 @@ venueDirectory:
   titleZh: "場館目錄"
   description: "Compare Hong Kong’s key concert venues before you buy. Detailed transport, facilities and local tips are coming next."
   descriptionZh: "購票前比較香港主要演唱會場館。詳細交通、設施及本地貼士將陸續加入。"
-  action: "Venue guides"
-  actionZh: "場館指南"
 ---

@@ -140,8 +140,6 @@ const pages = defineCollection({
         titleZh: z.string(),
         description: z.string(),
         descriptionZh: z.string(),
-        action: z.string(),
-        actionZh: z.string(),
       }),
     }),
     z.object({
