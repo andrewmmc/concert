@@ -7,6 +7,8 @@ description: >-
 descriptionZh: >-
   啟德主場館是啟德體育園的核心50,000人場館，亦是香港最大的體育場。伸縮上蓋
   可配合全天候體育、演唱會及大型娛樂活動。
+cardDescription: "Hong Kong's 50,000-capacity flagship stadium, with a retractable roof for all-weather events."
+cardDescriptionZh: "香港50,000人旗艦主場館，設伸縮上蓋配合全天候大型活動。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   The stadium bowl opens for scheduled events rather than fixed daily public

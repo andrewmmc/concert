@@ -9,6 +9,8 @@ descriptionZh: >-
   香港體育館由康樂及文化事務署管理，是位於紅磡站旁的香港地標室內場館。
   無柱式主場可靈活配合中央舞台、正面舞台、體育及娛樂活動，最多可容納
   12,500名觀眾。
+cardDescription: "Hong Kong's landmark 12,500-capacity indoor arena, directly connected to Hung Hom Station."
+cardDescriptionZh: "紅磡站旁的香港地標室內場館，最多可容納12,500名觀眾。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   Arena admission follows each event's published schedule. The URBTIX box

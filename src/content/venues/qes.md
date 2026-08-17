@@ -7,6 +7,8 @@ description: >-
 descriptionZh: >-
   伊利沙伯體育館是康樂及文化事務署管理的灣仔多用途室內場館。主場最多可容納
   3,500人，並可配合正面舞台、三面舞台、中央舞台、擂台及中央場地等活動佈置。
+cardDescription: "A 3,500-capacity Wan Chai arena with five flexible stage and sports configurations."
+cardDescriptionZh: "灣仔3,500人多用途場館，支援五種舞台及體育活動佈置。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   The building and URBTIX box office publish daily service hours. Admission to

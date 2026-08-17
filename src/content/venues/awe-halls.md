@@ -7,6 +7,8 @@ description: >-
 descriptionZh: >-
   亞洲國際博覽館6、8及10號展館是相鄰的無柱式活動空間，可單獨或合併舉辦演唱會、
   粉絲見面會及音樂節。三館合併面積達17,040平方米，彈性容量約8,400人。
+cardDescription: "Three adjoining flexible halls for concerts and fan events, combining for about 8,400 people."
+cardDescriptionZh: "三個相鄰彈性展館，合併可容納約8,400人舉辦演唱會及粉絲活動。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   These halls open according to each event rather than fixed daily public

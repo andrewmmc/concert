@@ -7,6 +7,8 @@ description: >-
 descriptionZh: >-
   啟德體藝館是啟德體育園內可容納10,000人的室內場館。無柱式主場及大部分可伸縮
   座位可靈活配合演唱會、室內體育、展覽及其他活動佈置。
+cardDescription: "A pillar-free 10,000-capacity indoor arena for concerts, sports and exhibitions."
+cardDescriptionZh: "無柱式10,000人室內場館，適合演唱會、體育及展覽活動。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   The arena is not a walk-in attraction with fixed daily public hours. Doors,

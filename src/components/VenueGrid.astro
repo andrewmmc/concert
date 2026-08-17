@@ -1,8 +1,11 @@
 ---
+import { getCollection } from 'astro:content';
 import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../lib/i18n.js';
+import { getVenueDetail } from '../lib/venueDetails.js';
 import { venueLine } from '../lib/venueLines.js';
 
 const { venues, compact = false } = Astro.props;
+const details = await getCollection('venues');
 const t = (key) => translate(ENGLISH, key);
 ---
 
@@ -10,6 +13,7 @@ const t = (key) => translate(ENGLISH, key);
   {venues.map((venue) => {
     const english = getVenueText(ENGLISH, venue);
     const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
+    const detail = getVenueDetail(details, venue.id);
     const line = venueLine(venue.id);
     return (
       <a
@@ -22,7 +26,7 @@ const t = (key) => translate(ENGLISH, key);
         </div>
         <div class="venue-card-copy">
           <h3 data-en={english.name} data-zh-hk={chinese.name}>{english.name}</h3>
-          <span data-en={english.subtitle} data-zh-hk={chinese.subtitle}>{english.subtitle}</span>
+          <span data-en={detail.cardDescription} data-zh-hk={detail.cardDescriptionZh}>{detail.cardDescription}</span>
         </div>
         <div class="venue-card-action">
           <span data-i18n="venueDetails">{t('venueDetails')}</span>

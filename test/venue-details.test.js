@@ -25,6 +25,8 @@ test('throws when a venue has no Markdown details', () => {
 test('every registered venue has the required Markdown detail sections', async () => {
   const requiredFields = [
     'description',
+    'cardDescription',
+    'cardDescriptionZh',
     'cover',
     'openingHours',
     'transport',
@@ -45,4 +47,15 @@ test('every registered venue has the required Markdown detail sections', async (
       assert.match(source, new RegExp(`^${field}:`, 'm'), `${venue.id} is missing ${field}`);
     }
   }
+});
+
+test('venue cards source descriptions from venue Markdown', async () => {
+  const source = await readFile(
+    new URL('../src/components/VenueGrid.astro', import.meta.url),
+    'utf8',
+  );
+
+  assert.match(source, /detail\.cardDescription/);
+  assert.match(source, /detail\.cardDescriptionZh/);
+  assert.doesNotMatch(source, /english\.subtitle|chinese\.subtitle/);
 });

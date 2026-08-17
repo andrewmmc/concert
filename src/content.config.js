@@ -36,6 +36,8 @@ const venues = defineCollection({
     venue: z.enum(['hkc', 'qes', 'kta', 'kts', 'awe', 'awe-halls']),
     description: z.string(),
     descriptionZh: z.string(),
+    cardDescription: z.string(),
+    cardDescriptionZh: z.string(),
     cover: z.string(),
     openingHoursIntro: z.string(),
     openingHoursIntroZh: z.string(),

@@ -7,6 +7,8 @@ description: >-
 descriptionZh: >-
   亞洲國際博覽館Arena是亞洲國際博覽館1號展館，位於香港國際機場旁。無柱式室內
   場館最多可容納14,000人，並直接連接機場快綫亞洲國際博覽館站。
+cardDescription: "A 14,000-capacity airport-side arena with direct Airport Express access."
+cardDescriptionZh: "機場旁的14,000人場館，直接連接機場快綫。"
 cover: "/images/venue-cover-placeholder.svg"
 openingHoursIntro: >-
   Hall 1 opens according to each event rather than fixed daily public hours.
