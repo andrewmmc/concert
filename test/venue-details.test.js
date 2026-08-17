@@ -71,5 +71,6 @@ test('venue pages render Markdown-backed official information and website links'
 
   assert.match(source, /detail\.venueInformationIntro/);
   assert.match(source, /detail\.venueInformation\.map/);
+  assert.match(source, /href=\{item\.href\}/);
   assert.match(source, /href=\{link\.url\}/);
 });

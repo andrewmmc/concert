@@ -9,7 +9,7 @@ descriptionZh: >-
   可配合全天候體育、演唱會及大型娛樂活動。
 cardDescription: "Hong Kong's 50,000-capacity flagship stadium, with a retractable roof for all-weather events."
 cardDescriptionZh: "香港50,000人旗艦主場館，設伸縮上蓋配合全天候大型活動。"
-cover: "/images/venue-cover-placeholder.svg"
+cover: "/images/venues/kts/exterior.webp"
 openingHoursIntro: >-
   The stadium bowl opens for scheduled events rather than fixed daily public
   visiting hours. Gate times, assigned approaches and re-entry rules are
@@ -48,8 +48,8 @@ venueInformationIntroZh: >-
   公布的訪客聯絡資料。
 venueInformation:
   - { label: "Official website", labelZh: "官方網站", value: "Kai Tak Sports Park", valueZh: "啟德體育園", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.kaitaksportspark.com.hk/en/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.kaitaksportspark.com.hk/tc/" }] }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）" }
-  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）" }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）", href: "tel:+85237115050" }
+  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）", href: "mailto:info@kaitaksportspark.com.hk" }
 facilitiesIntro: >-
   The stadium provides modern concourses, accessible seating, food and beverage
   service and event support across its levels. Exact gates, concessions and
@@ -62,10 +62,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Concourse kiosks and bars operate according to the event, with more restaurants and cafes in the park retail areas. Outside-food rules are event-specific.", descriptionZh: "大堂餐飲攤位及酒吧按活動開放，園區零售範圍另有餐廳及咖啡店。外來食物規定按個別活動訂定。" }
   - { title: "Washrooms and guest services", titleZh: "洗手間及訪客服務", description: "Standard and accessible washrooms are distributed across the stadium concourses. Allow extra time at intervals and after large events, and use the facilities nearest your assigned section.", descriptionZh: "各層大堂設有一般及無障礙洗手間。大型活動中場及散場時請預留時間，並使用最接近指定座位區的設施。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "All event gates may use security and bag screening. Check the organiser's notice for bag-size limits, prohibited items, bottle rules, camera restrictions and storage arrangements.", descriptionZh: "活動閘口可能設保安及手袋檢查。手袋尺寸、禁止物品、飲料容器、攝影限制及儲物安排請查閱主辦單位通知。" }
-galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
-galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
+galleryIntro: "Views of Kai Tak Stadium from the entrance and interior."
+galleryIntroZh: "啟德主場館入口及場內景觀。"
 gallery:
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Exterior preview", captionZh: "外觀預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Arrival preview", captionZh: "到場路線預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Interior preview", captionZh: "場內預覽" }
+  - { image: "/images/venues/kts/entrance.webp", caption: "Stadium entrance", captionZh: "主場館入口" }
+  - { image: "/images/venues/kts/interior.webp", caption: "Stadium interior", captionZh: "主場館內部" }
+  - { image: "/images/venues/kts/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
 ---

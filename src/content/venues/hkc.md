@@ -11,7 +11,7 @@ descriptionZh: >-
   12,500名觀眾。
 cardDescription: "Hong Kong's landmark 12,500-capacity indoor arena, directly connected to Hung Hom Station."
 cardDescriptionZh: "紅磡站旁的香港地標室內場館，最多可容納12,500名觀眾。"
-cover: "/images/venue-cover-placeholder.svg"
+cover: "/images/venues/hkc/exterior.webp"
 openingHoursIntro: >-
   Arena admission follows each event's published schedule. The URBTIX box
   office has fixed daily hours, while gate-opening and re-entry arrangements
@@ -50,10 +50,10 @@ venueInformationIntroZh: >-
   請查閱場館官方網站。
 venueInformation:
   - { label: "Official website", labelZh: "官方網站", value: "Hong Kong Coliseum — LCSD", valueZh: "香港體育館 — 康樂及文化事務署", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.lcsd.gov.hk/en/hkc/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.lcsd.gov.hk/tc/hkc/" }] }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2355 7234", valueZh: "+852 2355 7234" }
-  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7261", valueZh: "+852 2355 7261" }
-  - { label: "Box office", labelZh: "售票處", value: "+852 2355 7233", valueZh: "+852 2355 7233" }
-  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）" }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2355 7234", valueZh: "+852 2355 7234", href: "tel:+85223557234" }
+  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7261", valueZh: "+852 2355 7261", href: "tel:+85223557261" }
+  - { label: "Box office", labelZh: "售票處", value: "+852 2355 7233", valueZh: "+852 2355 7233", href: "tel:+85223557233" }
+  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）", href: "mailto:stadiaoffice@lcsd.gov.hk" }
   - { label: "Fax", labelZh: "傳真", value: "+852 2363 2549", valueZh: "+852 2363 2549" }
 facilitiesIntro: >-
   The Coliseum provides event-day catering, accessible audience facilities and
@@ -67,16 +67,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Light-refreshment counters operate for events. Availability and rules on bringing outside food or drinks depend on the organiser, so check the event notice before arrival.", descriptionZh: "活動期間設有輕食服務。餐飲供應及攜帶外來食物或飲品的規定視乎主辦單位，出發前請查閱活動通知。" }
   - { title: "Washrooms and family facilities", titleZh: "洗手間及家庭設施", description: "Washrooms are located around the concourses, including six accessible toilets. Baby-care and breastfeeding facilities are also available.", descriptionZh: "各層大堂設有洗手間，包括六個無障礙洗手間，另設嬰兒護理及哺乳設施。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "Entrances may use bag checks and security screening. Bag-size limits, prohibited items, camera rules and any storage arrangements are event-specific.", descriptionZh: "入口可能設有手袋檢查及保安檢查。手袋尺寸、禁止物品、攝影器材及寄存安排均按個別活動訂定。" }
-galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
-galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
+galleryIntro: "Views of Hong Kong Coliseum from the approach and exterior."
+galleryIntroZh: "香港體育館外觀及到場路線景觀。"
 gallery:
-  - image: "/images/venue-cover-placeholder.svg"
-    caption: "Exterior preview"
-    captionZh: "外觀預覽"
-  - image: "/images/venue-cover-placeholder.svg"
-    caption: "Arrival preview"
-    captionZh: "到場路線預覽"
-  - image: "/images/venue-cover-placeholder.svg"
-    caption: "Interior preview"
-    captionZh: "場內預覽"
+  - { image: "/images/venues/hkc/exterior-angle.webp", caption: "Exterior angle view", captionZh: "場館外觀側景" }
+  - { image: "/images/venues/hkc/approach.webp", caption: "Approach from Hung Hom Station", captionZh: "由紅磡站前往場館" }
+  - { image: "/images/venues/hkc/exterior.webp", caption: "Main exterior facade", captionZh: "場館正門外觀" }
 ---

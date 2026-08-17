@@ -391,6 +391,7 @@
   }
   .venue-cover-label small {
     margin-top: 20px;
+    margin-left: 4px;
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 600;
@@ -480,6 +481,12 @@
     font-weight: 700;
     text-align: right;
   }
+  .venue-detail-value-link {
+    color: inherit;
+    text-decoration-color: var(--signal);
+    text-underline-offset: 3px;
+  }
+  .venue-detail-value-link:hover { color: var(--signal); }
   .venue-transit-lines {
     margin-bottom: 10px;
     display: flex;
@@ -978,6 +985,8 @@
   .footer-brand { cursor: default; }
   footer p { color: var(--muted); font-size: 13px; }
   footer > span { color: #858780; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; }
+  footer > a { color: #858780; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-decoration: none; }
+  footer > a:hover { color: var(--signal); }
 
   .portal { font-size: 14px; }
   .portal button, .portal input, .portal select { font-size: 14px; }

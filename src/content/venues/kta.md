@@ -9,7 +9,7 @@ descriptionZh: >-
   座位可靈活配合演唱會、室內體育、展覽及其他活動佈置。
 cardDescription: "A pillar-free 10,000-capacity indoor arena for concerts, sports and exhibitions."
 cardDescriptionZh: "無柱式10,000人室內場館，適合演唱會、體育及展覽活動。"
-cover: "/images/venue-cover-placeholder.svg"
+cover: "/images/venues/kta/exterior.webp"
 openingHoursIntro: >-
   The arena is not a walk-in attraction with fixed daily public hours. Doors,
   ticket checks and re-entry arrangements are published for each event; nearby
@@ -47,8 +47,8 @@ venueInformationIntroZh: >-
   公布的訪客聯絡資料。
 venueInformation:
   - { label: "Official website", labelZh: "官方網站", value: "Kai Tak Sports Park", valueZh: "啟德體育園", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.kaitaksportspark.com.hk/en/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.kaitaksportspark.com.hk/tc/" }] }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）" }
-  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）" }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）", href: "tel:+85237115050" }
+  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）", href: "mailto:info@kaitaksportspark.com.hk" }
 facilitiesIntro: >-
   The modern arena provides step-free circulation, accessible seating,
   audience amenities and event-day food service. Exact entrance, concession
@@ -61,10 +61,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Event-day concessions operate inside the arena, with additional restaurants and cafes in the connected park retail areas. Outside-food rules are set by each event.", descriptionZh: "活動日場內設有餐飲攤位，相連的園區零售範圍另有餐廳及咖啡店。外來食物規定按個別活動訂定。" }
   - { title: "Washrooms and guest services", titleZh: "洗手間及訪客服務", description: "Standard and accessible washrooms are distributed around the concourses. Event layouts may change which facilities and service counters are closest to each entrance.", descriptionZh: "各層大堂設有一般及無障礙洗手間。活動佈置可能影響各入口最近的設施及服務櫃台位置。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "Security screening applies at event entrances. Check the organiser's notice for bag-size limits, prohibited items, camera rules and locker or storage arrangements.", descriptionZh: "活動入口設保安檢查。手袋尺寸、禁止物品、攝影器材及儲物安排請查閱主辦單位通知。" }
-galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
-galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
+galleryIntro: "Views of Kai Tak Arena from the entrance and lobby."
+galleryIntroZh: "啟德體藝館入口及大堂景觀。"
 gallery:
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Exterior preview", captionZh: "外觀預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Arrival preview", captionZh: "到場路線預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Interior preview", captionZh: "場內預覽" }
+  - { image: "/images/venues/kta/north-entrance.webp", caption: "North entrance", captionZh: "北面入口" }
+  - { image: "/images/venues/kta/lobby.webp", caption: "Arena lobby", captionZh: "場館大堂" }
+  - { image: "/images/venues/kta/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
 ---

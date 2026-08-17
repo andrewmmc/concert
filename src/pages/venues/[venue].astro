@@ -52,12 +52,11 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
           <div class="venue-cover-label">
             <span class="line-chip">{line.code}</span>
             <strong>{venue.id.toUpperCase()}</strong>
-            <small>HONG KONG / 852</small>
+            <small>HONG KONG</small>
           </div>
         </div>
         <figcaption>
-          <span data-i18n="coverPreview">{t('coverPreview')}</span>
-          <span aria-hidden="true">01</span>
+          <span data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</span>
         </figcaption>
       </figure>
     </div>
@@ -181,7 +180,13 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
             <div>
               <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
               <dd>
-                <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
+                {item.href ? (
+                  <a class="venue-detail-value-link" href={item.href}>
+                    <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
+                  </a>
+                ) : (
+                  <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
+                )}
                 {item.links && (
                   <span class="venue-detail-links">
                     {item.links.map((link) => (

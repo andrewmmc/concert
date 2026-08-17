@@ -9,7 +9,7 @@ descriptionZh: >-
   場館最多可容納14,000人，並直接連接機場快綫亞洲國際博覽館站。
 cardDescription: "A 14,000-capacity airport-side arena with direct Airport Express access."
 cardDescriptionZh: "機場旁的14,000人場館，直接連接機場快綫。"
-cover: "/images/venue-cover-placeholder.svg"
+cover: "/images/venues/awe/exterior.webp"
 openingHoursIntro: >-
   Hall 1 opens according to each event rather than fixed daily public hours.
   Check the ticket or organiser's notice for doors, admission zones and re-entry
@@ -48,8 +48,8 @@ venueInformationIntroZh: >-
   場館服務及最新到場資訊請查閱官方網站。
 venueInformation:
   - { label: "Official website", labelZh: "官方網站", value: "AsiaWorld-Expo", valueZh: "亞洲國際博覽館", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.asiaworld-expo.com/en-us/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.asiaworld-expo.com/zh-tc/" }] }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888 (shared venue contact)", valueZh: "+852 3606 8888（博覽館共用）" }
-  - { label: "Email", labelZh: "電郵", value: "info@asiaworld-expo.com", valueZh: "info@asiaworld-expo.com" }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888 (shared venue contact)", valueZh: "+852 3606 8888（博覽館共用）", href: "tel:+85236068888" }
+  - { label: "Email", labelZh: "電郵", value: "info@asiaworld-expo.com", valueZh: "info@asiaworld-expo.com", href: "mailto:info@asiaworld-expo.com" }
   - { label: "Fax", labelZh: "傳真", value: "+852 3606 8889", valueZh: "+852 3606 8889" }
 facilitiesIntro: >-
   AsiaWorld-Expo provides barrier-free access, event catering and visitor
@@ -63,10 +63,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Event concessions and venue dining outlets include cafes, takeaway choices and restaurants. Opening hours and rules on outside food and drinks vary by event.", descriptionZh: "場館設活動餐飲攤位、咖啡店、外賣店及餐廳。營業時間及攜帶外來食物或飲品的規定按活動而定。" }
   - { title: "Guest services and washrooms", titleZh: "訪客服務及洗手間", description: "Standard and accessible washrooms, customer service, first aid, nursing rooms, Wi-Fi and charging facilities are available within the complex. Some services operate only during events.", descriptionZh: "館內設一般及無障礙洗手間、客戶服務、急救、育嬰室、Wi-Fi及充電設施；部分服務只於活動期間提供。" }
   - { title: "Security and storage", titleZh: "保安及寄存", description: "Security and bag screening may apply. Bag-size limits, prohibited items and camera rules are event-specific. Cloakroom or baggage storage may be available for selected events; confirm before bringing luggage.", descriptionZh: "場館可能實施保安及手袋檢查。手袋尺寸、禁止物品及攝影規則按活動而定。部分活動或提供衣帽間或行李寄存，攜帶行李前請先確認。" }
-galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
-galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
+galleryIntro: "A selection of views around AsiaWorld-Expo and the Arena."
+galleryIntroZh: "亞洲國際博覽館及Arena周邊景觀精選。"
 gallery:
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Exterior preview", captionZh: "外觀預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Arrival preview", captionZh: "到場路線預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Interior preview", captionZh: "場內預覽" }
+  - { image: "/images/venues/awe/exterior-angle.webp", caption: "Exterior angle view", captionZh: "場館外觀側景" }
+  - { image: "/images/venues/awe/walkway.webp", caption: "Covered walkway from the MTR station", captionZh: "由港鐵站前往場館的有蓋通道" }
+  - { image: "/images/venues/awe/hall-1-interior.webp", caption: "Arena interior", captionZh: "場館內部" }
 ---

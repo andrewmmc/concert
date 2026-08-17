@@ -9,7 +9,7 @@ descriptionZh: >-
   3,500人，並可配合正面舞台、三面舞台、中央舞台、擂台及中央場地等活動佈置。
 cardDescription: "A 3,500-capacity Wan Chai arena with five flexible stage and sports configurations."
 cardDescriptionZh: "灣仔3,500人多用途場館，支援五種舞台及體育活動佈置。"
-cover: "/images/venue-cover-placeholder.svg"
+cover: "/images/venues/qes/exterior.webp"
 openingHoursIntro: >-
   The building and URBTIX box office publish daily service hours. Admission to
   the arena still follows the ticketed event's own gate-opening and re-entry
@@ -48,10 +48,10 @@ venueInformationIntroZh: >-
   安排，請查閱場館官方網站。
 venueInformation:
   - { label: "Official website", labelZh: "官方網站", value: "Queen Elizabeth Stadium — LCSD", valueZh: "伊利沙伯體育館 — 康樂及文化事務署", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.lcsd.gov.hk/en/qes/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.lcsd.gov.hk/tc/qes/" }] }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2591 1346", valueZh: "+852 2591 1346" }
-  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7282", valueZh: "+852 2355 7282" }
-  - { label: "URBTIX hotline", labelZh: "城市售票網電話購票", value: "+852 3166 1288", valueZh: "+852 3166 1288" }
-  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）" }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2591 1346", valueZh: "+852 2591 1346", href: "tel:+85225911346" }
+  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7282", valueZh: "+852 2355 7282", href: "tel:+85223557282" }
+  - { label: "URBTIX hotline", labelZh: "城市售票網電話購票", value: "+852 3166 1288", valueZh: "+852 3166 1288", href: "tel:+85231661288" }
+  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）", href: "mailto:stadiaoffice@lcsd.gov.hk" }
   - { label: "Fax", labelZh: "傳真", value: "+852 2803 5794", valueZh: "+852 2803 5794" }
 facilitiesIntro: >-
   The three-level venue includes accessible audience facilities, ticketing,
@@ -65,10 +65,10 @@ facilities:
   - { title: "Food and drink", titleZh: "飲食", description: "Catering or refreshment service may operate for events. Check the organiser's notice for available outlets and rules on outside food and drinks.", descriptionZh: "活動期間可能提供餐飲或輕食服務。可用餐飲點及攜帶外來食物或飲品的規定，請查閱主辦單位通知。" }
   - { title: "Washrooms and family facilities", titleZh: "洗手間及家庭設施", description: "Washrooms are available on the venue levels, including accessible toilets. Baby-care and breastfeeding facilities are also provided.", descriptionZh: "場館各層設有洗手間及無障礙廁所，另提供嬰兒護理及哺乳設施。" }
   - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "Event entrances may use bag checks. Bag-size limits, prohibited items, camera rules and any storage arrangements are determined by the organiser.", descriptionZh: "活動入口可能設有手袋檢查。手袋尺寸、禁止物品、攝影器材及寄存安排由主辦單位訂定。" }
-galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
-galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
+galleryIntro: "Views of Queen Elizabeth Stadium from the entrance and lobby."
+galleryIntroZh: "伊利沙伯體育館入口及大堂景觀。"
 gallery:
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Exterior preview", captionZh: "外觀預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Arrival preview", captionZh: "到場路線預覽" }
-  - { image: "/images/venue-cover-placeholder.svg", caption: "Interior preview", captionZh: "場內預覽" }
+  - { image: "/images/venues/qes/entrance-sign.webp", caption: "Entrance signage", captionZh: "入口標示" }
+  - { image: "/images/venues/qes/lobby.webp", caption: "Venue lobby", captionZh: "場館大堂" }
+  - { image: "/images/venues/qes/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
 ---

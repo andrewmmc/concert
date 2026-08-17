@@ -26,6 +26,7 @@ const localizedTransportMethod = localizedScheduleItem.extend({
 });
 
 const localizedVenueInformation = localizedScheduleItem.extend({
+  href: z.string().regex(/^(?:mailto:|tel:)/).optional(),
   links: z.array(localizedTransportLink).min(1).optional(),
 });
 
