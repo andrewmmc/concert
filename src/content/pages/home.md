@@ -27,8 +27,8 @@ stats:
 board:
   title: "Venue board"
   titleZh: "場館一覽"
-  note: "Pick a venue to open its interactive 3D seat map."
-  noteZh: "選擇場館，開啟互動 3D 座位圖。"
+  note: "Pick a venue to open its full guide and practical details."
+  noteZh: "選擇場館，查看完整指南及實用資訊。"
 paths:
   eyebrow: "Start here"
   eyebrowZh: "由這裡開始"

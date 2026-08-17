@@ -51,7 +51,7 @@ const content = entry.data;
           const chinese = getVenueText(TRADITIONAL_CHINESE, venue);
           return (
             <li>
-              <a href={`/viewer/${venue.id}/${venue.defaultLayout}/`} style={`--line-color: ${line.color}`}>
+              <a href={`/venues/${venue.id}/`} style={`--line-color: ${line.color}`}>
                 <span class="line-chip" aria-hidden="true">{line.code}</span>
                 <span class="board-name" data-en={english.name} data-zh-hk={chinese.name}>{english.name}</span>
                 <span class="board-arrow" aria-hidden="true">→</span>
