@@ -1,17 +1,26 @@
 ---
+import { getEntry } from 'astro:content';
 import VenueGrid from '../../components/VenueGrid.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { ENGLISH, translate } from '../../lib/i18n.js';
 import { venues } from '../../venues/index.js';
 
-const t = (key) => translate(ENGLISH, key);
+const entry = await getEntry('pages', 'venue-directory');
+if (!entry || entry.data.type !== 'venue-directory') {
+  throw new Error('Missing venue directory Markdown content');
+}
+const content = entry.data;
 ---
 
-<BaseLayout currentPage="venues">
+<BaseLayout
+  currentPage="venues"
+  title={`${content.title} — Hong Kong Concert Guide`}
+  titleZh={`${content.titleZh} — 香港演唱會指南`}
+  description={content.description}
+>
   <section class="page-hero venues-hero">
-    <p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p>
-    <h1 data-i18n="venueIndexTitle">{t('venueIndexTitle')}</h1>
-    <p data-i18n="venueIndexBody">{t('venueIndexBody')}</p>
+    <p class="eyebrow" data-en={content.eyebrow} data-zh-hk={content.eyebrowZh}>{content.eyebrow}</p>
+    <h1 data-en={content.title} data-zh-hk={content.titleZh}>{content.title}</h1>
+    <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
   <section class="venue-directory-page">
     <VenueGrid venues={venues} />

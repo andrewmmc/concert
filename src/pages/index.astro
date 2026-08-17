@@ -1,37 +1,47 @@
 ---
+import { getEntry } from 'astro:content';
 import VenueGrid from '../components/VenueGrid.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../lib/i18n.js';
+import { ENGLISH, TRADITIONAL_CHINESE, getVenueText } from '../lib/i18n.js';
 import { venueLine } from '../lib/venueLines.js';
 import { venues } from '../venues/index.js';
 
-const t = (key) => translate(ENGLISH, key);
+const entry = await getEntry('pages', 'home');
+if (!entry || entry.data.type !== 'home') {
+  throw new Error('Missing home Markdown content');
+}
+const content = entry.data;
 ---
 
-<BaseLayout currentPage="home">
+<BaseLayout currentPage="home" description={content.hero.description}>
   <section class="hero">
     <div class="hero-copy reveal">
-      <p class="eyebrow" data-i18n="portalEyebrow">{t('portalEyebrow')}</p>
-      <h1><span data-i18n="heroTitle">{t('heroTitle')}</span> <em data-i18n="heroTitleAccent">{t('heroTitleAccent')}</em></h1>
-      <p class="hero-body" data-i18n="heroBody">{t('heroBody')}</p>
+      <p class="eyebrow" data-en={content.hero.eyebrow} data-zh-hk={content.hero.eyebrowZh}>{content.hero.eyebrow}</p>
+      <h1>
+        <span data-en={content.hero.title} data-zh-hk={content.hero.titleZh}>{content.hero.title}</span>
+        <em data-en={content.hero.titleAccent} data-zh-hk={content.hero.titleAccentZh}>{content.hero.titleAccent}</em>
+      </h1>
+      <p class="hero-body" data-en={content.hero.description} data-zh-hk={content.hero.descriptionZh}>{content.hero.description}</p>
       <div class="hero-actions">
-        <a class="button-primary" href="/venues/">
-          <span data-i18n="browseVenues">{t('browseVenues')}</span><span aria-hidden="true">→</span>
+        <a class="button-primary" href={content.hero.primaryAction.href}>
+          <span data-en={content.hero.primaryAction.label} data-zh-hk={content.hero.primaryAction.labelZh}>{content.hero.primaryAction.label}</span>
+          <span aria-hidden="true">→</span>
         </a>
-        <a class="button-link" href="/guide/">
-          <span data-i18n="beforeYouGo">{t('beforeYouGo')}</span><span aria-hidden="true">→</span>
+        <a class="button-link" href={content.hero.secondaryAction.href}>
+          <span data-en={content.hero.secondaryAction.label} data-zh-hk={content.hero.secondaryAction.labelZh}>{content.hero.secondaryAction.label}</span>
+          <span aria-hidden="true">→</span>
         </a>
       </div>
       <div class="hero-stats">
-        <div><strong>{venues.length}</strong><span data-i18n="modelsAvailable">{t('modelsAvailable')}</span></div>
-        <div><strong>繁 / EN</strong><span data-i18n="bilingualGuide">{t('bilingualGuide')}</span></div>
-        <div><strong>852</strong><span data-i18n="builtForHongKong">{t('builtForHongKong')}</span></div>
+        <div><strong>{venues.length}</strong><span data-en={content.stats.venueModels} data-zh-hk={content.stats.venueModelsZh}>{content.stats.venueModels}</span></div>
+        <div><strong>繁 / EN</strong><span data-en={content.stats.languages} data-zh-hk={content.stats.languagesZh}>{content.stats.languages}</span></div>
+        <div><strong>852</strong><span data-en={content.stats.localFocus} data-zh-hk={content.stats.localFocusZh}>{content.stats.localFocus}</span></div>
       </div>
     </div>
 
-    <nav class="hero-board reveal delay-one" aria-label={t('navVenues')}>
+    <nav class="hero-board reveal delay-one" aria-label={content.board.title}>
       <div class="board-head">
-        <span data-i18n="heroBoardTitle">{t('heroBoardTitle')}</span>
+        <span data-en={content.board.title} data-zh-hk={content.board.titleZh}>{content.board.title}</span>
         <span class="board-stamp">852 · HKT</span>
       </div>
       <ul>
@@ -50,30 +60,41 @@ const t = (key) => translate(ENGLISH, key);
           );
         })}
       </ul>
-      <p class="board-foot" data-i18n="heroBoardNote">{t('heroBoardNote')}</p>
+      <p class="board-foot" data-en={content.board.note} data-zh-hk={content.board.noteZh}>{content.board.note}</p>
     </nav>
   </section>
 
   <section class="portal-paths">
     <div class="section-heading">
-      <p class="eyebrow" data-i18n="homePathEyebrow">{t('homePathEyebrow')}</p>
-      <h2 data-i18n="homePathTitle">{t('homePathTitle')}</h2>
-      <p class="section-description" data-i18n="homePathBody">{t('homePathBody')}</p>
+      <p class="eyebrow" data-en={content.paths.eyebrow} data-zh-hk={content.paths.eyebrowZh}>{content.paths.eyebrow}</p>
+      <h2 data-en={content.paths.title} data-zh-hk={content.paths.titleZh}>{content.paths.title}</h2>
+      <p class="section-description" data-en={content.paths.description} data-zh-hk={content.paths.descriptionZh}>{content.paths.description}</p>
     </div>
     <div class="path-grid">
-      <article><span>01</span><h3 data-i18n="beforeYouGo">{t('beforeYouGo')}</h3><p data-i18n="beforeYouGoBody">{t('beforeYouGoBody')}</p><a href="/guide/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
-      <article><span>02</span><h3 data-i18n="seeAllConcerts">{t('seeAllConcerts')}</h3><p data-i18n="seeAllConcertsBody">{t('seeAllConcertsBody')}</p><a href="/concerts/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
-      <article><span>03</span><h3 data-i18n="compareVenues">{t('compareVenues')}</h3><p data-i18n="compareVenuesBody">{t('compareVenuesBody')}</p><a href="/venues/"><span data-i18n="openPage">{t('openPage')}</span> →</a></article>
+      {content.paths.items.map((item, index) => (
+        <article>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <h3 data-en={item.title} data-zh-hk={item.titleZh}>{item.title}</h3>
+          <p data-en={item.description} data-zh-hk={item.descriptionZh}>{item.description}</p>
+          <a href={item.href}>
+            <span data-en={item.action} data-zh-hk={item.actionZh}>{item.action}</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      ))}
     </div>
   </section>
 
   <section class="home-venue-preview">
     <div class="section-heading">
-      <p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p>
-      <h2 data-i18n="venueDirectoryTitle">{t('venueDirectoryTitle')}</h2>
-      <p class="section-description" data-i18n="venueDirectoryBody">{t('venueDirectoryBody')}</p>
+      <p class="eyebrow" data-en={content.venueDirectory.eyebrow} data-zh-hk={content.venueDirectory.eyebrowZh}>{content.venueDirectory.eyebrow}</p>
+      <h2 data-en={content.venueDirectory.title} data-zh-hk={content.venueDirectory.titleZh}>{content.venueDirectory.title}</h2>
+      <p class="section-description" data-en={content.venueDirectory.description} data-zh-hk={content.venueDirectory.descriptionZh}>{content.venueDirectory.description}</p>
     </div>
     <VenueGrid venues={venues} compact />
-    <a class="wide-link" href="/venues/"><span data-i18n="compareVenues">{t('compareVenues')}</span><span>→</span></a>
+    <a class="wide-link" href="/venues/">
+      <span data-en={content.venueDirectory.action} data-zh-hk={content.venueDirectory.actionZh}>{content.venueDirectory.action}</span>
+      <span aria-hidden="true">→</span>
+    </a>
   </section>
 </BaseLayout>
