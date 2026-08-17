@@ -104,6 +104,16 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
             <div>
               <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
               <dd>
+                {item.lines && (
+                  <span class="venue-transit-lines">
+                    {item.lines.map((line) => (
+                      <span class="venue-transit-line" style={`--transit-line-color: ${line.color}`}>
+                        <span aria-hidden="true"></span>
+                        <span data-en={line.label} data-zh-hk={line.labelZh}>{line.label}</span>
+                      </span>
+                    ))}
+                  </span>
+                )}
                 <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
                 <span class="venue-transport-links">
                   {item.links.map((link) => (

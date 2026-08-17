@@ -480,6 +480,31 @@
     font-weight: 700;
     text-align: right;
   }
+  .venue-transit-lines {
+    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px 14px;
+  }
+  .venue-transit-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .venue-transit-line > span:first-child {
+    width: 10px;
+    height: 10px;
+    flex: 0 0 10px;
+    border-radius: 50%;
+    background: var(--transit-line-color);
+    box-shadow: 0 0 0 1px rgba(20, 20, 18, .16);
+  }
   .venue-transport-links {
     margin-top: 10px;
     display: flex;
@@ -1121,6 +1146,7 @@
     .venue-section-heading { grid-template-columns: 64px 1fr; }
     .venue-detail-table > div { grid-template-columns: 1fr; gap: 8px; }
     .venue-detail-table dd { text-align: left; }
+    .venue-transit-lines { justify-content: flex-start; }
     .venue-transport-links { justify-content: flex-start; }
     .venue-facilities-list li { grid-template-columns: 36px 1fr; gap: 10px 14px; }
     .venue-facilities-list p { grid-column: 2; }

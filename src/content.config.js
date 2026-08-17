@@ -14,7 +14,14 @@ const localizedTransportLink = z.object({
   url: z.string().url(),
 });
 
+const localizedTransitLine = z.object({
+  label: z.string(),
+  labelZh: z.string(),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+});
+
 const localizedTransportMethod = localizedScheduleItem.extend({
+  lines: z.array(localizedTransitLine).min(1).optional(),
   links: z.array(localizedTransportLink).min(1),
 });
 
