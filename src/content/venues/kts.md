@@ -1,28 +1,54 @@
 ---
 venue: kts
-description: "A practical venue profile is being prepared here, bringing the essential arrival, access and on-site details together before your concert."
-descriptionZh: "這個場館專頁正在整理中，稍後會集中提供演唱會前需要的到場、入場及場內實用資訊。"
+description: >-
+  Kai Tak Stadium is the 50,000-capacity centrepiece of Kai Tak Sports Park and
+  Hong Kong's largest stadium. A retractable roof supports all-weather sports,
+  concerts and large-scale entertainment events.
+descriptionZh: >-
+  啟德主場館是啟德體育園的核心50,000人場館，亦是香港最大的體育場。伸縮上蓋
+  可配合全天候體育、演唱會及大型娛樂活動。
 cover: "/images/venue-cover-placeholder.svg"
-openingHoursIntro: "Opening arrangements are being prepared. Always confirm the event organiser's latest notice before travelling."
-openingHoursIntroZh: "開放安排正在整理中，出發前請先查看活動主辦單位的最新通知。"
+openingHoursIntro: >-
+  The stadium bowl opens for scheduled events rather than fixed daily public
+  visiting hours. Gate times, assigned approaches and re-entry rules are
+  published by the organiser and may differ by ticket zone.
+openingHoursIntroZh: >-
+  主場館看台按已編排活動開放，並無固定每日公眾參觀時間。開閘時間、指定到場
+  路線及再次入場規則由主辦單位公布，並可能按門票區域而異。
 openingHours:
-  - { label: "Public access", labelZh: "公眾開放", value: "Event dependent", valueZh: "視乎活動安排" }
-  - { label: "Doors open", labelZh: "入場時間", value: "To be confirmed", valueZh: "有待公布" }
-transport: "MTR exits, walking routes, bus connections and post-show crowd arrangements will be added here."
-transportZh: "港鐵出口、步行路線、巴士接駁及散場人流安排將會在這裡補充。"
-address: "Venue address to be confirmed"
-addressZh: "場館地址有待確認"
-mapNote: "The map currently shows a broad Hong Kong preview while the venue pin is being prepared."
-mapNoteZh: "場館位置正在整理中，地圖目前顯示香港範圍預覽。"
-mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=113.83%2C22.15%2C114.44%2C22.58&layer=mapnik"
-mapUrl: "https://www.openstreetmap.org/#map=11/22.330/114.135"
-facilitiesIntro: "This section will become a quick reference for the services worth checking before arrival."
-facilitiesIntroZh: "這裡將整理到場前值得確認的場館服務，方便快速查閱。"
+  - { label: "Stadium access", labelZh: "場館開放", value: "Event-specific; check the ticket and organiser's notice", valueZh: "按活動安排；請查閱門票及主辦單位通知" }
+  - { label: "Park and retail areas", labelZh: "園區及零售設施", value: "Separate operating hours; check the official park directory", valueZh: "另有營業時間；請查閱體育園官方指南" }
+  - { label: "Visitor information", labelZh: "訪客資訊", value: "kaitaksportspark.com.hk", valueZh: "kaitaksportspark.com.hk" }
+transport: >-
+  Take the Tuen Ma Line to Sung Wong Toi or Kai Tak Station and walk about 10
+  minutes; Sung Wong Toi is generally the more convenient approach for the
+  Stadium. Buses, green minibuses, taxis and the North Point-Kowloon City ferry
+  also serve the wider park area. Designated drop-off zones and public car
+  parks are available, but roads and parking may be restricted during major
+  events. MTR is strongly recommended for full-capacity events.
+transportZh: >-
+  可乘搭屯馬綫至宋皇臺站或啟德站，再步行約10分鐘；前往主場館一般以宋皇臺站
+  較方便。園區一帶亦有巴士、專線小巴、的士及北角至九龍城渡輪服務。場內設
+  指定上落客區及公共停車場，但大型活動期間道路及泊車可能受限制。滿座活動
+  強烈建議乘搭港鐵。
+address: "Kai Tak Sports Park, 38-39 Shing Kai Road, Kowloon, Hong Kong"
+addressZh: "香港九龍承啟道38至39號啟德體育園"
+mapNote: "The map is centred on Kai Tak Stadium within the southern side of Kai Tak Sports Park."
+mapNoteZh: "地圖以啟德體育園南面的啟德主場館為中心。"
+mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=114.188%2C22.316%2C114.212%2C22.340&layer=mapnik&marker=22.3224%2C114.1972"
+mapUrl: "https://www.openstreetmap.org/#map=16/22.3224/114.1972"
+facilitiesIntro: >-
+  The stadium provides modern concourses, accessible seating, food and beverage
+  service and event support across its levels. Exact gates, concessions and
+  audience rules vary with the sports or concert configuration.
+facilitiesIntroZh: >-
+  主場館各層設有現代化大堂、無障礙座位、餐飲及活動支援設施。實際閘口、
+  餐飲點及觀眾規則視乎體育或演唱會佈置。
 facilities:
-  - { title: "Accessibility", titleZh: "無障礙設施", description: "Step-free routes and accessible seating details are being prepared.", descriptionZh: "無梯級路線及無障礙座位資料正在整理中。" }
-  - { title: "Food and drink", titleZh: "飲食", description: "Concession and outside-food guidance will be added here.", descriptionZh: "場內飲食及攜帶外來食物指引將會在這裡補充。" }
-  - { title: "Washrooms", titleZh: "洗手間", description: "Locations and accessible washroom notes are coming soon.", descriptionZh: "位置及無障礙洗手間資訊即將補充。" }
-  - { title: "Bag policy", titleZh: "攜帶物品", description: "Event-specific bag and security rules will be listed here.", descriptionZh: "活動相關的攜帶物品及保安規定將會列於這裡。" }
+  - { title: "Accessibility", titleZh: "無障礙設施", description: "Step-free routes, ramps, lifts, accessible seating and toilets, tactile or Braille guidance, and hearing-support facilities are provided. Contact the organiser before the event for accessible ticketing or assistance.", descriptionZh: "場館設無梯級通道、斜道、升降機、無障礙座位及洗手間、觸感或盲文指引，以及聽覺支援設施。無障礙票務或協助請於活動前聯絡主辦單位。" }
+  - { title: "Food and drink", titleZh: "飲食", description: "Concourse kiosks and bars operate according to the event, with more restaurants and cafes in the park retail areas. Outside-food rules are event-specific.", descriptionZh: "大堂餐飲攤位及酒吧按活動開放，園區零售範圍另有餐廳及咖啡店。外來食物規定按個別活動訂定。" }
+  - { title: "Washrooms and guest services", titleZh: "洗手間及訪客服務", description: "Standard and accessible washrooms are distributed across the stadium concourses. Allow extra time at intervals and after large events, and use the facilities nearest your assigned section.", descriptionZh: "各層大堂設有一般及無障礙洗手間。大型活動中場及散場時請預留時間，並使用最接近指定座位區的設施。" }
+  - { title: "Security and belongings", titleZh: "保安及隨身物品", description: "All event gates may use security and bag screening. Check the organiser's notice for bag-size limits, prohibited items, bottle rules, camera restrictions and storage arrangements.", descriptionZh: "活動閘口可能設保安及手袋檢查。手袋尺寸、禁止物品、飲料容器、攝影限制及儲物安排請查閱主辦單位通知。" }
 galleryIntro: "A venue photo set will be added here. These frames reserve the final editorial layout."
 galleryIntroZh: "場館相片將會加入這裡；目前的圖片位置用作預覽最終版面。"
 gallery:
