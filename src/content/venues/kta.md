@@ -64,7 +64,7 @@ facilities:
 galleryIntro: "Views of Kai Tak Arena from the entrance and lobby."
 galleryIntroZh: "啟德體藝館入口及大堂景觀。"
 gallery:
-  - { image: "/images/venues/kta/north-entrance.webp", caption: "North entrance", captionZh: "北面入口" }
-  - { image: "/images/venues/kta/lobby.webp", caption: "Arena lobby", captionZh: "場館大堂" }
-  - { image: "/images/venues/kta/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
+  - { image: "/images/venues/kta/north-entrance.webp", caption: "North entrance", captionZh: "北面入口", credit: "Photo: Ceeseven / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Kai_Tak_Arena_North_Entrance.jpg" }
+  - { image: "/images/venues/kta/lobby.webp", caption: "Arena lobby", captionZh: "場館大堂", credit: "Photo: 任晏延 / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Kt_arena_lobby.jpg" }
+  - { image: "/images/venues/kta/exterior.webp", caption: "Exterior view at dusk", captionZh: "場館外觀黃昏景色", credit: "Photo: LN9267 / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Kai_Tak_Arena_19-04-2026(1).jpg" }
 ---

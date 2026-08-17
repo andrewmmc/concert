@@ -65,7 +65,7 @@ facilities:
 galleryIntro: "Views of Kai Tak Stadium from the entrance and interior."
 galleryIntroZh: "啟德主場館入口及場內景觀。"
 gallery:
-  - { image: "/images/venues/kts/entrance.webp", caption: "Stadium entrance", captionZh: "主場館入口" }
-  - { image: "/images/venues/kts/interior.webp", caption: "Stadium interior", captionZh: "主場館內部" }
-  - { image: "/images/venues/kts/exterior.webp", caption: "Exterior view", captionZh: "場館外觀" }
+  - { image: "/images/venues/kts/entrance.webp", caption: "Stadium entrance", captionZh: "主場館入口", credit: "Photo: 任晏延 / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Kai_tak_stadium_entrance.jpg" }
+  - { image: "/images/venues/kts/interior.webp", caption: "Stadium interior", captionZh: "主場館內部", credit: "Photo: 任晏延 / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Inside_the_Kai_Tak_stadium_(1).jpg" }
+  - { image: "/images/venues/kts/exterior.webp", caption: "Exterior view from Central Square", captionZh: "由中央廣場望向場館外觀", credit: "Photo: Ceeseven / Wikimedia Commons", license: "CC BY-SA 4.0", sourceUrl: "https://commons.wikimedia.org/wiki/File:Kai_Tak_Stadium_viewed_from_Central_Square.jpg" }
 ---
