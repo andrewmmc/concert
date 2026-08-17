@@ -1,29 +1,31 @@
 ---
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ENGLISH, translate } from '../lib/i18n.js';
 
-const t = (key) => translate(ENGLISH, key);
-const guides = [
-  ['guideTicketTitle', 'guideTicketBody'],
-  ['guideArrivalTitle', 'guideArrivalBody'],
-  ['guideInsideTitle', 'guideInsideBody'],
-  ['guideAfterTitle', 'guideAfterBody'],
-  ['guideAccessibilityTitle', 'guideAccessibilityBody'],
-];
+const entry = await getEntry('pages', 'guide');
+if (!entry || entry.data.type !== 'guide') {
+  throw new Error('Missing guide Markdown content');
+}
+const content = entry.data;
 ---
 
-<BaseLayout currentPage="guide">
+<BaseLayout
+  currentPage="guide"
+  title={`${content.title} — Hong Kong Concert Guide`}
+  titleZh={`${content.titleZh} — 香港演唱會指南`}
+  description={content.description}
+>
   <section class="page-hero guide-hero">
-    <p class="eyebrow" data-i18n="guidePageEyebrow">{t('guidePageEyebrow')}</p>
-    <h1 data-i18n="guidePageTitle">{t('guidePageTitle')}</h1>
-    <p data-i18n="guidePageBody">{t('guidePageBody')}</p>
+    <p class="eyebrow" data-en={content.eyebrow} data-zh-hk={content.eyebrowZh}>{content.eyebrow}</p>
+    <h1 data-en={content.title} data-zh-hk={content.titleZh}>{content.title}</h1>
+    <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
   <section class="guide-grid">
-    {guides.map(([title, body], index) => (
+    {content.sections.map((section, index) => (
       <article>
         <span>{String(index + 1).padStart(2, '0')}</span>
-        <h2 data-i18n={title}>{t(title)}</h2>
-        <p data-i18n={body}>{t(body)}</p>
+        <h2 data-en={section.title} data-zh-hk={section.titleZh}>{section.title}</h2>
+        <p data-en={section.description} data-zh-hk={section.descriptionZh}>{section.description}</p>
       </article>
     ))}
   </section>

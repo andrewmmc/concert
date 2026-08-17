@@ -21,6 +21,15 @@ const localizedPhoto = z.object({
   captionZh: z.string(),
 });
 
+const localizedPageFields = {
+  eyebrow: z.string(),
+  eyebrowZh: z.string(),
+  title: z.string(),
+  titleZh: z.string(),
+  description: z.string(),
+  descriptionZh: z.string(),
+};
+
 const venues = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/venues' }),
   schema: z.object({
@@ -48,4 +57,38 @@ const venues = defineCollection({
   }),
 });
 
-export const collections = { venues };
+const pages = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/pages' }),
+  schema: z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('guide'),
+      ...localizedPageFields,
+      sections: z.array(z.object({
+        title: z.string(),
+        titleZh: z.string(),
+        description: z.string(),
+        descriptionZh: z.string(),
+      })).min(1),
+    }),
+    z.object({
+      type: z.literal('concerts'),
+      ...localizedPageFields,
+      calendar: z.object({
+        range: z.string(),
+        year: z.number(),
+        label: z.string(),
+        labelZh: z.string(),
+      }),
+      events: z.array(z.object({
+        date: z.string(),
+        dateZh: z.string(),
+        title: z.string(),
+        titleZh: z.string(),
+        meta: z.string(),
+        metaZh: z.string(),
+      })).min(1),
+    }),
+  ]),
+});
+
+export const collections = { pages, venues };

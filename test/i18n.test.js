@@ -38,7 +38,7 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(TRADITIONAL_CHINESE, 'navConcerts'), '演出日程');
   assert.equal(translate(ENGLISH, 'arenaTransportTitle'), 'Transport');
   assert.equal(translate(TRADITIONAL_CHINESE, 'exploreOtherArenas'), '探索其他場館');
-  assert.equal(translate(ENGLISH, 'guidePageTitle'), 'The things worth knowing before show day.');
+  assert.equal(translate(ENGLISH, 'navGuide'), 'Before You Go');
   assert.equal(translate(TRADITIONAL_CHINESE, 'openDedicatedViewer'), '開啟獨立 3D 座位視圖');
   assert.equal(translate(ENGLISH, 'venueDirectoryTitle'), 'Venue directory');
   assert.equal(translate(TRADITIONAL_CHINESE, 'venueDirectoryTitle'), '場館目錄');

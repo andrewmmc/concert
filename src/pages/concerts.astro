@@ -1,29 +1,40 @@
 ---
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { ENGLISH, translate } from '../lib/i18n.js';
 
-const t = (key) => translate(ENGLISH, key);
-const concerts = [
-  ['concertOne', 'concertOneMeta'],
-  ['concertTwo', 'concertTwoMeta'],
-  ['concertThree', 'concertThreeMeta'],
-];
+const entry = await getEntry('pages', 'concerts');
+if (!entry || entry.data.type !== 'concerts') {
+  throw new Error('Missing concerts Markdown content');
+}
+const content = entry.data;
 ---
 
-<BaseLayout currentPage="concerts">
+<BaseLayout
+  currentPage="concerts"
+  title={`${content.title} — Hong Kong Concert Guide`}
+  titleZh={`${content.titleZh} — 香港演唱會指南`}
+  description={content.description}
+>
   <section class="page-hero concerts-hero">
-    <p class="eyebrow" data-i18n="concertPageEyebrow">{t('concertPageEyebrow')}</p>
-    <h1 data-i18n="concertPageTitle">{t('concertPageTitle')}</h1>
-    <p data-i18n="concertPageBody">{t('concertPageBody')}</p>
+    <p class="eyebrow" data-en={content.eyebrow} data-zh-hk={content.eyebrowZh}>{content.eyebrow}</p>
+    <h1 data-en={content.title} data-zh-hk={content.titleZh}>{content.title}</h1>
+    <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
   <section class="concert-section standalone-concerts">
     <div class="concert-board">
-      <div class="calendar-stamp"><span>AUG — DEC</span><strong>2026</strong><small data-i18n="calendarPreview">{t('calendarPreview')}</small></div>
+      <div class="calendar-stamp">
+        <span>{content.calendar.range}</span>
+        <strong>{content.calendar.year}</strong>
+        <small data-en={content.calendar.label} data-zh-hk={content.calendar.labelZh}>{content.calendar.label}</small>
+      </div>
       <div class="concert-list">
-        {concerts.map(([title, meta], index) => (
+        {content.events.map((event, index) => (
           <article>
-            <time>TBA</time>
-            <div><h3 data-i18n={title}>{t(title)}</h3><p data-i18n={meta}>{t(meta)}</p></div>
+            <time data-en={event.date} data-zh-hk={event.dateZh}>{event.date}</time>
+            <div>
+              <h3 data-en={event.title} data-zh-hk={event.titleZh}>{event.title}</h3>
+              <p data-en={event.meta} data-zh-hk={event.metaZh}>{event.meta}</p>
+            </div>
             <span>{String(index + 1).padStart(2, '0')}</span>
           </article>
         ))}
