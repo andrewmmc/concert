@@ -139,7 +139,7 @@ const messages = {
     exploreOtherArenas: '探索其他場館',
     venueDetails: '場館詳情',
     openingHours: '開放時間',
-    addressAndMap: '地址及地圖',
+    addressAndMap: '地址',
     venueAddress: '地址',
     photoAlbum: '相片集',
     coverPreview: '場館封面預覽',
