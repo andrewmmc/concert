@@ -33,6 +33,7 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(TRADITIONAL_CHINESE, 'findSeat'), '尋找座位');
   assert.equal(translate(ENGLISH, 'viewFromSeat'), 'Stage view');
   assert.equal(translate(TRADITIONAL_CHINESE, 'seatSurroundings'), '座位周邊');
+  assert.equal(translate(ENGLISH, 'noSeatSelected'), 'No seat selected');
   assert.equal(translate(TRADITIONAL_CHINESE, 'noSeatSelected'), '尚未選擇座位');
   assert.equal(translate(ENGLISH, 'siteName'), 'Hong Kong Concert Guide');
   assert.equal(translate(TRADITIONAL_CHINESE, 'siteName'), '香港演唱會指南');

@@ -94,7 +94,7 @@ const messages = {
     row: 'Row',
     seat: 'Seat',
     goToSeat: 'Go to seat',
-    noSeatSelected: '— no seat selected —',
+    noSeatSelected: 'No seat selected',
     selectSeatHint: 'Click a seat for its stage and seating-area views',
     viewFromSeat: 'Stage view',
     seatSurroundings: 'Seat area',
