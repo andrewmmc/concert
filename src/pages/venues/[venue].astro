@@ -1,20 +1,24 @@
 ---
-import VenueGrid from '../../components/VenueGrid.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../../lib/i18n.js';
+import { getVenueDetail } from '../../lib/venueDetails.js';
 import { venueLine } from '../../lib/venueLines.js';
 import { venues } from '../../venues/index.js';
 
-export function getStaticPaths() {
-  return venues.map((venue) => ({ params: { venue: venue.id }, props: { venue } }));
+export async function getStaticPaths() {
+  const details = await getCollection('venues');
+  return venues.map((venue) => ({
+    params: { venue: venue.id },
+    props: { venue, detail: getVenueDetail(details, venue.id) },
+  }));
 }
 
-const { venue } = Astro.props;
+const { venue, detail } = Astro.props;
 const t = (key) => translate(ENGLISH, key);
 const text = getVenueText(ENGLISH, venue);
 const chineseText = getVenueText(TRADITIONAL_CHINESE, venue);
-const venueNumber = venues.findIndex((item) => item.id === venue.id) + 1;
-const otherVenues = venues.filter((item) => item.id !== venue.id).slice(0, 3);
+const line = venueLine(venue.id);
 const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
 ---
 
@@ -23,36 +27,145 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
   venueId={venue.id}
   title={`${text.name} — ${t('siteName')}`}
   titleZh={`${chineseText.name} — ${translate(TRADITIONAL_CHINESE, 'siteName')}`}
+  description={detail.description}
 >
-  <section class="arena-hero">
-    <div class="arena-hero-copy reveal">
-      <a class="back-link" href="/venues/"><span aria-hidden="true">←</span> <span data-i18n="navVenues">{t('navVenues')}</span></a>
-      <p class="eyebrow"><span data-i18n="arenaPageEyebrow">{t('arenaPageEyebrow')}</span> / {venue.id.toUpperCase()}</p>
-      <h1 data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</h1>
-      <p class="arena-subtitle" data-en={text.subtitle} data-zh-hk={chineseText.subtitle}>{text.subtitle}</p>
-      <p class="arena-intro" data-en={text.dims} data-zh-hk={chineseText.dims}>{text.dims}</p>
-      <a class="button-primary venue-viewer-button" href={viewerUrl}><span data-i18n="openDedicatedViewer">{t('openDedicatedViewer')}</span><span aria-hidden="true">↗</span></a>
-    </div>
-    <div class="arena-index reveal delay-one" aria-hidden="true" style={`--line-color: ${venueLine(venue.id).color}`}>
-      <span class="line-chip">{venueLine(venue.id).code}</span>
-      <span class="arena-number">{venueNumber}</span>
-      <small>{venue.id.toUpperCase()} / 852</small>
+  <section class="venue-profile-hero" style={`--venue-color: ${line.color}`}>
+    <div class="venue-profile-grid">
+      <div class="venue-profile-copy reveal">
+        <a class="back-link" href="/venues/"><span aria-hidden="true">←</span> <span data-i18n="navVenues">{t('navVenues')}</span></a>
+        <p class="eyebrow"><span data-i18n="arenaPageEyebrow">{t('arenaPageEyebrow')}</span> / {venue.id.toUpperCase()}</p>
+        <h1 data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</h1>
+        <p
+          class="venue-description"
+          data-en={detail.description}
+          data-zh-hk={detail.descriptionZh}
+        >{detail.description}</p>
+        <a class="button-primary venue-viewer-button" href={viewerUrl}>
+          <span data-i18n="openDedicatedViewer">{t('openDedicatedViewer')}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      <figure class="venue-cover reveal delay-one">
+        <div class="venue-cover-media">
+          <img src={detail.cover} alt="" />
+          <div class="venue-cover-label">
+            <span class="line-chip">{line.code}</span>
+            <strong>{venue.id.toUpperCase()}</strong>
+            <small>HONG KONG / 852</small>
+          </div>
+        </div>
+        <figcaption>
+          <span data-i18n="coverPreview">{t('coverPreview')}</span>
+          <span aria-hidden="true">01</span>
+        </figcaption>
+      </figure>
     </div>
   </section>
 
-  <section class="venue-detail-section">
-    <div class="detail-grid">
-      <article><span>01</span><h2 data-i18n="openingHours">{t('openingHours')}</h2><strong data-i18n="openingHoursValue">{t('openingHoursValue')}</strong><p data-i18n="openingHoursBody">{t('openingHoursBody')}</p></article>
-      <article><span>02</span><h2 data-i18n="arenaTransportTitle">{t('arenaTransportTitle')}</h2><p data-i18n="arenaTransportBody">{t('arenaTransportBody')}</p></article>
-      <article><span>03</span><h2 data-i18n="venueFacilities">{t('venueFacilities')}</h2><p data-i18n="venueFacilitiesBody">{t('venueFacilitiesBody')}</p></article>
-      <article><span>04</span><h2 data-i18n="venueUpcoming">{t('venueUpcoming')}</h2><p data-i18n="venueUpcomingBody">{t('venueUpcomingBody')}</p><b data-i18n="dateTba">{t('dateTba')}</b></article>
-      <article><span>05</span><h2 data-i18n="venueComments">{t('venueComments')}</h2><p data-i18n="venueCommentsBody">{t('venueCommentsBody')}</p><blockquote>“<span data-i18n="localCommentsBody">{t('localCommentsBody')}</span>”</blockquote></article>
-      <article class="viewer-callout"><span>3D</span><h2 data-i18n="viewerTitle">{t('viewerTitle')}</h2><p data-i18n="viewerBody">{t('viewerBody')}</p><a href={viewerUrl}><span data-i18n="openDedicatedViewer">{t('openDedicatedViewer')}</span> →</a></article>
-    </div>
-  </section>
+  <div class="venue-guide">
+    <section class="venue-info-section" aria-labelledby="opening-hours">
+      <header class="venue-section-heading">
+        <span>01 / 04</span>
+        <h2 id="opening-hours" data-i18n="openingHours">{t('openingHours')}</h2>
+      </header>
+      <div class="venue-section-body venue-hours-layout">
+        <p
+          class="venue-section-lead"
+          data-en={detail.openingHoursIntro}
+          data-zh-hk={detail.openingHoursIntroZh}
+        >{detail.openingHoursIntro}</p>
+        <dl class="venue-hours-list">
+          {detail.openingHours.map((item) => (
+            <div>
+              <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
+              <dd data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
 
-  <section class="other-arenas">
-    <div class="section-heading"><div><p class="eyebrow" data-i18n="venueDirectoryEyebrow">{t('venueDirectoryEyebrow')}</p><h2 data-i18n="exploreOtherArenas">{t('exploreOtherArenas')}</h2></div></div>
-    <VenueGrid venues={otherVenues} compact />
-  </section>
+    <section class="venue-info-section" aria-labelledby="transport-maps">
+      <header class="venue-section-heading">
+        <span>02 / 04</span>
+        <h2 id="transport-maps" data-i18n="transportAndMaps">{t('transportAndMaps')}</h2>
+      </header>
+      <div class="venue-section-body venue-transport-layout">
+        <div>
+          <p
+            class="venue-section-lead"
+            data-en={detail.transport}
+            data-zh-hk={detail.transportZh}
+          >{detail.transport}</p>
+          <p
+            class="venue-section-note"
+            data-en={detail.transportNote}
+            data-zh-hk={detail.transportNoteZh}
+          >{detail.transportNote}</p>
+          <a class="venue-map-link" href={detail.mapUrl} target="_blank" rel="noreferrer">
+            <span data-i18n="openInOpenStreetMap">{t('openInOpenStreetMap')}</span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <div class="venue-map">
+          <iframe
+            src={detail.mapEmbedUrl}
+            title={`OpenStreetMap preview for ${text.name}`}
+            loading="lazy"
+            referrerpolicy="no-referrer"
+          ></iframe>
+          <span>© OpenStreetMap contributors</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="venue-info-section" aria-labelledby="facilities">
+      <header class="venue-section-heading">
+        <span>03 / 04</span>
+        <h2 id="facilities" data-i18n="venueFacilities">{t('venueFacilities')}</h2>
+      </header>
+      <div class="venue-section-body">
+        <p
+          class="venue-section-lead venue-facilities-intro"
+          data-en={detail.facilitiesIntro}
+          data-zh-hk={detail.facilitiesIntroZh}
+        >{detail.facilitiesIntro}</p>
+        <ul class="venue-facilities-list">
+          {detail.facilities.map((facility, index) => (
+            <li>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3 data-en={facility.title} data-zh-hk={facility.titleZh}>{facility.title}</h3>
+              <p data-en={facility.description} data-zh-hk={facility.descriptionZh}>{facility.description}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="venue-info-section venue-album-section" aria-labelledby="photo-album">
+      <header class="venue-section-heading">
+        <span>04 / 04</span>
+        <h2 id="photo-album" data-i18n="photoAlbum">{t('photoAlbum')}</h2>
+      </header>
+      <div class="venue-section-body">
+        <p
+          class="venue-section-lead"
+          data-en={detail.galleryIntro}
+          data-zh-hk={detail.galleryIntroZh}
+        >{detail.galleryIntro}</p>
+        <div class="venue-gallery">
+          {detail.gallery.map((photo, index) => (
+            <figure>
+              <div class="venue-gallery-image">
+                <img src={photo.image} alt="" loading="lazy" />
+                <span>{String(index + 1).padStart(2, '0')}</span>
+              </div>
+              <figcaption data-en={photo.caption} data-zh-hk={photo.captionZh}>{photo.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  </div>
 </BaseLayout>

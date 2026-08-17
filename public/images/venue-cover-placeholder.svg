@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Venue image placeholder</title>
+  <desc id="desc">An abstract architectural study used while venue photography is prepared.</desc>
+  <rect width="1200" height="900" fill="#d9dbd4"/>
+  <path d="M0 0h760L390 900H0z" fill="#171714"/>
+  <path d="M1200 0v900H390L760 0z" fill="#ef3e2f"/>
+  <circle cx="760" cy="450" r="245" fill="none" stroke="#fffdf8" stroke-width="2" opacity=".75"/>
+  <circle cx="760" cy="450" r="165" fill="none" stroke="#fffdf8" stroke-width="2" opacity=".45"/>
+  <path d="M184 672V228h280M184 450h410" fill="none" stroke="#fffdf8" stroke-width="3"/>
+  <path d="m948 180 94 94-94 94-94-94z" fill="#d9ff43"/>
+</svg>
