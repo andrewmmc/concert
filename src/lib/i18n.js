@@ -143,7 +143,7 @@ const messages = {
     venueAddress: '地址',
     photoAlbum: '相片集',
     coverPreview: '場館封面預覽',
-    openInOpenStreetMap: '在 OpenStreetMap 開啟',
+    openInOpenStreetMap: '開啟地圖',
     openingHoursValue: '視乎活動安排',
     openingHoursBody: '公眾開放及入場時間因活動而異，出發前請查看主辦單位最新通知。',
     venueFacilities: '場館設施',
