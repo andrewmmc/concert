@@ -29,10 +29,10 @@ transportZh: >-
   場館位於銅鑼灣與灣仔之間的摩理臣山。由港鐵站需要在地面步行，請預留時間；
   由於場館不設一般訪客停車場，建議使用公共交通。
 transportMethods:
-  - { label: "MTR", labelZh: "港鐵", value: "Walk about 10-15 minutes from Causeway Bay or Wan Chai Station toward Morrison Hill and Oi Kwan Road", valueZh: "由銅鑼灣或灣仔站向摩理臣山及愛群道方向步行約10至15分鐘" }
-  - { label: "Bus and minibus", labelZh: "巴士及小巴", value: "Services stop around Queen's Road East, Morrison Hill Road and the Wan Chai district", valueZh: "多條路線停靠皇后大道東、摩理臣山道及灣仔一帶" }
-  - { label: "Taxi", labelZh: "的士", value: "Use the main entrance on Oi Kwan Road for drop-off and pick-up", valueZh: "可於愛群道正門上落客" }
-  - { label: "Driving", labelZh: "自駕", value: "No general visitor car park is provided at the stadium", valueZh: "場館不設一般訪客停車場" }
+  - { label: "MTR", labelZh: "港鐵", value: "Walk about 10-15 minutes from Causeway Bay or Wan Chai Station toward Morrison Hill and Oi Kwan Road", valueZh: "由銅鑼灣或灣仔站向摩理臣山及愛群道方向步行約10至15分鐘", links: [{ label: "MTR Journey Planner", labelZh: "港鐵行程指南", url: "https://www.mtr.com.hk/en/customer/jp/index.php" }] }
+  - { label: "Bus and minibus", labelZh: "巴士及小巴", value: "Services stop around Queen's Road East, Morrison Hill Road and the Wan Chai district", valueZh: "多條路線停靠皇后大道東、摩理臣山道及灣仔一帶", links: [{ label: "Citybus", labelZh: "城巴", url: "https://www.citybus.com.hk/routes/index.aspx?intLangID=1" }, { label: "HKeMobility route search", labelZh: "香港出行易路線搜尋", url: "https://www.hkemobility.gov.hk/en/route-search/pt" }] }
+  - { label: "Taxi", labelZh: "的士", value: "Use the main entrance on Oi Kwan Road for drop-off and pick-up", valueZh: "可於愛群道正門上落客", links: [{ label: "Transport Department taxi guide", labelZh: "運輸署的士指南", url: "https://www.td.gov.hk/en/transport_in_hong_kong/public_transport/taxi/index.html" }] }
+  - { label: "Driving", labelZh: "自駕", value: "No general visitor car park is provided at the stadium", valueZh: "場館不設一般訪客停車場", links: [{ label: "HKeMobility parking", labelZh: "香港出行易泊車資訊", url: "https://www.hkemobility.gov.hk/en/" }] }
 address: "18 Oi Kwan Road, Wan Chai, Hong Kong"
 addressZh: "香港灣仔愛群道18號"
 mapNote: "The map is centred on the Oi Kwan Road entrance at Morrison Hill."

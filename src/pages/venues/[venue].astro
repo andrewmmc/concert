@@ -79,7 +79,9 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
           {detail.openingHours.map((item) => (
             <div>
               <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
-              <dd data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</dd>
+              <dd>
+                <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
+              </dd>
             </div>
           ))}
         </dl>
@@ -101,7 +103,17 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
           {detail.transportMethods.map((item) => (
             <div>
               <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
-              <dd data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</dd>
+              <dd>
+                <span data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</span>
+                <span class="venue-transport-links">
+                  {item.links.map((link) => (
+                    <a href={link.url} target="_blank" rel="noreferrer">
+                      <span data-en={link.label} data-zh-hk={link.labelZh}>{link.label}</span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </span>
+              </dd>
             </div>
           ))}
         </dl>

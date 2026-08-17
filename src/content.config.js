@@ -8,6 +8,16 @@ const localizedScheduleItem = z.object({
   valueZh: z.string(),
 });
 
+const localizedTransportLink = z.object({
+  label: z.string(),
+  labelZh: z.string(),
+  url: z.string().url(),
+});
+
+const localizedTransportMethod = localizedScheduleItem.extend({
+  links: z.array(localizedTransportLink).min(1),
+});
+
 const localizedFacility = z.object({
   title: z.string(),
   titleZh: z.string(),
@@ -44,7 +54,7 @@ const venues = defineCollection({
     openingHours: z.array(localizedScheduleItem).min(1),
     transport: z.string(),
     transportZh: z.string(),
-    transportMethods: z.array(localizedScheduleItem).min(1),
+    transportMethods: z.array(localizedTransportMethod).min(1),
     address: z.string(),
     addressZh: z.string(),
     mapNote: z.string(),
