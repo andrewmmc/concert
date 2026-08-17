@@ -22,16 +22,17 @@ openingHours:
   - { label: "URBTIX box office", labelZh: "城市售票網售票處", value: "Daily 10:00 am-6:30 pm; until 30 min after a performance starts on event days", valueZh: "每日上午10時至下午6時30分；活動日服務至演出開始後30分鐘" }
   - { label: "Arena access", labelZh: "主場開放", value: "Event-specific; check the organiser's notice", valueZh: "按活動安排；請查閱主辦單位通知" }
 transport: >-
-  The stadium is within walking distance of both Causeway Bay and Wan Chai MTR
-  stations; allow about 10-15 minutes and follow signs toward Morrison Hill and
-  Oi Kwan Road. Numerous buses and green minibuses serve Queen's Road East,
-  Morrison Hill Road and the surrounding Wan Chai area. Taxis can use the Oi
-  Kwan Road entrance. There is no general visitor car park at the stadium, so
-  public transport is recommended.
+  The stadium sits on Morrison Hill between Causeway Bay and Wan Chai. Allow
+  time for the street-level walk from the MTR, and use public transport because
+  the venue does not provide a general visitor car park.
 transportZh: >-
-  場館可由銅鑼灣或灣仔港鐵站步行前往，請預留約10至15分鐘，並依照摩理臣山及
-  愛群道方向前進。多條巴士及專線小巴途經皇后大道東、摩理臣山道及灣仔一帶；
-  的士可使用愛群道入口。場館不設一般訪客停車場，建議乘搭公共交通。
+  場館位於銅鑼灣與灣仔之間的摩理臣山。由港鐵站需要在地面步行，請預留時間；
+  由於場館不設一般訪客停車場，建議使用公共交通。
+transportMethods:
+  - { label: "MTR", labelZh: "港鐵", value: "Walk about 10-15 minutes from Causeway Bay or Wan Chai Station toward Morrison Hill and Oi Kwan Road", valueZh: "由銅鑼灣或灣仔站向摩理臣山及愛群道方向步行約10至15分鐘" }
+  - { label: "Bus and minibus", labelZh: "巴士及小巴", value: "Services stop around Queen's Road East, Morrison Hill Road and the Wan Chai district", valueZh: "多條路線停靠皇后大道東、摩理臣山道及灣仔一帶" }
+  - { label: "Taxi", labelZh: "的士", value: "Use the main entrance on Oi Kwan Road for drop-off and pick-up", valueZh: "可於愛群道正門上落客" }
+  - { label: "Driving", labelZh: "自駕", value: "No general visitor car park is provided at the stadium", valueZh: "場館不設一般訪客停車場" }
 address: "18 Oi Kwan Road, Wan Chai, Hong Kong"
 addressZh: "香港灣仔愛群道18號"
 mapNote: "The map is centred on the Oi Kwan Road entrance at Morrison Hill."

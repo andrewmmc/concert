@@ -24,17 +24,18 @@ openingHours:
   - { label: "URBTIX box office", labelZh: "城市售票網售票處", value: "Daily 10:00 am-6:30 pm; until 30 min after a performance starts on event days", valueZh: "每日上午10時至下午6時30分；活動日服務至演出開始後30分鐘" }
   - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2355 7234", valueZh: "+852 2355 7234" }
 transport: >-
-  MTR is the simplest option: take the East Rail Line or Tuen Ma Line to Hung
-  Hom Station and follow signs for Hong Kong Coliseum; the covered walk takes
-  only a few minutes. The Hung Hom Station public transport interchange also
-  serves buses, cross-harbour routes and taxis. Road access and nearby parking
-  become congested on show nights, so public transport is strongly recommended.
-  Follow MTR and venue crowd-control directions after major events.
+  Hung Hom Station connects directly to the Coliseum, making rail the simplest
+  choice. Public transport is strongly recommended on show nights; after major
+  events, follow the signed crowd-control routes rather than returning against
+  the departing flow.
 transportZh: >-
-  最方便的方法是乘搭東鐵綫或屯馬綫至紅磡站，依照香港體育館指示沿有蓋通道
-  步行數分鐘。紅磡站公共運輸交匯處亦有巴士、過海路線及的士服務。演出當晚
-  附近道路及停車場容易擠塞，強烈建議使用公共交通；大型活動散場時請遵從
-  港鐵及場館的人流管制指示。
+  紅磡站直接連接香港體育館，鐵路是最方便的選擇。演出當晚強烈建議使用公共
+  交通；大型活動散場時請依照指定人流管制路線，不要逆向返回離場人潮。
+transportMethods:
+  - { label: "MTR", labelZh: "港鐵", value: "East Rail or Tuen Ma Line to Hung Hom Station; follow Coliseum signs for a short covered walk", valueZh: "乘東鐵綫或屯馬綫至紅磡站；依香港體育館指示沿有蓋通道步行數分鐘" }
+  - { label: "Bus", labelZh: "巴士", value: "Use Hung Hom Station Public Transport Interchange, including local and cross-harbour services", valueZh: "可使用紅磡站公共運輸交匯處的本地及過海巴士服務" }
+  - { label: "Taxi", labelZh: "的士", value: "Drop-off and pick-up are available near the Cheong Wan Road venue entrance", valueZh: "可於暢運道場館入口附近上落客" }
+  - { label: "Driving", labelZh: "自駕", value: "Nearby parking is limited and roads are congested on event nights", valueZh: "附近泊車位有限，活動當晚道路容易擠塞" }
 address: "9 Cheong Wan Road, Hung Hom, Kowloon, Hong Kong"
 addressZh: "香港九龍紅磡暢運道9號"
 mapNote: "The map is centred on the Coliseum and its direct connection to Hung Hom Station."

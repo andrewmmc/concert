@@ -22,17 +22,18 @@ openingHours:
   - { label: "Complex access", labelZh: "博覽館開放", value: "Varies by exhibition, conference or event", valueZh: "按展覽、會議或活動而定" }
   - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888", valueZh: "+852 3606 8888" }
 transport: >-
-  The Airport Express runs directly to AsiaWorld-Expo Station inside the venue:
-  it is one stop from Airport Station and connects through Tsing Yi, Kowloon
-  and Hong Kong stations. Airport and Lantau bus routes, taxis, cross-boundary
-  coaches and on-site parking provide alternatives. Event-specific buses or
-  late services may be announced separately. Check the return Airport Express
-  timetable before the show, especially for late finishes.
+  AsiaWorld-Expo Station is inside the venue, making the Airport Express the
+  most direct route. Road and bus options are also available, but late-finishing
+  events may require special return planning; check the event transport notice
+  and last-train timetable before travelling.
 transportZh: >-
-  機場快綫直達位於場館內的亞洲國際博覽館站；由機場站只需一站，並連接青衣、
-  九龍及香港站。機場及大嶼山巴士、的士、跨境客車及場內停車場亦可到達。
-  活動特別巴士或延長服務會另行公布。演出完結較晚時，出發前請先查看回程
-  機場快綫時間。
+  亞洲國際博覽館站位於場館內，機場快綫是最直接的路線。亦可乘搭巴士或道路
+  交通；演出完結較晚時需要預先規劃回程，出發前請查看活動交通通知及尾班車時間。
+transportMethods:
+  - { label: "Airport Express", labelZh: "機場快綫", value: "Direct to AsiaWorld-Expo Station inside the venue; one stop from Airport Station", valueZh: "直達場館內的亞洲國際博覽館站；由機場站只需一站" }
+  - { label: "Bus", labelZh: "巴士", value: "Airport and Lantau routes serve the venue; special event services may be announced separately", valueZh: "機場及大嶼山路線服務場館；活動特別班次會另行公布" }
+  - { label: "Taxi and cross-boundary", labelZh: "的士及跨境交通", value: "Taxi stands and cross-boundary coach connections are available at the complex", valueZh: "博覽館設有的士站及跨境客車接駁" }
+  - { label: "Driving", labelZh: "自駕", value: "On-site parking is available; check event arrangements and availability before arrival", valueZh: "場館設有停車場；出發前請查看活動安排及泊位供應" }
 address: "AsiaWorld-Expo, 1 Airport Expo Boulevard, Chek Lap Kok, Lantau, Hong Kong"
 addressZh: "香港大嶼山赤鱲角機場博覽道1號亞洲國際博覽館"
 mapNote: "The map covers AsiaWorld-Expo, its in-venue MTR station and the adjacent airport precinct."

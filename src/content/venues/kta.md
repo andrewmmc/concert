@@ -22,17 +22,18 @@ openingHours:
   - { label: "Park and retail areas", labelZh: "園區及零售設施", value: "Separate operating hours; check the official park directory", valueZh: "另有營業時間；請查閱體育園官方指南" }
   - { label: "Visitor information", labelZh: "訪客資訊", value: "kaitaksportspark.com.hk", valueZh: "kaitaksportspark.com.hk" }
 transport: >-
-  Take the Tuen Ma Line to Kai Tak or Sung Wong Toi Station and walk about 10
-  minutes; Kai Tak Station is generally the more convenient approach for the
-  Arena. Buses, green minibuses, taxis and the North Point-Kowloon City ferry
-  also serve the wider park area. Designated drop-off zones and public car
-  parks are available, but access may be restricted during major events.
-  MTR is recommended, and visitors should follow event-day crowd-control signs.
+  Both Kai Tak and Sung Wong Toi stations serve the Sports Park, with Kai Tak
+  generally the more convenient approach for the Arena. Major events may use
+  controlled walking routes and temporary road restrictions, so follow the
+  route assigned in the event notice.
 transportZh: >-
-  可乘搭屯馬綫至啟德站或宋皇臺站，再步行約10分鐘；前往體藝館一般以啟德站
-  較方便。園區一帶亦有巴士、專線小巴、的士及北角至九龍城渡輪服務。場內設
-  指定上落客區及公共停車場，但大型活動期間可能實施交通限制。建議乘搭港鐵，
-  並遵從活動日人流管制指示。
+  啟德站及宋皇臺站均可前往體育園，前往體藝館一般以啟德站較方便。大型活動
+  可能實施指定步行路線及臨時道路限制，請依照活動通知所列路線前往。
+transportMethods:
+  - { label: "MTR", labelZh: "港鐵", value: "Tuen Ma Line to Kai Tak or Sung Wong Toi Station; allow about 10 minutes on foot", valueZh: "乘屯馬綫至啟德站或宋皇臺站，再步行約10分鐘" }
+  - { label: "Bus, minibus and ferry", labelZh: "巴士、小巴及渡輪", value: "Services reach the wider park and Kowloon City area; the North Point-Kowloon City ferry is another option", valueZh: "多條路線服務園區及九龍城一帶，亦可乘北角至九龍城渡輪" }
+  - { label: "Taxi and drop-off", labelZh: "的士及上落客", value: "Use the park's designated taxi or private-car drop-off zones", valueZh: "使用體育園指定的士或私家車上落客區" }
+  - { label: "Parking", labelZh: "泊車", value: "Public car parks are available, but access and capacity may be restricted during major events", valueZh: "設有公共停車場，但大型活動期間出入及泊位可能受限制" }
 address: "Kai Tak Sports Park, 38-39 Shing Kai Road, Kowloon, Hong Kong"
 addressZh: "香港九龍承啟道38至39號啟德體育園"
 mapNote: "The map is centred on Kai Tak Arena within the north-eastern side of Kai Tak Sports Park."

@@ -69,13 +69,13 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
         <span>01 / 04</span>
         <h2 id="opening-hours" data-i18n="openingHours">{t('openingHours')}</h2>
       </header>
-      <div class="venue-section-body venue-hours-layout">
+      <div class="venue-section-body venue-table-layout">
         <p
           class="venue-section-lead"
           data-en={detail.openingHoursIntro}
           data-zh-hk={detail.openingHoursIntroZh}
         >{detail.openingHoursIntro}</p>
-        <dl class="venue-hours-list">
+        <dl class="venue-detail-table">
           {detail.openingHours.map((item) => (
             <div>
               <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
@@ -91,12 +91,20 @@ const viewerUrl = `/viewer/${venue.id}/${venue.defaultLayout}/`;
         <span>02 / 05</span>
         <h2 id="transport" data-i18n="arenaTransportTitle">{t('arenaTransportTitle')}</h2>
       </header>
-      <div class="venue-section-body">
+      <div class="venue-section-body venue-table-layout">
         <p
-          class="venue-section-lead venue-transport-copy"
+          class="venue-section-lead"
           data-en={detail.transport}
           data-zh-hk={detail.transportZh}
         >{detail.transport}</p>
+        <dl class="venue-detail-table">
+          {detail.transportMethods.map((item) => (
+            <div>
+              <dt data-en={item.label} data-zh-hk={item.labelZh}>{item.label}</dt>
+              <dd data-en={item.value} data-zh-hk={item.valueZh}>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
 

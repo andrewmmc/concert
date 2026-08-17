@@ -30,6 +30,7 @@ test('every registered venue has the required Markdown detail sections', async (
     'cover',
     'openingHours',
     'transport',
+    'transportMethods',
     'address',
     'mapEmbedUrl',
     'facilities',

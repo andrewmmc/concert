@@ -44,6 +44,7 @@ const venues = defineCollection({
     openingHours: z.array(localizedScheduleItem).min(1),
     transport: z.string(),
     transportZh: z.string(),
+    transportMethods: z.array(localizedScheduleItem).min(1),
     address: z.string(),
     addressZh: z.string(),
     mapNote: z.string(),
