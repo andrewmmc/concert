@@ -20,7 +20,6 @@ openingHoursIntroZh: >-
 openingHours:
   - { label: "Arena access", labelZh: "場館開放", value: "Event-specific; check the ticket and organiser's notice", valueZh: "按活動安排；請查閱門票及主辦單位通知" }
   - { label: "Park and retail areas", labelZh: "園區及零售設施", value: "Separate operating hours; check the official park directory", valueZh: "另有營業時間；請查閱體育園官方指南" }
-  - { label: "Visitor information", labelZh: "訪客資訊", value: "kaitaksportspark.com.hk", valueZh: "kaitaksportspark.com.hk" }
 transport: >-
   Both Kai Tak and Sung Wong Toi stations serve the Sports Park, with Kai Tak
   generally the more convenient approach for the Arena. Major events may use
@@ -40,6 +39,16 @@ mapNote: "The map is centred on Kai Tak Arena within the north-eastern side of K
 mapNoteZh: "地圖以啟德體育園東北面的啟德體藝館為中心。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=114.195%2C22.328%2C114.215%2C22.342&layer=mapnik&marker=22.3347%2C114.2029"
 mapUrl: "https://www.openstreetmap.org/#map=16/22.3347/114.2029"
+venueInformationIntro: >-
+  Kai Tak Arena is operated as part of Kai Tak Sports Park. The park publishes
+  one shared visitor contact for the Arena, Stadium and other facilities.
+venueInformationIntroZh: >-
+  啟德體藝館是啟德體育園的一部分。體藝館、主場館及園內其他設施共用體育園
+  公布的訪客聯絡資料。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "Kai Tak Sports Park", valueZh: "啟德體育園", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.kaitaksportspark.com.hk/en/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.kaitaksportspark.com.hk/tc/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）" }
+  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）" }
 facilitiesIntro: >-
   The modern arena provides step-free circulation, accessible seating,
   audience amenities and event-day food service. Exact entrance, concession

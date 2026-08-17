@@ -33,6 +33,8 @@ test('every registered venue has the required Markdown detail sections', async (
     'transportMethods',
     'address',
     'mapEmbedUrl',
+    'venueInformationIntro',
+    'venueInformation',
     'facilities',
     'gallery',
   ];
@@ -59,4 +61,15 @@ test('venue cards source descriptions from venue Markdown', async () => {
   assert.match(source, /detail\.cardDescription/);
   assert.match(source, /detail\.cardDescriptionZh/);
   assert.doesNotMatch(source, /english\.subtitle|chinese\.subtitle/);
+});
+
+test('venue pages render Markdown-backed official information and website links', async () => {
+  const source = await readFile(
+    new URL('../src/pages/venues/[venue].astro', import.meta.url),
+    'utf8',
+  );
+
+  assert.match(source, /detail\.venueInformationIntro/);
+  assert.match(source, /detail\.venueInformation\.map/);
+  assert.match(source, /href=\{link\.url\}/);
 });

@@ -505,14 +505,14 @@
     background: var(--transit-line-color);
     box-shadow: 0 0 0 1px rgba(20, 20, 18, .16);
   }
-  .venue-transport-links {
+  .venue-detail-links {
     margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 6px 14px;
   }
-  .venue-transport-links a {
+  .venue-detail-links a {
     display: inline-flex;
     gap: 5px;
     color: var(--signal);
@@ -523,7 +523,7 @@
     text-decoration: none;
     text-transform: uppercase;
   }
-  .venue-transport-links a:hover { text-decoration: underline; }
+  .venue-detail-links a:hover { text-decoration: underline; }
   .venue-map-layout {
     display: grid;
     grid-template-columns: minmax(280px, .7fr) minmax(0, 1.3fr);
@@ -1145,7 +1145,7 @@
     .venue-detail-table > div { grid-template-columns: 1fr; gap: 8px; }
     .venue-detail-table dd { text-align: left; }
     .venue-transit-lines { justify-content: flex-start; }
-    .venue-transport-links { justify-content: flex-start; }
+    .venue-detail-links { justify-content: flex-start; }
     .venue-facilities-list li { grid-template-columns: 36px 1fr; gap: 10px 14px; }
     .venue-facilities-list p { grid-column: 2; }
     .venue-gallery { grid-template-columns: 1fr; }

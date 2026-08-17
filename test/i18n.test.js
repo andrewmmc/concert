@@ -44,6 +44,7 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(TRADITIONAL_CHINESE, 'openDedicatedViewer'), '開啟獨立 3D 座位視圖');
   assert.equal(translate(ENGLISH, 'venueDetails'), 'Venue details');
   assert.equal(translate(TRADITIONAL_CHINESE, 'venueDetails'), '場館詳情');
+  assert.equal(translate(TRADITIONAL_CHINESE, 'venueInformation'), '聯絡及官方資料');
   assert.equal(copy.name, '香港體育館');
   assert.equal(copy.layoutName, '三面台');
   assert.equal(copy.sides[0], '紅閘 40 段');

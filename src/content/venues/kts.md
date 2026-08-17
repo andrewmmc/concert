@@ -20,7 +20,6 @@ openingHoursIntroZh: >-
 openingHours:
   - { label: "Stadium access", labelZh: "場館開放", value: "Event-specific; check the ticket and organiser's notice", valueZh: "按活動安排；請查閱門票及主辦單位通知" }
   - { label: "Park and retail areas", labelZh: "園區及零售設施", value: "Separate operating hours; check the official park directory", valueZh: "另有營業時間；請查閱體育園官方指南" }
-  - { label: "Visitor information", labelZh: "訪客資訊", value: "kaitaksportspark.com.hk", valueZh: "kaitaksportspark.com.hk" }
 transport: >-
   Both Sung Wong Toi and Kai Tak stations serve the Sports Park, with Sung Wong
   Toi generally the more convenient approach for the Stadium. Full-capacity
@@ -40,6 +39,17 @@ mapNote: "The map is centred on Kai Tak Stadium within the southern side of Kai 
 mapNoteZh: "地圖以啟德體育園南面的啟德主場館為中心。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=114.188%2C22.316%2C114.212%2C22.340&layer=mapnik&marker=22.3224%2C114.1972"
 mapUrl: "https://www.openstreetmap.org/#map=16/22.3224/114.1972"
+venueInformationIntro: >-
+  Kai Tak Stadium is operated as part of Kai Tak Sports Park. The park
+  publishes one shared visitor contact for the Stadium, Arena and other
+  facilities.
+venueInformationIntroZh: >-
+  啟德主場館是啟德體育園的一部分。主場館、體藝館及園內其他設施共用體育園
+  公布的訪客聯絡資料。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "Kai Tak Sports Park", valueZh: "啟德體育園", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.kaitaksportspark.com.hk/en/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.kaitaksportspark.com.hk/tc/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3711 5050 (shared park contact)", valueZh: "+852 3711 5050（體育園共用）" }
+  - { label: "Email", labelZh: "電郵", value: "info@kaitaksportspark.com.hk (shared park contact)", valueZh: "info@kaitaksportspark.com.hk（體育園共用）" }
 facilitiesIntro: >-
   The stadium provides modern concourses, accessible seating, food and beverage
   service and event support across its levels. Exact gates, concessions and

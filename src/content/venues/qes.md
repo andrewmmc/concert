@@ -39,6 +39,20 @@ mapNote: "The map is centred on the Oi Kwan Road entrance at Morrison Hill."
 mapNoteZh: "地圖以摩理臣山愛群道入口為中心。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=114.170%2C22.270%2C114.190%2C22.282&layer=mapnik&marker=22.2750%2C114.1786"
 mapUrl: "https://www.openstreetmap.org/#map=17/22.2750/114.1786"
+venueInformationIntro: >-
+  Queen Elizabeth Stadium is managed by the Leisure and Cultural Services
+  Department. Its official pages publish current venue notices, booking
+  information and visitor arrangements.
+venueInformationIntroZh: >-
+  伊利沙伯體育館由康樂及文化事務署管理。最新場館通告、場地租用資料及訪客
+  安排，請查閱場館官方網站。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "Queen Elizabeth Stadium — LCSD", valueZh: "伊利沙伯體育館 — 康樂及文化事務署", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.lcsd.gov.hk/en/qes/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.lcsd.gov.hk/tc/qes/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2591 1346", valueZh: "+852 2591 1346" }
+  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7282", valueZh: "+852 2355 7282" }
+  - { label: "URBTIX hotline", labelZh: "城市售票網電話購票", value: "+852 3166 1288", valueZh: "+852 3166 1288" }
+  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）" }
+  - { label: "Fax", labelZh: "傳真", value: "+852 2803 5794", valueZh: "+852 2803 5794" }
 facilitiesIntro: >-
   The three-level venue includes accessible audience facilities, ticketing,
   sports rooms and event catering. Admission rules and the services operating

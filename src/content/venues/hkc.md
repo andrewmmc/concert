@@ -22,7 +22,6 @@ openingHoursIntroZh: >-
 openingHours:
   - { label: "Arena access", labelZh: "主場開放", value: "Event-specific; check the organiser's notice", valueZh: "按活動安排；請查閱主辦單位通知" }
   - { label: "URBTIX box office", labelZh: "城市售票網售票處", value: "Daily 10:00 am-6:30 pm; until 30 min after a performance starts on event days", valueZh: "每日上午10時至下午6時30分；活動日服務至演出開始後30分鐘" }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2355 7234", valueZh: "+852 2355 7234" }
 transport: >-
   Hung Hom Station connects directly to the Coliseum, making rail the simplest
   choice. Public transport is strongly recommended on show nights; after major
@@ -42,6 +41,20 @@ mapNote: "The map is centred on the Coliseum and its direct connection to Hung H
 mapNoteZh: "地圖以香港體育館及其連接紅磡站的通道為中心。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=114.172%2C22.296%2C114.192%2C22.308&layer=mapnik&marker=22.3015%2C114.1820"
 mapUrl: "https://www.openstreetmap.org/#map=17/22.3015/114.1820"
+venueInformationIntro: >-
+  Hong Kong Coliseum is managed by the Leisure and Cultural Services
+  Department. Use the venue's official pages for current notices, booking
+  information and visitor arrangements.
+venueInformationIntroZh: >-
+  香港體育館由康樂及文化事務署管理。最新通告、場地租用資料及訪客安排，
+  請查閱場館官方網站。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "Hong Kong Coliseum — LCSD", valueZh: "香港體育館 — 康樂及文化事務署", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.lcsd.gov.hk/en/hkc/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.lcsd.gov.hk/tc/hkc/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 2355 7234", valueZh: "+852 2355 7234" }
+  - { label: "Venue booking", labelZh: "場地租用查詢", value: "+852 2355 7261", valueZh: "+852 2355 7261" }
+  - { label: "Box office", labelZh: "售票處", value: "+852 2355 7233", valueZh: "+852 2355 7233" }
+  - { label: "Email", labelZh: "電郵", value: "stadiaoffice@lcsd.gov.hk (shared LCSD Stadia Office)", valueZh: "stadiaoffice@lcsd.gov.hk（康文署體育館辦事處共用）" }
+  - { label: "Fax", labelZh: "傳真", value: "+852 2363 2549", valueZh: "+852 2363 2549" }
 facilitiesIntro: >-
   The Coliseum provides event-day catering, accessible audience facilities and
   colour-coded entrance gates. Bag limits, prohibited items, photography rules

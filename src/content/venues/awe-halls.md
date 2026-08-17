@@ -20,7 +20,6 @@ openingHoursIntroZh: >-
 openingHours:
   - { label: "Hall access", labelZh: "展館開放", value: "Event-specific; check the ticket and organiser's notice", valueZh: "按活動安排；請查閱門票及主辦單位通知" }
   - { label: "Complex access", labelZh: "博覽館開放", value: "Varies by exhibition, conference or event", valueZh: "按展覽、會議或活動而定" }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888", valueZh: "+852 3606 8888" }
 transport: >-
   AsiaWorld-Expo Station is inside the venue; follow the in-building signs from
   the concourse to Hall 6, 8 or 10. Late-finishing events may require special
@@ -40,6 +39,18 @@ mapNote: "The map covers the full AsiaWorld-Expo complex, including the hall ent
 mapNoteZh: "地圖涵蓋亞洲國際博覽館全館，包括各展館入口及館內港鐵站。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=113.930%2C22.312%2C113.960%2C22.332&layer=mapnik&marker=22.3214%2C113.9439"
 mapUrl: "https://www.openstreetmap.org/#map=16/22.3214/113.9439"
+venueInformationIntro: >-
+  Halls 6, 8 and 10 share AsiaWorld-Expo's central visitor contact. Use the
+  official website for event notices, hall services and the latest arrival
+  information.
+venueInformationIntroZh: >-
+  6、8及10號展館使用亞洲國際博覽館的中央訪客聯絡資料。活動通告、展館服務
+  及最新到場資訊請查閱官方網站。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "AsiaWorld-Expo", valueZh: "亞洲國際博覽館", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.asiaworld-expo.com/en-us/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.asiaworld-expo.com/zh-tc/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888 (shared venue contact)", valueZh: "+852 3606 8888（博覽館共用）" }
+  - { label: "Email", labelZh: "電郵", value: "info@asiaworld-expo.com", valueZh: "info@asiaworld-expo.com" }
+  - { label: "Fax", labelZh: "傳真", value: "+852 3606 8889", valueZh: "+852 3606 8889" }
 facilitiesIntro: >-
   The three ground-level halls share AsiaWorld-Expo's barrier-free routes,
   catering and visitor services. Entrances, stage position, seating, open

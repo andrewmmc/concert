@@ -20,7 +20,6 @@ openingHoursIntroZh: >-
 openingHours:
   - { label: "Arena access", labelZh: "場館開放", value: "Event-specific; check the ticket and organiser's notice", valueZh: "按活動安排；請查閱門票及主辦單位通知" }
   - { label: "Complex access", labelZh: "博覽館開放", value: "Varies by exhibition, conference or event", valueZh: "按展覽、會議或活動而定" }
-  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888", valueZh: "+852 3606 8888" }
 transport: >-
   AsiaWorld-Expo Station is inside the venue, making the Airport Express the
   most direct route. Road and bus options are also available, but late-finishing
@@ -40,6 +39,18 @@ mapNote: "The map covers AsiaWorld-Expo, its in-venue MTR station and the adjace
 mapNoteZh: "地圖涵蓋亞洲國際博覽館、館內港鐵站及毗鄰機場範圍。"
 mapEmbedUrl: "https://www.openstreetmap.org/export/embed.html?bbox=113.934%2C22.315%2C113.958%2C22.330&layer=mapnik&marker=22.3214%2C113.9439"
 mapUrl: "https://www.openstreetmap.org/#map=16/22.3214/113.9439"
+venueInformationIntro: >-
+  AsiaWorld-Arena shares AsiaWorld-Expo's central visitor contact. Use the
+  official website for event notices, venue services and the latest arrival
+  information.
+venueInformationIntroZh: >-
+  亞洲國際博覽館Arena使用亞洲國際博覽館的中央訪客聯絡資料。活動通告、
+  場館服務及最新到場資訊請查閱官方網站。
+venueInformation:
+  - { label: "Official website", labelZh: "官方網站", value: "AsiaWorld-Expo", valueZh: "亞洲國際博覽館", links: [{ label: "English website", labelZh: "英文網站", url: "https://www.asiaworld-expo.com/en-us/" }, { label: "Traditional Chinese website", labelZh: "繁體中文網站", url: "https://www.asiaworld-expo.com/zh-tc/" }] }
+  - { label: "General enquiries", labelZh: "一般查詢", value: "+852 3606 8888 (shared venue contact)", valueZh: "+852 3606 8888（博覽館共用）" }
+  - { label: "Email", labelZh: "電郵", value: "info@asiaworld-expo.com", valueZh: "info@asiaworld-expo.com" }
+  - { label: "Fax", labelZh: "傳真", value: "+852 3606 8889", valueZh: "+852 3606 8889" }
 facilitiesIntro: >-
   AsiaWorld-Expo provides barrier-free access, event catering and visitor
   services across the complex. Hall setup, open concessions and admission
