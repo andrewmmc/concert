@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const entry = await getEntry('pages', 'concerts');
@@ -7,6 +7,8 @@ if (!entry || entry.data.type !== 'concerts') {
   throw new Error('Missing concerts Markdown content');
 }
 const content = entry.data;
+const calendars = (await getCollection('concerts'))
+  .sort((a, b) => b.data.year - a.data.year);
 ---
 
 <BaseLayout
@@ -21,24 +23,26 @@ const content = entry.data;
     <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
   <section class="concert-section standalone-concerts">
-    <div class="concert-board">
-      <div class="calendar-stamp">
-        <span>{content.calendar.range}</span>
-        <strong>{content.calendar.year}</strong>
-        <small data-en={content.calendar.label} data-zh-hk={content.calendar.labelZh}>{content.calendar.label}</small>
+    {calendars.map(({ data: calendar }) => (
+      <div class="concert-board">
+        <div class="calendar-stamp">
+          <span>{calendar.range}</span>
+          <strong>{calendar.year}</strong>
+          <small data-en={calendar.label} data-zh-hk={calendar.labelZh}>{calendar.label}</small>
+        </div>
+        <div class="concert-list">
+          {calendar.events.map((event, index) => (
+            <article>
+              <time data-en={event.date} data-zh-hk={event.dateZh}>{event.date}</time>
+              <div>
+                <h3 data-en={event.title} data-zh-hk={event.titleZh}>{event.title}</h3>
+                <p data-en={event.meta} data-zh-hk={event.metaZh}>{event.meta}</p>
+              </div>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+            </article>
+          ))}
+        </div>
       </div>
-      <div class="concert-list">
-        {content.events.map((event, index) => (
-          <article>
-            <time data-en={event.date} data-zh-hk={event.dateZh}>{event.date}</time>
-            <div>
-              <h3 data-en={event.title} data-zh-hk={event.titleZh}>{event.title}</h3>
-              <p data-en={event.meta} data-zh-hk={event.metaZh}>{event.meta}</p>
-            </div>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-          </article>
-        ))}
-      </div>
-    </div>
+    ))}
   </section>
 </BaseLayout>

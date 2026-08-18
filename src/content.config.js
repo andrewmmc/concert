@@ -88,6 +88,24 @@ const venues = defineCollection({
   }),
 });
 
+const concerts = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/concerts' }),
+  schema: z.object({
+    year: z.number().int(),
+    range: z.string(),
+    label: z.string(),
+    labelZh: z.string(),
+    events: z.array(z.object({
+      date: z.string(),
+      dateZh: z.string(),
+      title: z.string(),
+      titleZh: z.string(),
+      meta: z.string(),
+      metaZh: z.string(),
+    })).min(1),
+  }),
+});
+
 const pages = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/pages' }),
   schema: z.discriminatedUnion('type', [
@@ -104,20 +122,6 @@ const pages = defineCollection({
     z.object({
       type: z.literal('concerts'),
       ...localizedPageFields,
-      calendar: z.object({
-        range: z.string(),
-        year: z.number(),
-        label: z.string(),
-        labelZh: z.string(),
-      }),
-      events: z.array(z.object({
-        date: z.string(),
-        dateZh: z.string(),
-        title: z.string(),
-        titleZh: z.string(),
-        meta: z.string(),
-        metaZh: z.string(),
-      })).min(1),
     }),
     z.object({
       type: z.literal('home'),
@@ -180,4 +184,4 @@ const pages = defineCollection({
   ]),
 });
 
-export const collections = { pages, venues };
+export const collections = { concerts, pages, venues };

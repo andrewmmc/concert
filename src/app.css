@@ -976,7 +976,7 @@
   .guide-grid article > span, .detail-grid article > span { color: var(--signal); font-family: var(--mono); font-size: 13px; font-weight: 600; }
   .guide-grid h2, .detail-grid h2 { margin-top: 26px; font-family: var(--grotesk); font-size: 24px; font-weight: 700; }
   .guide-grid p, .detail-grid p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
-  .standalone-concerts { padding-top: 56px; padding-bottom: 72px; }
+  .standalone-concerts { display: grid; gap: 24px; padding-top: 56px; padding-bottom: 72px; }
   .venue-directory-page { padding-top: 56px; }
 
   .venue-viewer-button { margin-top: 34px; }
