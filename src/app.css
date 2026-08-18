@@ -958,11 +958,11 @@
   /* ---------- Page heroes & grids ---------- */
   .page-hero { min-height: 320px; padding: 64px max(32px, calc((100vw - 1280px) / 2)); display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid var(--line); }
   .page-hero h1 { max-width: 900px; margin-top: 18px; font-family: var(--grotesk); font-size: clamp(38px, 5vw, 64px); line-height: 1.06; letter-spacing: -.02em; font-weight: 700; }
-  .page-hero > p:last-child { max-width: 620px; margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+  .page-hero > h1 + p { max-width: 620px; margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.7; }
   .guide-hero { background: var(--soft); }
   .concerts-hero { background: var(--ink); color: #fff; border-color: #393a35; }
   .concerts-hero .eyebrow { color: #ff8a7d; }
-  .concerts-hero > p:last-child { color: #aaaca6; }
+  .concerts-hero > h1 + p { color: #aaaca6; }
   .venues-hero { background: var(--soft); }
   .legal-hero { background: var(--soft); }
   .legal-updated {

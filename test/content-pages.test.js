@@ -25,15 +25,29 @@ test('editorial pages have structured Markdown content', async () => {
   }
 });
 
-test('legal document titles use the eyebrow rather than the headline', async () => {
-  const source = await readFile(
-    new URL('../src/components/LegalDocument.astro', import.meta.url),
-    'utf8',
-  );
+test('editorial document titles use the eyebrow rather than the headline', async () => {
+  const files = [
+    '../src/components/LegalDocument.astro',
+    '../src/pages/guide.astro',
+    '../src/pages/concerts.astro',
+    '../src/pages/venues/index.astro',
+  ];
 
-  assert.match(source, /title=\{`\$\{content\.eyebrow\}/);
-  assert.match(source, /titleZh=\{`\$\{content\.eyebrowZh\}/);
-  assert.doesNotMatch(source, /title=\{`\$\{content\.title\}/);
+  for (const file of files) {
+    const source = await readFile(new URL(file, import.meta.url), 'utf8');
+    assert.match(source, /title=\{`\$\{content\.eyebrow\}/, `${file} should use the eyebrow for the document title`);
+    assert.match(source, /titleZh=\{`\$\{content\.eyebrowZh\}/, `${file} should use the Chinese eyebrow for the document title`);
+    assert.doesNotMatch(source, /title=\{`\$\{content\.title\}/, `${file} should not use the headline for the document title`);
+  }
+});
+
+test('page hero description styles follow the headline, not the last paragraph', async () => {
+  const css = await readFile(new URL('../src/app.css', import.meta.url), 'utf8');
+
+  assert.match(css, /\.page-hero > h1 \+ p \{/);
+  assert.match(css, /\.concerts-hero > h1 \+ p \{/);
+  assert.doesNotMatch(css, /\.page-hero > p:last-child \{/);
+  assert.doesNotMatch(css, /\.concerts-hero > p:last-child \{/);
 });
 
 test('legal pages describe unofficial use and current data practices', async () => {
