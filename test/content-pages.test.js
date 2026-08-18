@@ -25,6 +25,17 @@ test('editorial pages have structured Markdown content', async () => {
   }
 });
 
+test('legal document titles use the eyebrow rather than the headline', async () => {
+  const source = await readFile(
+    new URL('../src/components/LegalDocument.astro', import.meta.url),
+    'utf8',
+  );
+
+  assert.match(source, /title=\{`\$\{content\.eyebrow\}/);
+  assert.match(source, /titleZh=\{`\$\{content\.eyebrowZh\}/);
+  assert.doesNotMatch(source, /title=\{`\$\{content\.title\}/);
+});
+
 test('legal pages describe unofficial use and current data practices', async () => {
   const terms = await readFile(new URL('../src/content/pages/terms.md', import.meta.url), 'utf8');
   const privacy = await readFile(new URL('../src/content/pages/privacy.md', import.meta.url), 'utf8');
