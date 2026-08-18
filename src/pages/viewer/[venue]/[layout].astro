@@ -3,9 +3,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { ENGLISH, TRADITIONAL_CHINESE, getVenueText, translate } from '../../../lib/i18n.js';
 import { venues } from '../../../venues/index.js';
 
+const isComingSoon = (layout: { id: string; comingSoon?: boolean }) => Boolean(layout.comingSoon);
+
 export function getStaticPaths() {
   return venues.flatMap((venue) => venue.layouts
-    .filter((layout) => !layout.comingSoon)
+    .filter((layout) => !('comingSoon' in layout && layout.comingSoon))
     .map((layout) => ({
       params: { venue: venue.id, layout: layout.id },
       props: { venue, layout },
@@ -16,6 +18,7 @@ const { venue, layout } = Astro.props;
 const t = (key) => translate(ENGLISH, key);
 const text = getVenueText(ENGLISH, venue, layout);
 const chineseText = getVenueText(TRADITIONAL_CHINESE, venue, layout);
+const planUrl = 'planUrl' in layout ? layout.planUrl : venue.planUrl;
 ---
 
 <BaseLayout
@@ -76,11 +79,11 @@ const chineseText = getVenueText(TRADITIONAL_CHINESE, venue, layout);
                   <option
                     value={item.id}
                     selected={item.id === layout.id}
-                    disabled={item.comingSoon}
-                    data-en={item.comingSoon ? `${optionText} (${t('comingSoon')})` : optionText}
-                    data-zh-hk={item.comingSoon ? `${chineseText} (${translate('zh-HK', 'comingSoon')})` : chineseText}
+                    disabled={isComingSoon(item)}
+                    data-en={isComingSoon(item) ? `${optionText} (${t('comingSoon')})` : optionText}
+                    data-zh-hk={isComingSoon(item) ? `${chineseText} (${translate('zh-HK', 'comingSoon')})` : chineseText}
                   >
-                    {item.comingSoon ? `${optionText} (${t('comingSoon')})` : optionText}
+                    {isComingSoon(item) ? `${optionText} (${t('comingSoon')})` : optionText}
                   </option>
                 );
               })}
@@ -135,8 +138,8 @@ const chineseText = getVenueText(TRADITIONAL_CHINESE, venue, layout);
             <label class="switch"><input type="checkbox" data-setting="labels" checked /><span class="slider"></span></label></div>
         </div>
 
-        {(layout.planUrl || venue.planUrl) && (
-          <a class="plan-link" href={layout.planUrl || venue.planUrl} target="_blank" rel="noopener noreferrer">
+        {planUrl && (
+          <a class="plan-link" href={planUrl} target="_blank" rel="noopener noreferrer">
             <span data-i18n="officialPlan">{t('officialPlan')}</span><span aria-hidden="true">↗</span>
           </a>
         )}
