@@ -4,6 +4,6 @@ eyebrow: "Hong Kong concert calendar"
 eyebrowZh: "香港演唱會日曆"
 title: "All upcoming concerts."
 titleZh: "所有即將舉行的演唱會。"
-description: "A dedicated event index for browsing dates, venues and ticket-sale reminders. Listings are placeholders for now."
-descriptionZh: "獨立演出索引，方便按日期、場館及售票提示瀏覽。現階段顯示的是版面預覽。"
+description: "Confirmed Hong Kong concert dates from August to December 2026, gathered from official venue, artist and promoter listings."
+descriptionZh: "整理自官方場館、藝人及主辦單位資料的 2026 年 8 月至 12 月香港演唱會日程。"
 ---
