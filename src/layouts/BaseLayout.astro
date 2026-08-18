@@ -43,7 +43,7 @@ const {
           location.replace(`/venues/${parts[1]}/`);
           return;
         }
-        const portalRoutes = new Set(['guide', 'concerts', 'venues']);
+        const portalRoutes = new Set(['guide', 'concerts', 'venues', 'terms', 'privacy']);
         if (portalRoutes.has(parts[0])) {
           location.replace(`/${parts[0]}/`);
           return;
@@ -64,7 +64,7 @@ const {
       <main class:list={{ 'viewer-main': viewer }}>
         <slot />
       </main>
-      {!viewer && <Footer />}
+      {!viewer && <Footer currentPage={currentPage} />}
     </div>
 
     <script>

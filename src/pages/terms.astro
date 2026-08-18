@@ -1,0 +1,11 @@
+---
+import { getEntry } from 'astro:content';
+import LegalDocument from '../components/LegalDocument.astro';
+
+const entry = await getEntry('pages', 'terms');
+if (!entry || entry.data.type !== 'legal') {
+  throw new Error('Missing terms Markdown content');
+}
+---
+
+<LegalDocument currentPage="terms" content={entry.data} />

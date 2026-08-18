@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { ENGLISH, translate } from '../lib/i18n.js';
+
+const { currentPage, content } = Astro.props;
+const t = (key) => translate(ENGLISH, key);
+---
+
+<BaseLayout
+  currentPage={currentPage}
+  title={`${content.title} — Hong Kong Concert Guide`}
+  titleZh={`${content.titleZh} — 香港演唱會指南`}
+  description={content.description}
+>
+  <section class="page-hero legal-hero">
+    <p class="eyebrow" data-en={content.eyebrow} data-zh-hk={content.eyebrowZh}>{content.eyebrow}</p>
+    <h1 data-en={content.title} data-zh-hk={content.titleZh}>{content.title}</h1>
+    <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
+    <p class="legal-updated">
+      <span data-i18n="lastUpdated">{t('lastUpdated')}</span>
+      <time data-en={content.updated} data-zh-hk={content.updatedZh}>{content.updated}</time>
+    </p>
+  </section>
+  <article class="legal-doc">
+    {content.sections.map((section) => (
+      <section>
+        <h2 data-en={section.title} data-zh-hk={section.titleZh}>{section.title}</h2>
+        {section.paragraphs.map((paragraph) => (
+          <p data-en={paragraph.text} data-zh-hk={paragraph.textZh}>{paragraph.text}</p>
+        ))}
+      </section>
+    ))}
+  </article>
+</BaseLayout>

@@ -7,6 +7,8 @@ const pages = [
   { id: 'concerts', type: 'concerts', fields: ['eyebrow', 'title', 'description'] },
   { id: 'home', type: 'home', fields: ['hero', 'board', 'paths', 'venueDirectory'] },
   { id: 'venue-directory', type: 'venue-directory', fields: ['eyebrow', 'title', 'description'] },
+  { id: 'terms', type: 'legal', fields: ['eyebrow', 'title', 'description', 'updated', 'updatedZh', 'sections'] },
+  { id: 'privacy', type: 'legal', fields: ['eyebrow', 'title', 'description', 'updated', 'updatedZh', 'sections'] },
 ];
 
 test('editorial pages have structured Markdown content', async () => {
@@ -21,6 +23,16 @@ test('editorial pages have structured Markdown content', async () => {
       assert.match(source, new RegExp(`^${field}:`, 'm'), `${page.id} is missing ${field}`);
     }
   }
+});
+
+test('legal pages describe unofficial use and current data practices', async () => {
+  const terms = await readFile(new URL('../src/content/pages/terms.md', import.meta.url), 'utf8');
+  const privacy = await readFile(new URL('../src/content/pages/privacy.md', import.meta.url), 'utf8');
+
+  assert.match(terms, /do not sell tickets/i);
+  assert.match(terms, /Hong Kong Special Administrative Region/);
+  assert.match(privacy, /concert-locale/);
+  assert.match(privacy, /Personal Data \(Privacy\) Ordinance/);
 });
 
 test('concert listings are stored in year-specific Markdown files', async () => {

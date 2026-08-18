@@ -1,6 +1,7 @@
 ---
 import { ENGLISH, translate } from '../lib/i18n.js';
 
+const { currentPage = '' } = Astro.props;
 const t = (key) => translate(ENGLISH, key);
 ---
 
@@ -10,5 +11,9 @@ const t = (key) => translate(ENGLISH, key);
     <span class="brand-word" data-i18n="shortBrand">{t('shortBrand')}</span>
   </div>
   <span>© 2026 / 22°19'N 114°10'E</span>
-  <a href="https://mmc.dev/" target="_blank" rel="noreferrer">mmc.dev</a>
+  <nav class="footer-links" aria-label={t('footerNavLabel')} data-i18n-aria-label="footerNavLabel">
+    <a class:list={{ active: currentPage === 'terms' }} href="/terms/" data-i18n="navTerms">{t('navTerms')}</a>
+    <a class:list={{ active: currentPage === 'privacy' }} href="/privacy/" data-i18n="navPrivacy">{t('navPrivacy')}</a>
+    <a href="https://mmc.dev/" target="_blank" rel="noreferrer">mmc.dev</a>
+  </nav>
 </footer>

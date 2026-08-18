@@ -964,6 +964,26 @@
   .concerts-hero .eyebrow { color: #ff8a7d; }
   .concerts-hero > p:last-child { color: #aaaca6; }
   .venues-hero { background: var(--soft); }
+  .legal-hero { background: var(--soft); }
+  .legal-updated {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 22px;
+    color: #858780;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .legal-doc {
+    width: min(760px, calc(100% - 64px));
+    margin: 0 auto;
+    padding: 72px 0 96px;
+  }
+  .legal-doc section + section { margin-top: 40px; }
+  .legal-doc h2 { font-family: var(--grotesk); font-size: 22px; font-weight: 700; }
+  .legal-doc p { margin-top: 14px; color: var(--muted); font-size: 15px; line-height: 1.75; }
 
   .guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; background: var(--paper); }
   .guide-grid article {
@@ -994,8 +1014,9 @@
   .footer-brand { cursor: default; }
   footer p { color: var(--muted); font-size: 13px; }
   footer > span { color: #858780; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; }
-  footer > a { color: #858780; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-decoration: none; }
-  footer > a:hover { color: var(--signal); }
+  .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 18px; }
+  .footer-links a { color: #858780; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-decoration: none; }
+  .footer-links a:hover, .footer-links a.active { color: var(--signal); }
 
   .portal { font-size: 14px; }
   .portal button, .portal input, .portal select { font-size: 14px; }
@@ -1158,6 +1179,7 @@
     .section-heading h2 { font-size: 30px; }
     .concert-section { padding-left: 18px; padding-right: 18px; }
     .portal-paths, .home-venue-preview, .guide-grid, .venue-directory-page, .page-hero { padding-left: 18px; padding-right: 18px; }
+    .legal-doc { width: min(760px, calc(100% - 36px)); padding-top: 56px; padding-bottom: 72px; }
     .page-hero h1 { font-size: clamp(34px, 11vw, 48px); }
     .venue-section-heading { grid-template-columns: 64px 1fr; }
     .venue-detail-table > div { grid-template-columns: 1fr; gap: 8px; }

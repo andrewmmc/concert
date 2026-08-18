@@ -53,6 +53,12 @@ test('parses portal and venue detail pages', () => {
     location.hash = '#/venues';
     assert.equal(parseHash().page, 'venues');
 
+    location.hash = '#/terms';
+    assert.equal(parseHash().page, 'terms');
+
+    location.hash = '#/privacy';
+    assert.equal(parseHash().page, 'privacy');
+
     location.hash = '#/venue/kta';
     assert.equal(parseHash().page, 'venue');
     assert.equal(parseHash().venue.id, 'kta');

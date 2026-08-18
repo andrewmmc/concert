@@ -1,0 +1,11 @@
+---
+import { getEntry } from 'astro:content';
+import LegalDocument from '../components/LegalDocument.astro';
+
+const entry = await getEntry('pages', 'privacy');
+if (!entry || entry.data.type !== 'legal') {
+  throw new Error('Missing privacy Markdown content');
+}
+---
+
+<LegalDocument currentPage="privacy" content={entry.data} />

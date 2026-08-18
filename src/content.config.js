@@ -181,6 +181,20 @@ const pages = defineCollection({
       type: z.literal('venue-directory'),
       ...localizedPageFields,
     }),
+    z.object({
+      type: z.literal('legal'),
+      ...localizedPageFields,
+      updated: z.string(),
+      updatedZh: z.string(),
+      sections: z.array(z.object({
+        title: z.string(),
+        titleZh: z.string(),
+        paragraphs: z.array(z.object({
+          text: z.string(),
+          textZh: z.string(),
+        })).min(1),
+      })).min(1),
+    }),
   ]),
 });
 

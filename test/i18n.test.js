@@ -41,6 +41,9 @@ test('returns localized interface and venue copy', () => {
   assert.equal(translate(ENGLISH, 'arenaTransportTitle'), 'Transport');
   assert.equal(translate(TRADITIONAL_CHINESE, 'exploreOtherArenas'), '探索其他場館');
   assert.equal(translate(ENGLISH, 'navGuide'), 'Before You Go');
+  assert.equal(translate(ENGLISH, 'navTerms'), 'Terms');
+  assert.equal(translate(TRADITIONAL_CHINESE, 'navPrivacy'), '私隱');
+  assert.equal(translate(ENGLISH, 'lastUpdated'), 'Last updated');
   assert.equal(translate(TRADITIONAL_CHINESE, 'openDedicatedViewer'), '開啟獨立 3D 座位視圖');
   assert.equal(translate(ENGLISH, 'venueDetails'), 'Venue details');
   assert.equal(translate(TRADITIONAL_CHINESE, 'venueDetails'), '場館詳情');

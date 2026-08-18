@@ -1,11 +1,11 @@
 // Hash routes for portal pages and the legacy-compatible 3D viewer route:
-// #/guide, #/concerts, #/venues, #/venue/<venue>, #/<venue>/<layout>
+// #/guide, #/concerts, #/venues, #/terms, #/privacy, #/venue/<venue>, #/<venue>/<layout>
 import { getVenue, resolveLayout } from '../venues/index.js';
 
 export function parseHash() {
   const h = location.hash.replace(/^#\/?/, '');
   const [first, second] = h.split('/').filter(Boolean);
-  const portalPages = new Set(['guide', 'concerts', 'venues']);
+  const portalPages = new Set(['guide', 'concerts', 'venues', 'terms', 'privacy']);
 
   if (!first) {
     const venue = getVenue();
