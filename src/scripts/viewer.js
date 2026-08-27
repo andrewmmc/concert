@@ -54,6 +54,9 @@ export function initializeViewer() {
   const roofInput = root.querySelector('[data-setting="roof"]');
   const labelsInput = root.querySelector('[data-setting="labels"]');
   const autoRotateInput = root.querySelector('[data-setting="auto-rotate"]');
+  const viewerPanel = root.querySelector('#viewer-controls');
+  const panelButton = root.querySelector('[data-action="panel"]');
+  const panelSymbol = root.querySelector('[data-panel-symbol]');
 
   const engine = createScene(canvas);
   const { camera, controls, flyTo, scene, THREE } = engine;
@@ -176,6 +179,7 @@ export function initializeViewer() {
     seatCard.classList.add('has-seat');
     seatActions.hidden = false;
     viewFromSeat(index);
+    if (matchMedia('(max-width: 560px)').matches) setPanelOpen(true);
   }
 
   function resetCamera() {
@@ -312,6 +316,58 @@ export function initializeViewer() {
   root.querySelector('[data-action="clear"]').addEventListener('click', () => clearPin({ reset: true }));
   stageButton.addEventListener('click', () => pinnedId >= 0 && viewFromSeat(pinnedId));
   surroundingsButton.addEventListener('click', () => pinnedId >= 0 && viewSeatSurroundings(pinnedId));
+
+  function setPanelOpen(open) {
+    viewerPanel.classList.toggle('is-open', open);
+    panelButton.setAttribute('aria-expanded', String(open));
+    panelSymbol.textContent = open ? '↓' : '↑';
+    viewerPanel.style.transform = '';
+  }
+
+  let panelDrag;
+  let suppressPanelClick = false;
+  panelButton.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    const travel = viewerPanel.offsetHeight - panelButton.offsetHeight;
+    panelDrag = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      startOffset: viewerPanel.classList.contains('is-open') ? 0 : travel,
+      travel,
+    };
+    suppressPanelClick = false;
+    viewerPanel.classList.add('is-dragging');
+    panelButton.setPointerCapture(event.pointerId);
+  });
+  panelButton.addEventListener('pointermove', (event) => {
+    if (!panelDrag || event.pointerId !== panelDrag.pointerId) return;
+    const delta = event.clientY - panelDrag.startY;
+    const offset = Math.max(0, Math.min(panelDrag.travel, panelDrag.startOffset + delta));
+    suppressPanelClick ||= Math.abs(delta) > 5;
+    viewerPanel.style.transform = `translateY(${offset}px)`;
+  });
+  panelButton.addEventListener('pointerup', (event) => {
+    if (!panelDrag || event.pointerId !== panelDrag.pointerId) return;
+    const delta = event.clientY - panelDrag.startY;
+    const wasOpen = panelDrag.startOffset === 0;
+    const open = Math.abs(delta) > 30 ? delta < 0 : wasOpen;
+    panelDrag = null;
+    viewerPanel.classList.remove('is-dragging');
+    setPanelOpen(open);
+  });
+  panelButton.addEventListener('pointercancel', () => {
+    panelDrag = null;
+    viewerPanel.classList.remove('is-dragging');
+    setPanelOpen(viewerPanel.classList.contains('is-open'));
+  });
+  panelButton.addEventListener('click', (event) => {
+    if (suppressPanelClick) {
+      event.preventDefault();
+      suppressPanelClick = false;
+      return;
+    }
+    setPanelOpen(!viewerPanel.classList.contains('is-open'));
+  });
 
   const settingsButton = root.querySelector('[data-action="settings"]');
   const settingsPanel = root.querySelector('#portal-settings');
