@@ -165,7 +165,7 @@ const messages = {
     viewerEyebrow: '互動場館探索',
     viewerTitle: '從每一個角度看清場館。',
     viewerBody: '選擇場館及座位配置，再搜尋或按下任何座位預覽位置。',
-    liveModel: '3D 模型',
+    liveModel: '3D 座位視圖',
     viewerPanelLabel: '目前場館',
     open3dModel: '開啟 3D 模型',
     transportEyebrow: '計劃行程',
