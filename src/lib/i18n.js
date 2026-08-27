@@ -55,7 +55,7 @@ const messages = {
     viewerEyebrow: 'Interactive venue explorer',
     viewerTitle: 'See the room from every angle.',
     viewerBody: 'Choose a venue and layout, then search or tap any seat to preview its position.',
-    liveModel: 'Live 3D model',
+    liveModel: '3D model',
     viewerPanelLabel: 'Current venue',
     open3dModel: 'Open 3D model',
     transportEyebrow: 'Plan the journey',
