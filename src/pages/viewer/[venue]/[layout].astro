@@ -48,7 +48,7 @@ const planUrl = 'planUrl' in layout ? layout.planUrl : venue.planUrl;
       <aside class="viewer-panel" id="viewer-controls">
         <button class="mobile-panel-toggle" type="button" data-action="panel" aria-controls="viewer-controls" aria-expanded="false">
           <i aria-hidden="true"></i>
-          <span data-i18n="seatControls">{t('seatControls')}</span>
+          <span data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</span>
           <span data-panel-symbol aria-hidden="true">↑</span>
         </button>
         <div class="panel-kicker" data-i18n="viewerPanelLabel">{t('viewerPanelLabel')}</div>
