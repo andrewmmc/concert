@@ -1191,12 +1191,15 @@
     .venue-gallery { grid-template-columns: 1fr; }
     .venue-gallery figure:last-child { grid-column: auto; }
     .venue-gallery figure:not(:first-child) .venue-gallery-image { aspect-ratio: 4 / 3; }
-    .viewer-page { padding: 10px; }
+    html.viewer-open, body.viewer-open { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+    html.viewer-open .portal { height: auto; min-height: 100dvh; overflow: visible; }
+    .viewer-main { height: auto; min-height: 100dvh; overflow: visible; }
+    .viewer-page { height: auto; min-height: 100dvh; padding: 10px; overflow: visible; }
     .viewer-topbar { grid-template-columns: 1fr auto; }
     .viewer-topbar > span { display: none; }
-    .viewer-page .viewer-frame { display: block; position: relative; }
-    .viewer-page .canvas-stage { height: 100%; }
-    .viewer-page .viewer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(290px, 80vw); z-index: 5; background: rgba(255,255,255,.97); box-shadow: -12px 0 32px rgba(23,23,20,.18); }
+    .viewer-page .viewer-frame { display: block; flex: none; height: auto; }
+    .viewer-page .canvas-stage { height: calc(100dvh - 94px); min-height: 360px; max-height: 720px; }
+    .viewer-page .viewer-panel { position: static; width: 100%; overflow: visible; box-shadow: none; }
     .canvas-stage { min-height: 430px; }
     .canvas-hint { display: none; }
     .canvas-label { top: 12px; left: 12px; }
