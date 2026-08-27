@@ -15,8 +15,8 @@ const t = (key) => translate(ENGLISH, key);
     <a class:list={{ active: currentPage === 'home' }} href="/" data-i18n="navHome">{t('navHome')}</a>
     <a class:list={{ active: currentPage === 'guide' }} href="/guide/" data-i18n="navGuide">{t('navGuide')}</a>
     <a class:list={{ active: currentPage === 'concerts' }} href="/concerts/" data-i18n="navConcerts">{t('navConcerts')}</a>
-    <a class:list={{ active: currentPage === 'viewer' }} href="/viewer/hkc/center-stage/" data-i18n="navExplore">{t('navExplore')}</a>
     <a class:list={{ active: currentPage === 'venues' || currentPage === 'venue' }} href="/venues/" data-i18n="navVenues">{t('navVenues')}</a>
+    <a class:list={{ active: currentPage === 'viewer' }} href="/viewer/hkc/center-stage/" data-i18n="navExplore">{t('navExplore')}</a>
   </nav>
 
   <div class="top-actions">
