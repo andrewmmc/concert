@@ -713,6 +713,7 @@
   }
   .canvas-reset:hover { background: var(--ink); color: #fff; }
   .canvas-hint { left: 20px; bottom: 18px; padding: 7px 10px; background: rgba(23,23,20,.78); color: #fff; font-size: 12px; letter-spacing: .04em; }
+  .mobile-panel-link { display: none; }
   .viewer-panel { padding: 24px; background: #fff; overflow: auto; }
   .panel-kicker { color: var(--signal); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .16em; font-weight: 600; }
   .viewer-panel h3 { margin-top: 8px; font-family: var(--grotesk); font-size: 24px; line-height: 1.1; font-weight: 700; letter-spacing: -.01em; }
@@ -1199,11 +1200,30 @@
     .viewer-topbar > span { display: none; }
     .viewer-page .viewer-frame { display: block; flex: none; height: auto; }
     .viewer-page .canvas-stage { height: calc(100dvh - 94px); min-height: 360px; max-height: 720px; }
-    .viewer-page .viewer-panel { position: static; width: 100%; overflow: visible; box-shadow: none; }
+    .viewer-page .viewer-panel { position: static; width: 100%; overflow: visible; scroll-margin-top: 10px; box-shadow: none; }
     .canvas-stage { min-height: 430px; }
     .canvas-hint { display: none; }
     .canvas-label { top: 12px; left: 12px; }
     .canvas-reset { top: 12px; right: 12px; }
+    .mobile-panel-link {
+      position: absolute;
+      z-index: 4;
+      right: 12px;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 10px;
+      background: var(--signal);
+      color: #fff;
+      padding: 13px 15px;
+      font-family: var(--grotesk);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,.28);
+    }
     .viewer-panel { padding: 22px 18px; }
     .venue-grid { grid-template-columns: 1fr; }
     .venue-card { min-height: 220px; }

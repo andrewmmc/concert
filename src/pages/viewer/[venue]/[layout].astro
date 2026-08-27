@@ -51,9 +51,12 @@ const planUrl = 'planUrl' in layout ? layout.planUrl : venue.planUrl;
         </button>
         <canvas id="scene" aria-label={t('canvasLabel')} data-i18n-aria-label="canvasLabel"></canvas>
         <div class="canvas-hint" data-i18n="controlsHint">{t('controlsHint')}</div>
+        <a class="mobile-panel-link" href="#viewer-controls">
+          <span data-i18n="seatControls">{t('seatControls')}</span><span aria-hidden="true">↓</span>
+        </a>
       </div>
 
-      <aside class="viewer-panel">
+      <aside class="viewer-panel" id="viewer-controls">
         <div class="panel-kicker" data-i18n="viewerPanelLabel">{t('viewerPanelLabel')}</div>
         <h3 data-en={text.name} data-zh-hk={chineseText.name}>{text.name}</h3>
         <p class="venue-meta" data-en={text.layoutName} data-zh-hk={chineseText.layoutName}>{text.layoutName}</p>
