@@ -23,6 +23,7 @@ const planUrl = 'planUrl' in layout ? layout.planUrl : venue.planUrl;
 
 <BaseLayout
   viewer
+  currentPage="venue"
   venueId={venue.id}
   layoutId={layout.id}
   title={`${text.name} — ${t('siteName')}`}
@@ -34,15 +35,6 @@ const planUrl = 'planUrl' in layout ? layout.planUrl : venue.planUrl;
     data-venue-id={venue.id}
     data-layout-id={layout.id}
   >
-    <div class="viewer-topbar">
-      <a class="viewer-back" href={`/venues/${venue.id}/`}>← <span data-i18n="viewerBackToVenue">{t('viewerBackToVenue')}</span></a>
-      <span>{venue.id.toUpperCase()}</span>
-      <div class="viewer-language" role="group" aria-label={t('language')} data-i18n-aria-label="language">
-        <button type="button" data-locale="zh-HK" aria-label={t('traditionalChinese')} data-i18n-aria-label="traditionalChinese">繁</button>
-        <button type="button" data-locale="en" aria-label={t('english')} data-i18n-aria-label="english">EN</button>
-      </div>
-    </div>
-
     <div class="viewer-frame">
       <div class="canvas-stage">
         <div class="canvas-label"><i></i><span data-i18n="liveModel">{t('liveModel')}</span></div>

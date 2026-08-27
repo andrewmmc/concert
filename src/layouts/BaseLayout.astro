@@ -60,7 +60,7 @@ const {
     data-title-zh-hk={titleZh}
   >
     <div class:list={['portal', { 'viewer-shell': viewer }]} id="top">
-      {!viewer && <Header currentPage={currentPage} />}
+      <Header currentPage={currentPage} />
       <main class:list={{ 'viewer-main': viewer }}>
         <slot />
       </main>
