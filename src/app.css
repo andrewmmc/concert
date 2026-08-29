@@ -994,6 +994,14 @@
   .guide-grid h2, .detail-grid h2 { margin-top: 26px; font-family: var(--grotesk); font-size: 24px; font-weight: 700; }
   .guide-grid p, .detail-grid p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
   .standalone-concerts { display: grid; gap: 24px; padding-top: 56px; padding-bottom: 72px; }
+  .concert-empty {
+    padding: 72px 24px;
+    color: var(--muted);
+    font-family: var(--grotesk);
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 700;
+    text-align: center;
+  }
   .venue-directory-page { padding-top: 56px; }
 
   .venue-viewer-button { margin-top: 34px; }

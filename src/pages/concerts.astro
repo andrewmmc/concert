@@ -22,9 +22,9 @@ const calendars = (await getCollection('concerts'))
     <h1 data-en={content.title} data-zh-hk={content.titleZh}>{content.title}</h1>
     <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
-  <section class="concert-section standalone-concerts">
+  <section class="concert-section standalone-concerts" data-concerts>
     {calendars.map(({ data: calendar }) => (
-      <div class="concert-board">
+      <div class="concert-board" data-concert-board>
         <div class="calendar-stamp">
           <span>{calendar.range}</span>
           <strong>{calendar.year}</strong>
@@ -32,17 +32,31 @@ const calendars = (await getCollection('concerts'))
         </div>
         <div class="concert-list">
           {calendar.events.map((event, index) => (
-            <article>
-              <time data-en={event.date} data-zh-hk={event.dateZh}>{event.date}</time>
+            <article data-concert-ends-on={event.endsOn}>
+              <time datetime={event.endsOn} data-en={event.date} data-zh-hk={event.dateZh}>{event.date}</time>
               <div>
                 <h3 data-en={event.title} data-zh-hk={event.titleZh}>{event.title}</h3>
                 <p data-en={event.meta} data-zh-hk={event.metaZh}>{event.meta}</p>
               </div>
-              <span>{String(index + 1).padStart(2, '0')}</span>
+              <span data-concert-number>{String(index + 1).padStart(2, '0')}</span>
             </article>
           ))}
         </div>
       </div>
     ))}
+    <p
+      class="concert-empty"
+      data-concert-empty
+      data-en="No upcoming concerts are listed right now."
+      data-zh-hk="目前未有即將舉行的演唱會。"
+      hidden
+    >No upcoming concerts are listed right now.</p>
   </section>
 </BaseLayout>
+
+<script>
+  import { filterExpiredConcerts } from '../lib/concerts.js';
+
+  const concerts = document.querySelector('[data-concerts]');
+  if (concerts) filterExpiredConcerts(concerts);
+</script>

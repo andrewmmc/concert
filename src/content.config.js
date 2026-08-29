@@ -98,6 +98,7 @@ const concerts = defineCollection({
     events: z.array(z.object({
       date: z.string(),
       dateZh: z.string(),
+      endsOn: z.string().date(),
       title: z.string(),
       titleZh: z.string(),
       meta: z.string(),
