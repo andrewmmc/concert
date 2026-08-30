@@ -22,6 +22,10 @@ export function isConcertExpired(endsOn, now = new Date()) {
   return now >= concertExpiry(endsOn);
 }
 
+/**
+ * @param {ParentNode} [root=document]
+ * @param {Date} [now=new Date()]
+ */
 export function filterExpiredConcerts(root = document, now = new Date()) {
   for (const board of root.querySelectorAll('[data-concert-board]')) {
     for (const event of board.querySelectorAll('[data-concert-ends-on]')) {
