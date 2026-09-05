@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const pages = [
-  { id: 'guide', type: 'guide', fields: ['eyebrow', 'title', 'description', 'sections'] },
+  { id: 'guide', type: 'guide', fields: ['eyebrow', 'title', 'description'] },
   { id: 'concerts', type: 'concerts', fields: ['eyebrow', 'title', 'description'] },
   { id: 'home', type: 'home', fields: ['hero', 'board', 'paths', 'venueDirectory'] },
   { id: 'venue-directory', type: 'venue-directory', fields: ['eyebrow', 'title', 'description'] },
@@ -68,4 +68,21 @@ test('concert listings are stored in year-specific Markdown files', async () => 
 
   assert.match(source, /^year: 2026$/m);
   assert.match(source, /^events:$/m);
+});
+
+test('guide articles are stored as localized Markdown posts', async () => {
+  const english = await readFile(
+    new URL('../src/content/guides/en/before-buying.md', import.meta.url),
+    'utf8',
+  );
+  const chinese = await readFile(
+    new URL('../src/content/guides/zh-HK/before-buying.md', import.meta.url),
+    'utf8',
+  );
+
+  for (const source of [english, chinese]) {
+    assert.match(source, /^translationKey: before-buying$/m);
+    assert.match(source, /^publishedAt: "\d{4}-\d{2}-\d{2}"$/m);
+    assert.match(source, /^## /m, 'guide post should contain a Markdown body');
+  }
 });

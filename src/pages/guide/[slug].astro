@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('guidePosts');
+  return posts
+    .filter((post) => post.data.locale === 'en')
+    .map((english) => {
+      const chinese = posts.find((post) =>
+        post.data.locale === 'zh-HK' &&
+        post.data.translationKey === english.data.translationKey
+      );
+      if (!chinese) throw new Error(`Missing Chinese guide post: ${english.data.translationKey}`);
+      return {
+        params: { slug: english.data.translationKey },
+        props: { english, chinese },
+      };
+    });
+}
+
+const { english, chinese } = Astro.props;
+const { Content: EnglishContent } = await render(english);
+const { Content: ChineseContent } = await render(chinese);
+const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(`${date}T00:00:00Z`));
+---
+
+<BaseLayout
+  currentPage="guide"
+  title={`${english.data.title} — Hong Kong Concert Guide`}
+  titleZh={`${chinese.data.title} — 香港演唱會指南`}
+  description={english.data.description}
+>
+  <article class="guide-post">
+    <header class="guide-post-header">
+      <a href="/guide/">
+        <span aria-hidden="true">←</span>
+        <span data-en="Concert-going handbook" data-zh-hk="演唱會入場手冊">Concert-going handbook</span>
+      </a>
+      <p class="eyebrow" data-en="Before you go" data-zh-hk="入場之前">Before you go</p>
+      <h1 data-en={english.data.title} data-zh-hk={chinese.data.title}>{english.data.title}</h1>
+      <p data-en={english.data.description} data-zh-hk={chinese.data.description}>{english.data.description}</p>
+      <time
+        datetime={english.data.publishedAt}
+        data-en={formatDate(english.data.publishedAt, 'en-HK')}
+        data-zh-hk={formatDate(english.data.publishedAt, 'zh-HK')}
+      >{formatDate(english.data.publishedAt, 'en-HK')}</time>
+    </header>
+    <div class="guide-post-body" data-locale-body="en">
+      <EnglishContent />
+    </div>
+    <div class="guide-post-body" data-locale-body="zh-HK">
+      <ChineseContent />
+    </div>
+  </article>
+</BaseLayout>

@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const entry = await getEntry('pages', 'guide');
@@ -7,6 +7,24 @@ if (!entry || entry.data.type !== 'guide') {
   throw new Error('Missing guide Markdown content');
 }
 const content = entry.data;
+const allPosts = await getCollection('guidePosts');
+const posts = allPosts
+  .filter((post) => post.data.locale === 'en')
+  .map((post) => {
+    const chinese = allPosts.find((candidate) =>
+      candidate.data.locale === 'zh-HK' &&
+      candidate.data.translationKey === post.data.translationKey
+    );
+    if (!chinese) throw new Error(`Missing Chinese guide post: ${post.data.translationKey}`);
+    return { english: post.data, chinese: chinese.data };
+  })
+  .sort((a, b) => a.english.order - b.english.order);
+
+const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(new Date(`${date}T00:00:00Z`));
 ---
 
 <BaseLayout
@@ -21,11 +39,20 @@ const content = entry.data;
     <p data-en={content.description} data-zh-hk={content.descriptionZh}>{content.description}</p>
   </section>
   <section class="guide-grid">
-    {content.sections.map((section, index) => (
-      <article>
+    {posts.map(({ english, chinese }, index) => (
+      <article class="guide-card">
         <span>{String(index + 1).padStart(2, '0')}</span>
-        <h2 data-en={section.title} data-zh-hk={section.titleZh}>{section.title}</h2>
-        <p data-en={section.description} data-zh-hk={section.descriptionZh}>{section.description}</p>
+        <time
+          datetime={english.publishedAt}
+          data-en={formatDate(english.publishedAt, 'en-HK')}
+          data-zh-hk={formatDate(english.publishedAt, 'zh-HK')}
+        >{formatDate(english.publishedAt, 'en-HK')}</time>
+        <h2 data-en={english.title} data-zh-hk={chinese.title}>{english.title}</h2>
+        <p data-en={english.description} data-zh-hk={chinese.description}>{english.description}</p>
+        <a href={`/guide/${english.translationKey}/`}>
+          <span data-en="Read article" data-zh-hk="閱讀文章">Read article</span>
+          <span aria-hidden="true">→</span>
+        </a>
       </article>
     ))}
   </section>

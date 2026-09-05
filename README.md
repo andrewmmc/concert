@@ -111,3 +111,14 @@ Venues are data modules under `src/venues/`:
   `misc/awe_hall1/`.
 - AsiaWorld Expo VIVA TH8400 and TH5600 end-stage plans — project source drawings in
   `misc/awe_halls/`.
+
+## Managing guide posts
+
+The “Before You Go” guide is a collection of Markdown blog posts in
+`src/content/guides/`. Each article has an English file under `en/` and a
+Traditional Chinese file under `zh-HK/`.
+
+To add an article, copy one existing pair and update its frontmatter and
+Markdown body. Both files must use the same `translationKey`, `publishedAt`
+and `order`. The `translationKey` becomes the URL, for example
+`translationKey: before-buying` creates `/guide/before-buying/`.
