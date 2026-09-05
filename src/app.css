@@ -982,29 +982,36 @@
   .legal-doc h2 { font-family: var(--grotesk); font-size: 22px; font-weight: 700; }
   .legal-doc p { margin-top: 14px; color: var(--muted); font-size: 15px; line-height: 1.75; }
 
-  .guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; background: var(--paper); }
+  .guide-grid { display: grid; grid-template-columns: 1fr; gap: 12px; background: var(--paper); }
   .guide-grid article {
-    min-height: 210px;
+    min-height: 150px;
     padding: 24px;
     background: var(--soft);
     border: 1px solid var(--line);
     border-radius: 14px;
   }
   .guide-grid article > span, .detail-grid article > span { color: var(--signal); font-family: var(--mono); font-size: 13px; font-weight: 600; }
-  .guide-card { display: flex; flex-direction: column; }
+  .guide-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: 24px; }
+  .guide-card > span { grid-column: 1; grid-row: 1 / 4; }
   .guide-card time {
-    margin: -16px 0 0 auto;
+    grid-column: 2;
+    grid-row: 1;
     color: var(--muted);
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: .04em;
   }
-  .guide-grid h2, .detail-grid h2 { margin-top: 26px; font-family: var(--grotesk); font-size: 24px; font-weight: 700; }
-  .guide-grid p, .detail-grid p { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .guide-grid h2, .detail-grid h2 { font-family: var(--grotesk); font-size: 24px; font-weight: 700; }
+  .guide-grid h2 { margin-top: 10px; }
+  .detail-grid h2 { margin-top: 26px; }
+  .guide-grid p, .detail-grid p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .guide-grid p { max-width: 720px; margin-top: 8px; }
+  .detail-grid p { margin-top: 12px; }
   .guide-card > a {
     width: fit-content;
-    margin-top: auto;
-    padding-top: 24px;
+    grid-column: 3;
+    grid-row: 1 / 4;
+    align-self: center;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -1238,6 +1245,9 @@
     .guide-post { width: calc(100% - 36px); padding-top: 44px; padding-bottom: 72px; }
     .guide-post-header > a { margin-bottom: 40px; }
     .guide-post-body { font-size: 16px; }
+    .guide-card { grid-template-columns: 34px minmax(0, 1fr); column-gap: 12px; }
+    .guide-card > span { grid-row: 1 / 5; }
+    .guide-card > a { grid-column: 2; grid-row: 4; margin-top: 18px; }
     .guide-post-navigation { gap: 16px; margin-top: 48px; }
     .guide-post-navigation a { max-width: 48%; gap: 8px; }
     .guide-post-navigation strong { font-size: 15px; }
