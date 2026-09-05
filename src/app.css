@@ -991,8 +991,8 @@
     border-radius: 14px;
   }
   .guide-grid article > span, .detail-grid article > span { color: var(--signal); font-family: var(--mono); font-size: 13px; font-weight: 600; }
-  .guide-card { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: 24px; }
-  .guide-card > span { grid-column: 1; grid-row: 1 / 4; }
+  .guide-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 24px; }
+  .guide-card > span { grid-column: 1; grid-row: 1 / 5; }
   .guide-card time {
     grid-column: 2;
     grid-row: 1;
@@ -1009,9 +1009,9 @@
   .detail-grid p { margin-top: 12px; }
   .guide-card > a {
     width: fit-content;
-    grid-column: 3;
-    grid-row: 1 / 4;
-    align-self: center;
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 14px;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -1246,8 +1246,6 @@
     .guide-post-header > a { margin-bottom: 40px; }
     .guide-post-body { font-size: 16px; }
     .guide-card { grid-template-columns: 34px minmax(0, 1fr); column-gap: 12px; }
-    .guide-card > span { grid-row: 1 / 5; }
-    .guide-card > a { grid-column: 2; grid-row: 4; margin-top: 18px; }
     .guide-post-navigation { gap: 16px; margin-top: 48px; }
     .guide-post-navigation a { max-width: 48%; gap: 8px; }
     .guide-post-navigation strong { font-size: 15px; }
