@@ -86,3 +86,14 @@ test('guide articles are stored as localized Markdown posts', async () => {
     assert.match(source, /^## /m, 'guide post should contain a Markdown body');
   }
 });
+
+test('guide articles link to adjacent posts', async () => {
+  const source = await readFile(
+    new URL('../src/pages/guide/[slug].astro', import.meta.url),
+    'utf8',
+  );
+
+  assert.match(source, /localizedPosts\[index - 1\]/);
+  assert.match(source, /localizedPosts\[index \+ 1\]/);
+  assert.match(source, /class="guide-post-navigation"/);
+});
