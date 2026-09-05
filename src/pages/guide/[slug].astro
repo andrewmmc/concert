@@ -36,11 +36,6 @@ export async function getStaticPaths() {
 const { english, chinese, previous, next } = Astro.props;
 const { Content: EnglishContent } = await render(english);
 const { Content: ChineseContent } = await render(chinese);
-const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-}).format(new Date(`${date}T00:00:00Z`));
 ---
 
 <BaseLayout
@@ -58,11 +53,6 @@ const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
       <p class="eyebrow" data-en="Before you go" data-zh-hk="入場之前">Before you go</p>
       <h1 data-en={english.data.title} data-zh-hk={chinese.data.title}>{english.data.title}</h1>
       <p data-en={english.data.description} data-zh-hk={chinese.data.description}>{english.data.description}</p>
-      <time
-        datetime={english.data.publishedAt}
-        data-en={formatDate(english.data.publishedAt, 'en-HK')}
-        data-zh-hk={formatDate(english.data.publishedAt, 'zh-HK')}
-      >{formatDate(english.data.publishedAt, 'en-HK')}</time>
     </header>
     <div class="guide-post-body" data-locale-body="en">
       <EnglishContent />

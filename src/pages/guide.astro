@@ -19,12 +19,6 @@ const posts = allPosts
     return { english: post.data, chinese: chinese.data };
   })
   .sort((a, b) => a.english.order - b.english.order);
-
-const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-}).format(new Date(`${date}T00:00:00Z`));
 ---
 
 <BaseLayout
@@ -42,11 +36,6 @@ const formatDate = (date, locale) => new Intl.DateTimeFormat(locale, {
     {posts.map(({ english, chinese }, index) => (
       <article class="guide-card">
         <span>{String(index + 1).padStart(2, '0')}</span>
-        <time
-          datetime={english.publishedAt}
-          data-en={formatDate(english.publishedAt, 'en-HK')}
-          data-zh-hk={formatDate(english.publishedAt, 'zh-HK')}
-        >{formatDate(english.publishedAt, 'en-HK')}</time>
         <h2 data-en={english.title} data-zh-hk={chinese.title}>{english.title}</h2>
         <p data-en={english.description} data-zh-hk={chinese.description}>{english.description}</p>
         <a href={`/guide/${english.translationKey}/`}>
